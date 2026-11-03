@@ -243,6 +243,30 @@ details.note summary small{display:block;color:var(--muted);font-size:12.5px;fon
 .or::before,.or::after{content:"";flex:1;height:2px;background:var(--line)}
 .synced{font-size:12px;color:var(--green);font-weight:800;margin-top:4px}
 
+
+/* ---------- PROFİL ---------- */
+.ava{display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#58cc02,#1cb0f6);line-height:1;flex:0 0 auto}
+.ava img{width:100%;height:100%;object-fit:cover;display:block}
+.nav-ava{width:36px;height:36px;font-size:20px;border:2px solid var(--line);cursor:pointer;padding:0;color:var(--text)}
+.pavatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pavatar{overflow:hidden}
+button.profile{width:100%;text-align:left;color:var(--text);cursor:pointer;font:inherit;border-bottom-width:6px;transition:transform .12s}
+button.profile:active{transform:translateY(4px);border-bottom-width:2px}
+.pf-head{text-align:center;margin-bottom:18px}
+.ava.big{width:112px;height:112px;font-size:62px;margin:0 auto 10px;border:4px solid var(--line)}
+.pf-mail{color:var(--muted);font-size:14px;word-break:break-all}
+.pf-row{display:flex;gap:10px;align-items:center}
+.pf-row input{flex:1;min-width:0;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 14px;color:var(--text);font-size:16px;font-weight:700;outline:none}
+.pf-row input:focus{border-color:var(--blue)}
+.ava-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+.ava-opt{aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--card);font-size:28px;cursor:pointer;display:grid;place-items:center;overflow:hidden;padding:0;color:var(--text);transition:transform .1s,border-color .2s}
+.ava-opt img{width:100%;height:100%;object-fit:cover}
+.ava-opt:hover{border-color:var(--blue)}
+.ava-opt:active{transform:scale(.92)}
+.ava-opt.sel{border-color:var(--green);box-shadow:0 0 0 3px rgba(88,204,2,.3)}
+.ava-opt.up{font-size:22px;border-style:dashed}
+.auth-note{background:rgba(255,200,0,.1);border-left:4px solid var(--yellow);border-radius:8px;padding:10px 12px;color:#f1deb0;font-size:14px;text-align:left;line-height:1.5;margin-bottom:16px}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -259,6 +283,7 @@ details.note summary small{display:block;color:var(--muted);font-size:12.5px;fon
     <button class="nav-back" id="navBack" aria-label="Geri">←</button>
     <div class="nav-title" id="navTitle"></div>
     <div class="nav-stats"><span id="navStreak">🔥 0</span><span id="navXp">⭐ 0</span></div>
+    <button class="nav-ava ava" id="navAva" aria-label="Profil">🐉</button>
   </header>
 
   <main id="stage"></main>
@@ -2409,12 +2434,11 @@ const MAX_HEARTS=5;
 const $=s=>document.querySelector(s);
 const stage=$('#stage'),bottom=$('#bottom'),fbTitle=$('#fbTitle'),fbText=$('#fbText'),btnContinue=$('#btnContinue');
 const fillEl=$('#progressFill'),progressEl=$('#progress'),heartsEl=$('#hearts'),streakNum=$('#streakNum'),streakBox=$('#streak');
-const quizbar=$('#quizbar'),navbar=$('#navbar'),navBack=$('#navBack'),navTitle=$('#navTitle'),navStreak=$('#navStreak'),navXp=$('#navXp'),toastEl=$('#toast');
+const quizbar=$('#quizbar'),navbar=$('#navbar'),navBack=$('#navBack'),navTitle=$('#navTitle'),navStreak=$('#navStreak'),navXp=$('#navXp'),navAva=$('#navAva'),toastEl=$('#toast');
 
 function shuffle(a){const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=r[i];r[i]=r[j];r[j]=t;}return r;}
 function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e;}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function hash(s){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return(4294967296*(2097151&h2)+(h1>>>0)).toString(16);}
 function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function todayStr(){return ymd(new Date());}
 function yesterdayStr(){const d=new Date();d.setDate(d.getDate()-1);return ymd(d);}
@@ -2456,7 +2480,7 @@ function loadFirebase(){
   return fbLoading;
 }
 function cloudData(u){
-  return JSON.parse(JSON.stringify({name:u.name||'',xp:u.xp||0,streak:u.streak||0,last:u.last||'',done:u.done||{},ach:u.ach||{},stats:u.stats||{},quest:u.quest||{},updated:Date.now()}));
+  return JSON.parse(JSON.stringify({name:u.name||'',nameSet:!!u.nameSet,avatar:u.avatar||null,profileUpdated:u.profileUpdated||0,xp:u.xp||0,streak:u.streak||0,last:u.last||'',done:u.done||{},ach:u.ach||{},stats:u.stats||{},quest:u.quest||{},updated:Date.now()}));
 }
 function scheduleCloud(){
   if(!cloudReady)return;
@@ -2468,6 +2492,7 @@ async function pushCloud(){
   try{await FB.F.setDoc(FB.F.doc(FB.db,'users',U.uid),cloudData(U));}catch(e){}
 }
 function mergeProgress(l,c){
+  if((c.profileUpdated||0)>(l.profileUpdated||0)){if(c.name)l.name=c.name;l.nameSet=!!c.nameSet;if(c.avatar)l.avatar=c.avatar;l.profileUpdated=c.profileUpdated;}
   l.done=l.done||{};l.ach=l.ach||{};l.stats=l.stats||{};
   l.xp=Math.max(l.xp||0,c.xp||0);
   if((c.last||'')>(l.last||'')){l.last=c.last;l.streak=c.streak||0;}
@@ -2501,8 +2526,9 @@ async function pullCloud(){
 async function googleLogin(user){
   const key='g_'+user.uid;
   const local=DB.users[key]||newUser(user.displayName||'Öğrenci','');
-  local.google=true;local.uid=user.uid;local.email=user.email||'';
-  if(user.displayName)local.name=user.displayName;
+  local.google=true;local.uid=user.uid;local.email=user.email||'';local.photoURL=user.photoURL||'';
+  if(!local.nameSet&&user.displayName)local.name=user.displayName;
+  if(!local.avatar)local.avatar=local.photoURL?{t:'google'}:{t:'emoji',v:'🐉'};
   DB.users[key]=local;
   U=local;DB.session=key;cloudReady=false;
   await pullCloud();
@@ -2515,6 +2541,7 @@ function setupAuthListener(){
     fb.A.onAuthStateChanged(fb.auth,async user=>{
       if(user){
         if(U&&U.google&&U.uid===user.uid){
+          U.photoURL=user.photoURL||U.photoURL||'';
           const wasQuiz=view==='quiz';
           await pullCloud();refreshNav();
           if(!wasQuiz&&view==='home'){stage.innerHTML='';viewHome();}
@@ -2539,7 +2566,7 @@ async function googleSignIn(){
     if(c!=='auth/popup-closed-by-user'&&c!=='auth/cancelled-popup-request'){
       authError(c==='auth/unauthorized-domain'?'Bu site adresi Firebase’de yetkili alan adları arasında değil.':'Google girişi başarısız oldu. Tekrar dene.');
     }
-    btn.disabled=false;label.textContent='Google ile devam et';
+    btn.disabled=false;label.textContent='Google ile giriş yap';
   }
 }
 
@@ -2580,17 +2607,25 @@ function setChrome(mode){
   navbar.classList.toggle('hidden',mode!=='nav');
   stage.classList.toggle('quiz',mode==='quiz');
 }
+const EMOJIS=['🐉','🦊','🐼','🦁','🐯','🐸','🦉','🐙','🦄','🐺','🐧','🦅','🚀','⚽','🎮','📚','🧠','⭐'];
+function avatarHTML(u){
+  const a=u.avatar||{t:'emoji',v:'🐉'};
+  if(a.t==='custom'&&typeof a.v==='string'&&a.v.indexOf('data:image/')===0)return '<img alt="" src="'+esc(a.v)+'">';
+  if(a.t==='google'&&u.photoURL)return '<img alt="" referrerpolicy="no-referrer" src="'+esc(u.photoURL)+'">';
+  return esc(a.t==='emoji'&&a.v?a.v:'🐉');
+}
 function refreshNav(){
   if(!U)return;
+  navAva.innerHTML=avatarHTML(U);
   navStreak.textContent='🔥 '+streakOf(U);
   navXp.textContent='⭐ '+U.xp;
   streakNum.textContent=streakOf(U);
 }
 let view='auth',viewArg=null;
-const PARENT={lessons:'home',lessonSubj:'lessons',notes:'home',notesSubj:'notes',quests:'home',ach:'home'};
+const PARENT={profile:'home',lessons:'home',lessonSubj:'lessons',notes:'home',notesSubj:'notes',quests:'home',ach:'home'};
 function titleFor(v,arg){
   if(v==='lessonSubj'||v==='notesSubj'){const s=SUBJ_BY_ID[arg];return s.icon+' '+s.name;}
-  return({home:'🐉 HiskonLGS',lessons:'📚 Dersler',quests:'🎯 Görevler',ach:'🏆 Başarımlar',notes:'📝 Konu Anlatımları'})[v];
+  return({profile:'👤 Profil',home:'🐉 HiskonLGS',lessons:'📚 Dersler',quests:'🎯 Görevler',ach:'🏆 Başarımlar',notes:'📝 Konu Anlatımları'})[v];
 }
 function go(v,arg){
   hideBottom();
@@ -2599,69 +2634,36 @@ function go(v,arg){
   if(v!=='auth'){navTitle.textContent=titleFor(v,arg);navBack.classList.toggle('invisible',v==='home');refreshNav();}
   stage.innerHTML='';
   window.scrollTo(0,0);
-  const map={auth:viewAuth,home:viewHome,lessons:viewLessons,lessonSubj:viewLessonSubj,quests:viewQuests,ach:viewAch,notes:viewNotes,notesSubj:viewNotesSubj};
+  const map={auth:viewAuth,home:viewHome,profile:viewProfile,lessons:viewLessons,lessonSubj:viewLessonSubj,quests:viewQuests,ach:viewAch,notes:viewNotes,notesSubj:viewNotesSubj};
   map[v](arg);
 }
 navBack.addEventListener('click',()=>{const p=PARENT[view];if(p)go(p);});
+navAva.addEventListener('click',()=>{if(view!=='quiz'&&view!=='auth'&&U)go('profile');});
 
-/* ================= GİRİŞ / KAYIT ================= */
-let authTab='login';
+/* ================= GİRİŞ (SADECE GOOGLE) ================= */
 function viewAuth(){
-  const reg=authTab==='register';
   const w=el('section','center');
+  const isFile=location.protocol==='file:';
   w.innerHTML=
     '<div class="big float">🐉</div>'+
     '<h1>Hiskon<span>LGS</span></h1>'+
-    '<p class="sub">LGS’ye ejderha gibi hazırlan!</p>'+
-    '<div class="tabs">'+
-      '<button class="tab '+(reg?'':'active')+'" data-t="login" type="button">Giriş Yap</button>'+
-      '<button class="tab '+(reg?'active':'')+'" data-t="register" type="button">Kaydol</button>'+
-    '</div>'+
-    (GOOGLE_ON?'<button type="button" class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Google ile devam et</span></button><div class="or"><span>veya</span></div>':'')+
-    '<form id="authForm" class="form" novalidate>'+
-      '<label>Kullanıcı adı<input id="fUser" type="text" autocomplete="username" maxlength="16" placeholder="ornek_ogrenci"></label>'+
-      '<label>Şifre<div class="pw"><input id="fPass" type="password" autocomplete="'+(reg?'new-password':'current-password')+'" placeholder="••••••"><button type="button" class="eye" aria-label="Şifreyi göster">👁</button></div></label>'+
-      (reg?'<label>Şifre tekrar<input id="fPass2" type="password" autocomplete="new-password" placeholder="••••••"></label>':'')+
-      '<div class="form-err" id="authErr"></div>'+
-      '<button class="btn" type="submit">'+(reg?'Hesap Oluştur':'Giriş Yap')+'</button>'+
-    '</form>'+
-    '<p class="note-s">🔒 Hesabın yalnızca bu cihazda (tarayıcında) saklanır.</p>';
+    '<p class="sub">LGS’ye ejderha gibi hazırlan! Devam etmek için Google hesabınla giriş yap. İlerlemen tüm cihazlarında seninle olur.</p>'+
+    (isFile?'<div class="auth-note">Bu sayfa dosya olarak açıldı. Google girişi için siteyi bir https adresinden (yayınlanmış hâliyle) açman gerekir.</div>':'')+
+    (!GOOGLE_ON?'<div class="auth-note">Google girişi henüz yapılandırılmamış (FIREBASE_CONFIG boş).</div>':'')+
+    '<button type="button" class="gbtn" id="gBtn"'+(GOOGLE_ON?'':' disabled')+'><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Google ile giriş yap</span></button>'+
+    '<div class="form-err" id="authErr" style="margin-top:12px"></div>'+
+    '<p class="note-s">🔒 Şifre tutmayız. Giriş Google üzerinden yapılır; ilerlemen hesabına bağlı olarak buluta kaydedilir.</p>';
   stage.appendChild(w);
-  w.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{if(authTab!==b.dataset.t){authTab=b.dataset.t;stage.innerHTML='';viewAuth();}}));
-  w.querySelector('.eye').addEventListener('click',()=>{
-    const p=$('#fPass'),p2=$('#fPass2'),t=p.type==='password'?'text':'password';
-    p.type=t;if(p2)p2.type=t;
-  });
-  const gb=w.querySelector('#gBtn');if(gb)gb.addEventListener('click',googleSignIn);
-  w.querySelector('#authForm').addEventListener('submit',e=>{e.preventDefault();if(reg)doRegister();else doLogin();});
+  w.querySelector('#gBtn').addEventListener('click',googleSignIn);
 }
-function authError(msg){const e=$('#authErr');e.textContent=msg;e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}
-function keyOf(name){return name.trim().toLocaleLowerCase('tr');}
-function doLogin(){
-  const name=$('#fUser').value.trim(),pass=$('#fPass').value;
-  if(!name||!pass)return authError('Kullanıcı adı ve şifre gerekli.');
-  const key=keyOf(name),u=DB.users[key];
-  if(!u||u.pass!==hash(key+':'+pass))return authError('Kullanıcı adı veya şifre hatalı.');
-  login(key);
-}
-function doRegister(){
-  const name=$('#fUser').value.trim(),p1=$('#fPass').value,p2=$('#fPass2').value;
-  if(!/^[A-Za-z0-9_ığüşöçİĞÜŞÖÇ]{3,16}$/.test(name))return authError('Kullanıcı adı 3-16 karakter olmalı (harf, rakam, _).');
-  if(p1.length<4)return authError('Şifre en az 4 karakter olmalı.');
-  if(p1!==p2)return authError('Şifreler eşleşmiyor.');
-  const key=keyOf(name);
-  if(key.indexOf('g_')===0||DB.users[key])return authError('Bu kullanıcı adı alınamaz, başka bir ad dene.');
-  DB.users[key]=newUser(name,hash(key+':'+p1));
-  saveDB();login(key);
-  toast('🎉','Hoş geldin!',esc(name));
-}
+function authError(msg){const e=$('#authErr');if(!e)return;e.textContent=msg;e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}
 function login(key){
   DB.session=key;U=DB.users[key];
   U.stats=Object.assign({correct:0,lessons:0,perfect:0,claimed:0,karma:0},U.stats||{});
   U.done=U.done||{};U.ach=U.ach||{};
   ensureQuest();saveDB();go('home');
 }
-function logoutLocal(){clearTimeout(cloudTimer);cloudReady=false;DB.session=null;const t=U;U=null;saveDB();authTab='login';go('auth');return t;}
+function logoutLocal(){clearTimeout(cloudTimer);cloudReady=false;DB.session=null;U=null;saveDB();go('auth');}
 async function logout(){
   if(U&&U.google&&FB){
     try{await pushCloud();}catch(e){}
@@ -2677,8 +2679,8 @@ function viewHome(){
   const lvl=Math.floor(U.xp/100)+1,pct=U.xp%100;
   const qDone=QUESTS.filter(q=>U.quest[q.key]>=q.goal).length;
   w.innerHTML=
-    '<div class="profile"><div class="pavatar">🐉</div><div class="pinfo"><h2>Merhaba, '+esc(U.name)+'!</h2>'+
-    '<div class="lvl">Seviye '+lvl+' · '+pct+'/100 XP</div><div class="xpbar"><i style="width:'+pct+'%"></i></div></div></div>'+
+    '<button class="profile" id="profBtn"><div class="pavatar">'+avatarHTML(U)+'</div><div class="pinfo"><h2>Merhaba, '+esc(U.name)+'!</h2>'+
+    '<div class="lvl">Seviye '+lvl+' · '+pct+'/100 XP</div><div class="xpbar"><i style="width:'+pct+'%"></i></div></div><span class="arrow">›</span></button>'+
     '<div class="menu-grid">'+
       '<button class="tile" style="--c:var(--green)" data-go="lessons"><span class="ti">📚</span><div><h3>Dersler</h3><small>'+topicsDone(U)+'/'+ALL.length+' konu tamamlandı</small></div></button>'+
       '<button class="tile" style="--c:var(--blue)" data-go="quests"><span class="ti">🎯</span><div><h3>Görevler</h3><small>'+qDone+'/'+QUESTS.length+' günlük görev</small></div></button>'+
@@ -2690,6 +2692,67 @@ function viewHome(){
   w.appendChild(out);
   stage.appendChild(w);
   w.querySelectorAll('.tile').forEach(t=>t.addEventListener('click',()=>go(t.dataset.go)));
+  w.querySelector('#profBtn').addEventListener('click',()=>go('profile'));
+}
+
+/* ================= PROFİL ================= */
+function saveProfile(){U.profileUpdated=Date.now();saveDB();refreshNav();}
+function readImage(file,cb){
+  if(!file||file.size>8*1024*1024){cb(null);return;}
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const s=Math.min(img.width,img.height),c=document.createElement('canvas');
+      c.width=c.height=128;
+      c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,128,128);
+      cb(c.toDataURL('image/jpeg',0.82));
+    };
+    img.onerror=()=>cb(null);
+    img.src=fr.result;
+  };
+  fr.onerror=()=>cb(null);
+  fr.readAsDataURL(file);
+}
+function viewProfile(){
+  const w=el('section','page');
+  const lvl=Math.floor(U.xp/100)+1;
+  w.innerHTML=
+    '<div class="pf-head"><div class="ava big">'+avatarHTML(U)+'</div><div class="pf-mail">'+esc(U.email||'')+'</div><div class="lvl">Seviye '+lvl+' · '+U.xp+' XP</div></div>'+
+    '<div class="stats"><div class="stat g"><b>'+topicsDone(U)+'</b><span>Konu</span></div><div class="stat y"><b>'+U.xp+'</b><span>XP</span></div><div class="stat r"><b>'+streakOf(U)+'</b><span>Seri</span></div></div>'+
+    '<div class="sec-title">Kullanıcı adı</div>'+
+    '<div class="pf-row"><input id="pfName" maxlength="20" value="'+esc(U.name)+'" autocomplete="off"><button class="pill" id="pfSave" type="button">Kaydet</button></div>'+
+    '<div class="form-err" id="pfErr" style="margin-top:8px"></div>'+
+    '<div class="sec-title">Profil resmi</div><div class="ava-grid" id="avaGrid"></div>'+
+    '<input type="file" id="pfFile" accept="image/*" class="hidden">';
+  const grid=w.querySelector('#avaGrid');
+  const cur=U.avatar||{t:'emoji',v:'🐉'};
+  function opt(html,sel,fn,cls){const b=el('button','ava-opt'+(sel?' sel':'')+(cls?' '+cls:''),html);b.type='button';b.addEventListener('click',fn);grid.appendChild(b);}
+  if(U.photoURL)opt('<img alt="" referrerpolicy="no-referrer" src="'+esc(U.photoURL)+'">',cur.t==='google',()=>{U.avatar={t:'google'};saveProfile();stage.innerHTML='';viewProfile();});
+  if(cur.t==='custom'&&cur.v)opt('<img alt="" src="'+esc(cur.v)+'">',true,()=>{});
+  EMOJIS.forEach(em=>opt(em,cur.t==='emoji'&&cur.v===em,()=>{U.avatar={t:'emoji',v:em};saveProfile();stage.innerHTML='';viewProfile();}));
+  const fileIn=w.querySelector('#pfFile');
+  opt('📷',false,()=>fileIn.click(),'up');
+  fileIn.addEventListener('change',()=>{
+    const f=fileIn.files&&fileIn.files[0];
+    readImage(f,data=>{
+      if(!data){toast('⚠️','Fotoğraf','Görsel okunamadı (en fazla 8 MB, resim dosyası olmalı).');return;}
+      U.avatar={t:'custom',v:data};saveProfile();stage.innerHTML='';viewProfile();
+      toast('📷','Profil resmi','Fotoğrafın güncellendi.');
+    });
+  });
+  w.querySelector('#pfSave').addEventListener('click',()=>{
+    const v=w.querySelector('#pfName').value.trim().replace(/\s+/g,' '),err=w.querySelector('#pfErr');
+    err.textContent='';
+    if(v.length<2||v.length>20){err.textContent='Kullanıcı adı 2-20 karakter olmalı.';return;}
+    if(/[<>]/.test(v)){err.textContent='Kullanıcı adında < ve > kullanılamaz.';return;}
+    U.name=v;U.nameSet=true;saveProfile();
+    toast('✅','Kullanıcı adı','Artık “'+esc(v)+'” olarak görünüyorsun.');
+  });
+  const out=el('button','btn ghost','Çıkış Yap');
+  out.addEventListener('click',logout);
+  w.appendChild(out);
+  stage.appendChild(w);
 }
 
 /* ================= DERSLER ================= */
@@ -3050,8 +3113,8 @@ function confetti(){
 }
 
 /* ================= BAŞLAT ================= */
-if(DB.session&&DB.users[DB.session]){login(DB.session);}
-else{go('auth');}
+if(DB.session&&DB.users[DB.session]&&DB.users[DB.session].google){login(DB.session);}
+else{DB.session=null;go('auth');}
 if(GOOGLE_ON&&location.protocol!=='file:')setupAuthListener();
 })();
 </script>
