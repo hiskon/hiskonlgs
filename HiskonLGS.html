@@ -1,0 +1,3122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#131f24">
+<title>HiskonLGS</title>
+<style>
+:root{
+  --bg:#131f24;--card:#1f2c34;--card2:#26363f;--line:#37464f;--text:#e8f1f5;--muted:#8fa3ad;
+  --green:#58cc02;--green-d:#46a302;--red:#ff4b4b;--red-d:#d33131;
+  --blue:#1cb0f6;--blue-d:#1899d6;--yellow:#ffc800;--orange:#ff9600;--purple:#ce82ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;font-weight:700;overflow-x:hidden}
+button,input{font-family:inherit}
+.hidden{display:none!important}
+.invisible{visibility:hidden}
+#app{max-width:640px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+
+/* ---------- ÜST BARLAR ---------- */
+.topbar,.navbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(19,31,36,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.x-btn,.nav-back{flex:0 0 auto;width:38px;height:38px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--card);color:var(--text);font-size:17px;font-weight:900;cursor:pointer;transition:transform .1s}
+.x-btn:active,.nav-back:active{transform:translateY(2px);border-bottom-width:2px}
+.streak{display:flex;align-items:center;gap:4px;color:var(--orange);font-weight:900;font-size:18px;min-width:50px}
+.flame{display:inline-block;transform-origin:50% 90%;animation:flame 1.4s ease-in-out infinite}
+@keyframes flame{0%,100%{transform:scale(1) rotate(-4deg)}50%{transform:scale(1.2) rotate(4deg)}}
+.streak.bump #streakNum{display:inline-block;animation:pop .6s}
+.progress{flex:1;height:16px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#58cc02,#89e219);border-radius:99px;position:relative;transition:width .7s cubic-bezier(.22,1,.36,1)}
+.progress-fill::after{content:"";position:absolute;left:8px;right:8px;top:4px;height:4px;border-radius:99px;background:rgba(255,255,255,.4)}
+.hearts{display:flex;gap:1px;font-size:15px;line-height:1}
+.heart{display:inline-block;transition:filter .3s}
+.heart.lost{filter:grayscale(1) brightness(.55)}
+.heart.break{animation:heartbreak .6s}
+@keyframes heartbreak{0%{transform:scale(1)}30%{transform:scale(1.6) rotate(-12deg)}60%{transform:scale(.8) rotate(10deg)}100%{transform:scale(1)}}
+.nav-title{flex:1;font-size:19px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-stats{display:flex;gap:12px;font-weight:900;font-size:15px}
+#navStreak{color:var(--orange)}#navXp{color:var(--yellow)}
+
+/* ---------- SAHNE ---------- */
+main{flex:1;padding:18px 16px 50px}
+main.quiz{padding-bottom:210px}
+.page{animation:slideIn .45s cubic-bezier(.22,1,.36,1)}
+.qwrap{animation:slideIn .45s cubic-bezier(.22,1,.36,1)}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.qhead{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;border:2px solid var(--c,var(--blue));color:var(--c,var(--blue));font-size:13px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+.topic{color:var(--muted);font-size:13px}
+.retry-tag{font-size:12px;color:var(--yellow);font-weight:900}
+.qtitle{font-size:21px;line-height:1.4;font-weight:900;margin-bottom:20px}
+
+/* ---------- ŞIKLAR ---------- */
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);color:var(--text);border:2px solid var(--line);border-bottom-width:5px;border-radius:16px;padding:13px 14px;font-size:16.5px;font-weight:700;line-height:1.35;cursor:pointer;margin-bottom:12px;transition:transform .1s,background .2s,border-color .2s,opacity .3s}
+.opt:hover:not(:disabled){background:var(--card2);border-color:var(--blue)}
+.opt:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px;margin-bottom:15px}
+.opt:disabled{cursor:default;color:var(--text)}
+.opt .key{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;font-size:14px;color:var(--muted)}
+.opt.dim{opacity:.5}
+.opt.correct{background:rgba(88,204,2,.16);border-color:var(--green);color:#c4f58f;animation:pop .45s}
+.opt.correct .key{border-color:var(--green);background:var(--green);color:#10200a}
+.opt.wrong{background:rgba(255,75,75,.15);border-color:var(--red);color:#ffbcbc;animation:shake .45s}
+.opt.wrong .key{border-color:var(--red);background:var(--red);color:#2b0a0a}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+.flashcard{background:linear-gradient(145deg,#243a45,#1b2a32);border:2px solid var(--line);border-bottom-width:6px;border-radius:22px;padding:26px 20px;text-align:center;margin-bottom:22px;animation:flip .6s cubic-bezier(.22,1,.36,1)}
+@keyframes flip{from{opacity:0;transform:perspective(700px) rotateY(-70deg)}to{opacity:1;transform:none}}
+.flashcard .emoji{font-size:46px;margin-bottom:10px;display:block}
+.flashcard p{font-size:19px;line-height:1.55}
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tf-row .opt{justify-content:center;text-align:center;font-weight:900;font-size:17px;padding:18px 10px}
+
+.surprise{display:inline-block;margin-bottom:12px;padding:6px 14px;border-radius:99px;background:linear-gradient(90deg,#ff9600,#ffc800);color:#2b1a00;font-weight:900;font-size:13px;letter-spacing:.8px;animation:glow 1.6s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(255,200,0,.5)}50%{box-shadow:0 0 0 8px rgba(255,200,0,0)}}
+.fill-sent{font-size:19px;line-height:2.1;margin-bottom:22px}
+.blank{display:inline-block;min-width:110px;padding:0 10px;margin:0 4px;border-bottom:3px dashed var(--muted);text-align:center;color:var(--blue);font-weight:900;transition:all .25s}
+.blank.correct{border-bottom:3px solid var(--green);color:var(--green)}
+.blank.wrong{border-bottom:3px solid var(--red);color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips .opt{width:auto;margin:0 0 6px;padding:11px 18px;font-weight:900}
+
+.chat{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.avatar{flex:0 0 auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--card2);border:2px solid var(--line)}
+.bubble{background:var(--card);border:2px solid var(--line);border-radius:6px 18px 18px 18px;padding:12px 14px;font-size:17px;line-height:1.45}
+.bubble small{display:block;color:var(--muted);font-size:13px;margin-top:4px;font-weight:700}
+.answer-zone{min-height:68px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:10px 0;margin:6px 0 20px;border-top:2px solid var(--line);border-bottom:2px solid var(--line);background:repeating-linear-gradient(transparent,transparent 53px,var(--line) 53px,var(--line) 55px)}
+.bank{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:20px;min-height:52px}
+.block{background:var(--card);color:var(--text);border:2px solid var(--line);border-bottom-width:5px;border-radius:13px;padding:9px 14px;font-size:17px;font-weight:800;cursor:pointer;transition:transform .1s,background .2s;animation:pop .25s}
+.block:hover:not(:disabled){background:var(--card2)}
+.block:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px}
+.block:disabled{cursor:default;color:var(--text)}
+.block.correct{border-color:var(--green);background:rgba(88,204,2,.16);color:#c4f58f}
+.block.wrong{border-color:var(--red);background:rgba(255,75,75,.15);color:#ffbcbc}
+
+/* ---------- BUTONLAR ---------- */
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font-weight:900;font-size:16px;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;color:#fff;background:var(--green);box-shadow:0 5px 0 var(--green-d);transition:transform .1s,box-shadow .1s,filter .2s;margin-bottom:5px}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.blue{background:var(--blue);box-shadow:0 5px 0 var(--blue-d)}
+.btn.blue:active{box-shadow:0 1px 0 var(--blue-d)}
+.btn.orange{background:var(--orange);box-shadow:0 5px 0 #cc7800}
+.btn.orange:active{box-shadow:0 1px 0 #cc7800}
+.btn.ghost{background:transparent;color:var(--blue);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line)}
+.btn.stack{margin-bottom:14px}
+.pill{border:0;border-radius:12px;padding:9px 14px;font-weight:900;font-size:13px;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;color:#fff;background:var(--green);box-shadow:0 4px 0 var(--green-d);white-space:nowrap}
+.pill:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-d)}
+.pill:disabled{background:var(--line);box-shadow:0 4px 0 #2a3841;color:var(--muted);cursor:default}
+.pill:disabled:active{transform:none}
+
+/* ---------- ALT BAR ---------- */
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(110%);visibility:hidden;transition:transform .4s cubic-bezier(.22,1,.36,1),visibility .4s}
+.bottom.show{transform:none;visibility:visible}
+.bottom-in{max-width:640px;margin:0 auto;padding:16px 16px calc(16px + env(safe-area-inset-bottom));border-top:2px solid var(--line);border-radius:22px 22px 0 0}
+.bottom.ok .bottom-in{background:#16300f;border-color:var(--green)}
+.bottom.bad .bottom-in{background:#3a1717;border-color:var(--red)}
+.fb-title{font-size:20px;font-weight:900;margin-bottom:6px}
+.bottom.ok .fb-title{color:var(--green)}
+.bottom.bad .fb-title{color:var(--red)}
+.fb-text{font-size:15px;line-height:1.5;margin-bottom:14px;color:#dbe7ec;max-height:34vh;overflow:auto}
+.bottom.bad .btn{background:var(--red);box-shadow:0 5px 0 var(--red-d)}
+.bottom.bad .btn:active{box-shadow:0 1px 0 var(--red-d)}
+
+/* ---------- ORTAK EKRANLAR ---------- */
+.center{text-align:center;padding-top:14px;animation:slideIn .5s cubic-bezier(.22,1,.36,1)}
+.big{font-size:84px;line-height:1.1;margin-bottom:14px;display:inline-block}
+.float{animation:float 3s ease-in-out infinite}
+.bounce{animation:bounce 1.2s ease infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes bounce{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-18px) scale(1.1)}}
+.center h1{font-size:30px;font-weight:900;margin-bottom:10px;line-height:1.25}
+.center h1 span{color:var(--green)}
+.center p.sub{color:var(--muted);font-size:16px;line-height:1.55;margin-bottom:22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 26px}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px 6px}
+.stat b{display:block;font-size:22px;font-weight:900}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stat.g b{color:var(--green)}.stat.r b{color:var(--red)}.stat.y b{color:var(--yellow)}
+.stars-big{font-size:40px;letter-spacing:6px;margin-bottom:14px}
+.off{filter:grayscale(1) opacity(.3)}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:60}
+.confetti span{position:absolute;top:-50px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(540deg)}}
+
+/* ---------- GİRİŞ / KAYIT ---------- */
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:4px;margin-bottom:18px}
+.tab{border:0;background:transparent;color:var(--muted);padding:12px;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;transition:all .2s}
+.tab.active{background:var(--blue);color:#fff;box-shadow:0 3px 0 var(--blue-d)}
+.form{text-align:left}
+.form label{display:block;color:var(--muted);font-size:13px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px}
+.form input{display:block;width:100%;margin-top:6px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font-size:16px;font-weight:700;outline:none;transition:border-color .2s}
+.form input:focus{border-color:var(--blue)}
+.pw{position:relative}
+.pw input{padding-right:48px}
+.eye{position:absolute;right:8px;top:12px;width:36px;height:36px;border:0;background:transparent;font-size:18px;cursor:pointer;color:var(--text)}
+.form-err{min-height:22px;color:var(--red);font-size:14px;font-weight:800;margin-bottom:10px}
+.form-err.shake{animation:shake .45s}
+.note-s{color:var(--muted);font-size:13px;margin-top:16px;line-height:1.5}
+
+/* ---------- ANA MENÜ ---------- */
+.profile{display:flex;align-items:center;gap:14px;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;margin-bottom:18px}
+.pavatar{flex:0 0 auto;width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#58cc02,#1cb0f6);display:grid;place-items:center;font-size:34px}
+.pinfo{flex:1;min-width:0}
+.pinfo h2{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl{font-size:13px;color:var(--muted);margin:2px 0 8px}
+.xpbar{height:12px;background:var(--line);border-radius:99px;overflow:hidden}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#ffc800,#ff9600);border-radius:99px;transition:width .8s}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.tile{text-align:left;border:2px solid var(--line);border-bottom-width:6px;border-radius:22px;padding:18px 16px;background:var(--card);color:var(--text);cursor:pointer;min-height:158px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .12s,border-color .2s}
+.tile:hover{border-color:var(--c)}
+.tile:active{transform:translateY(4px);border-bottom-width:2px}
+.tile .ti{font-size:44px}
+.tile h3{font-size:18px;font-weight:900;color:var(--c);margin-top:8px}
+.tile small{color:var(--muted);font-size:13px;font-weight:700}
+
+/* ---------- DERSLER ---------- */
+.lcard{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);color:var(--text);border:2px solid var(--line);border-bottom-width:6px;border-radius:20px;padding:14px;margin-bottom:14px;cursor:pointer;transition:transform .12s,border-color .2s}
+.lcard:hover{border-color:var(--c)}
+.lcard:active{transform:translateY(4px);border-bottom-width:2px;margin-bottom:18px}
+.lcard.feat{background:linear-gradient(135deg,#2b2a14,#1f2c34);border-color:var(--yellow)}
+.licon{flex:0 0 auto;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:28px;border:3px solid var(--c);background:rgba(255,255,255,.04)}
+.lbody{flex:1;min-width:0}
+.lbody h3{font-size:17px;font-weight:900;line-height:1.3}
+.lbody p{color:var(--muted);font-size:13px;margin-top:2px;font-weight:700;line-height:1.35}
+.lbody .mini{margin-top:8px}
+.lstars{margin-top:5px;font-size:15px;letter-spacing:2px}
+.sec-title{font-size:13px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:10px 0 12px}
+.arrow{font-size:22px;color:var(--muted)}
+
+/* ---------- GÖREVLER ---------- */
+.qcard{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.qcard.done{border-color:var(--green)}
+.qi{font-size:32px}
+.qb{flex:1;min-width:0}
+.qb h3{font-size:16px;font-weight:900;margin-bottom:8px;line-height:1.3}
+.mini{height:14px;background:var(--line);border-radius:99px;overflow:hidden}
+.mini i{display:block;height:100%;background:linear-gradient(90deg,#58cc02,#89e219);border-radius:99px;transition:width .6s}
+.qb small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+.hint{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:16px}
+
+/* ---------- BAŞARIMLAR ---------- */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.acard{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 12px;text-align:center}
+.acard.got{border-color:var(--yellow);background:linear-gradient(160deg,#2e2a12,#1f2c34)}
+.acard .ai{font-size:40px;margin-bottom:6px}
+.acard:not(.got) .ai{filter:grayscale(1) opacity(.4)}
+.acard h3{font-size:15px;font-weight:900;margin-bottom:4px}
+.acard p{font-size:12.5px;color:var(--muted);line-height:1.4;min-height:35px;margin-bottom:8px}
+.acard small{color:var(--muted);font-size:12px}
+
+/* ---------- KONU ANLATIMLARI ---------- */
+details.note{background:var(--card);border:2px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
+details.note[open]{border-color:var(--c)}
+details.note summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 16px;font-size:17px;font-weight:900}
+details.note summary::-webkit-details-marker{display:none}
+details.note summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
+details.note[open] summary::after{transform:rotate(180deg)}
+details.note summary small{display:block;color:var(--muted);font-size:12.5px;font-weight:700}
+.note-body{padding:0 16px 16px;line-height:1.65;font-size:15.5px;font-weight:600}
+.note-body p{margin-bottom:8px}
+.note-body ul{margin:6px 0 10px 4px;list-style:none}
+.note-body li{margin:7px 0;padding-left:18px;position:relative}
+.note-body li::before{content:"▸";position:absolute;left:0;color:var(--c)}
+.example{background:rgba(28,176,246,.1);border-left:4px solid var(--blue);padding:10px 12px;border-radius:8px;margin:10px 0}
+.tip{background:rgba(255,200,0,.1);border-left:4px solid var(--yellow);padding:10px 12px;border-radius:8px;margin:10px 0 14px}
+
+/* ---------- TOAST ---------- */
+.toast{position:fixed;top:12px;left:50%;z-index:80;transform:translate(-50%,-140%);width:calc(100% - 28px);max-width:420px;background:#2e2a12;border:2px solid var(--yellow);border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:transform .45s cubic-bezier(.22,1,.36,1);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.toast.show{transform:translate(-50%,0)}
+.toast .ti{font-size:34px}
+.toast b{display:block;font-size:12px;color:var(--yellow);letter-spacing:.8px;text-transform:uppercase}
+.toast span{font-size:16px;font-weight:900}
+
+
+/* ---------- GOOGLE GİRİŞ ---------- */
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;color:#3c4043;border:0;border-radius:16px;padding:14px;font-weight:900;font-size:15.5px;cursor:pointer;box-shadow:0 5px 0 #c9ced3;transition:transform .1s,box-shadow .1s;margin-bottom:6px}
+.gbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #c9ced3}
+.gbtn:disabled{opacity:.7;cursor:default}
+.gbtn svg{width:22px;height:22px;flex:0 0 auto}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;font-weight:800;text-transform:uppercase;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:2px;background:var(--line)}
+.synced{font-size:12px;color:var(--green);font-weight:800;margin-top:4px}
+
+
+/* ---------- PROFİL ---------- */
+.ava{display:grid;place-items:center;overflow:hidden;border-radius:50%;background:linear-gradient(135deg,#58cc02,#1cb0f6);line-height:1;flex:0 0 auto}
+.ava img{width:100%;height:100%;object-fit:cover;display:block}
+.nav-ava{width:36px;height:36px;font-size:20px;border:2px solid var(--line);cursor:pointer;padding:0;color:var(--text)}
+.pavatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pavatar{overflow:hidden}
+button.profile{width:100%;text-align:left;color:var(--text);cursor:pointer;font:inherit;border-bottom-width:6px;transition:transform .12s}
+button.profile:active{transform:translateY(4px);border-bottom-width:2px}
+.pf-head{text-align:center;margin-bottom:18px}
+.ava.big{width:112px;height:112px;font-size:62px;margin:0 auto 10px;border:4px solid var(--line)}
+.pf-mail{color:var(--muted);font-size:14px;word-break:break-all}
+.pf-row{display:flex;gap:10px;align-items:center}
+.pf-row input{flex:1;min-width:0;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 14px;color:var(--text);font-size:16px;font-weight:700;outline:none}
+.pf-row input:focus{border-color:var(--blue)}
+.ava-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:22px}
+.ava-opt{aspect-ratio:1;border-radius:50%;border:3px solid var(--line);background:var(--card);font-size:28px;cursor:pointer;display:grid;place-items:center;overflow:hidden;padding:0;color:var(--text);transition:transform .1s,border-color .2s}
+.ava-opt img{width:100%;height:100%;object-fit:cover}
+.ava-opt:hover{border-color:var(--blue)}
+.ava-opt:active{transform:scale(.92)}
+.ava-opt.sel{border-color:var(--green);box-shadow:0 0 0 3px rgba(88,204,2,.3)}
+.ava-opt.up{font-size:22px;border-style:dashed}
+.auth-note{background:rgba(255,200,0,.1);border-left:4px solid var(--yellow);border-radius:8px;padding:10px 12px;color:#f1deb0;font-size:14px;text-align:left;line-height:1.5;margin-bottom:16px}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar hidden" id="quizbar">
+    <button class="x-btn" id="quitBtn" title="Dersten çık" aria-label="Dersten çık">✕</button>
+    <div class="streak" id="streak" title="Günlük Seri"><span class="flame">🔥</span><span id="streakNum">0</span></div>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="hearts" id="hearts" aria-label="Canlar"></div>
+  </header>
+
+  <header class="navbar hidden" id="navbar">
+    <button class="nav-back" id="navBack" aria-label="Geri">←</button>
+    <div class="nav-title" id="navTitle"></div>
+    <div class="nav-stats"><span id="navStreak">🔥 0</span><span id="navXp">⭐ 0</span></div>
+    <button class="nav-ava ava" id="navAva" aria-label="Profil">🐉</button>
+  </header>
+
+  <main id="stage"></main>
+
+  <footer class="bottom" id="bottom">
+    <div class="bottom-in">
+      <div class="fb-title" id="fbTitle"></div>
+      <div class="fb-text" id="fbText"></div>
+      <button class="btn" id="btnContinue">Devam Et</button>
+    </div>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= İÇERİK YARDIMCILARI ================= */
+const SUBJECTS=[];
+function subj(id,name,icon,color,elective){const s={id,name,icon,color,elective:!!elective,lessons:[]};SUBJECTS.push(s);return s;}
+function lesson(s,unit,id,topic,desc,notes,qs){
+  qs.forEach(q=>{q.subject=s.name;q.icon=s.icon;q.color=s.color;q.topic=topic;q.emoji=q.emoji||s.icon;});
+  s.lessons.push({id,subj:s.id,subject:s.name,icon:s.icon,color:s.color,unit,topic,desc,notes,questions:qs});
+}
+function N(intro,items,ex,tip){
+  return '<p>'+intro+'</p>'+
+    (items&&items.length?'<ul>'+items.map(i=>'<li>'+i+'</li>').join('')+'</ul>':'')+
+    (ex?'<div class="example"><b>Örnek:</b> '+ex+'</div>':'')+
+    (tip?'<div class="tip">💡 '+tip+'</div>':'');
+}
+/* Çoktan seçmeli: doğru şık ilk yazılır, çalışma anında karıştırılır */
+function mc(title,right,wrongs,explain){
+  return {type:'mcq',title,options:[{t:right,ok:true}].concat(wrongs.map(t=>({t,ok:false}))),explain};
+}
+function tf(statement,answer,explain){
+  return {type:'tf',title:'Bu bilgi doğru mu, yanlış mı?',statement,answer,explain};
+}
+function fl(title,before,after,options,answer,explain,surprise){
+  return {type:'fill',title,before,after,options,answer,explain,surprise:!!surprise};
+}
+function bl(title,who,whoIcon,me,meIcon,line,lineTr,hint,answer,blocks,explain){
+  return {type:'blocks',title,who,whoIcon,me,meIcon,line,lineTr,hint,answer,blocks,explain};
+}
+
+/* ================= TÜRKÇE ================= */
+const TR=subj("tr","Türkçe","📖","#ce82ff");
+
+lesson(TR,"Anlam Bilgisi","tr-sozcuk","Sözcükte Anlam","Gerçek, mecaz, terim, sesteş, deyim, atasözü",
+N("Bir sözcük, kullanıldığı yere göre farklı anlamlar kazanabilir.",[
+"<b>Gerçek anlam:</b> Sözcüğün akla gelen ilk, temel anlamıdır. <i>sert kaya</i>",
+"<b>Mecaz anlam:</b> Benzetme ilgisiyle kazanılan sözcüğün asıl anlamından uzaklaşmış anlamıdır. <i>sert bir üslup</i>",
+"<b>Terim anlam:</b> Bilim, sanat, meslek alanlarına özgü anlamdır. <i>üçgen, fiil</i>",
+"<b>Sesteş sözcük:</b> Yazılışı ve okunuşu aynı, anlamı farklı sözcüklerdir. <i>yüz (sayı) – yüz (surat)</i>",
+"<b>Deyim:</b> Çoğunlukla mecaz anlamlı, kalıplaşmış söz grubudur. <i>gözden düşmek</i>",
+"<b>Atasözü:</b> Öğüt veren, genel doğruları anlatan kalıplaşmış sözdür. <i>Damlaya damlaya göl olur.</i>",
+"<b>İkileme:</b> Anlamı pekiştirmek için sözcüğün tekrarlanması veya yakın anlamlı sözcüklerin yan yana gelmesidir. <i>yavaş yavaş, ağır ağır</i>"
+],null,"Deyimler genellikle tam bir yargı bildirmez, atasözleri ise öğüt veren tam bir yargı bildirir."),
+[
+mc("Aşağıdaki cümlelerin hangisinde “tatlı” sözcüğü mecaz anlamda kullanılmıştır?",
+"Tatlı bir gülümsemeyle bizi karşıladı.",
+["Tatlı olarak sütlaç yedik.","Çayımı tatlı içerim.","Tatlı su balıkları göllerde yaşar."],
+"Gülümseme tadılamaz; “tatlı” burada “hoş, sevimli” anlamında mecaz olarak kullanılmıştır. Diğerlerinde sözcük gerçek anlamdadır."),
+mc("Aşağıdakilerden hangisi bir deyimdir?",
+"Gözden düşmek",
+["Damlaya damlaya göl olur.","Kitap okumak","Yavaş yavaş"],
+"“Gözden düşmek”, “değerini yitirmek” anlamında kalıplaşmış bir deyimdir. İkinci seçenek atasözü, sonuncusu ikilemedir."),
+tf("“Yüz” sözcüğü, hem sayıyı hem de insanın yüzünü anlatabildiği için sesteş bir sözcüktür.",true,
+"Yazılışı ve okunuşu aynı olup anlamları farklı olan sözcükler sesteştir.")
+]);
+
+lesson(TR,"Anlam Bilgisi","tr-cumle","Cümlede Anlam","Öznel-nesnel yargı, sebep-sonuç, amaç-sonuç, koşul-sonuç",
+N("Cümlede anlam sorularında yargının türü ve cümleler arasındaki ilişki sorulur.",[
+"<b>Nesnel yargı:</b> Kanıtlanabilir, kişiye göre değişmez. <i>Ankara, Türkiye’nin başkentidir.</i>",
+"<b>Öznel yargı:</b> Kişisel görüşe dayanır, kanıtlanamaz. <i>Bence en güzel mevsim ilkbahardır.</i>",
+"<b>Sebep-sonuç:</b> “-dığı için, çünkü, bu yüzden”. <i>Yağmur yağdığı için maç ertelendi.</i>",
+"<b>Amaç-sonuç:</b> “-mak için, diye”. <i>Kazanmak için çok çalıştı.</i>",
+"<b>Koşul-sonuç:</b> “-sa/-se, eğer”. <i>Çalışırsan başarırsın.</i>",
+"<b>Örtük anlam:</b> Doğrudan söylenmeyen ama cümleden çıkarılan anlamdır."
+],null,"“Bence, sanırım, en güzel, kesinlikle” gibi ifadeler genellikle öznel yargıya işaret eder."),
+[
+mc("Aşağıdaki cümlelerin hangisi nesnel bir yargı bildirir?",
+"Dünya, Güneş’in etrafında dolanır.",
+["Bence en güzel mevsim ilkbahardır.","Annemin yaptığı yemekler dünyanın en lezzetlisidir.","Bu film kesinlikle çok sıkıcıydı."],
+"Dünya’nın Güneş etrafında dolanması kanıtlanabilir bir bilgidir; diğerleri kişisel görüş bildirir."),
+mc("Aşağıdaki cümlelerin hangisinde amaç-sonuç ilişkisi vardır?",
+"Sınavı kazanmak için gece gündüz çalıştı.",
+["Yağmur yağdığı için maç ertelendi.","Erken yatarsan dinç uyanırsın.","Ödevini bitirmediği için dışarı çıkamadı."],
+"“Kazanmak için” ifadesi çalışmanın amacını bildirir. Diğerleri sebep-sonuç veya koşul-sonuç ilişkisi taşır."),
+fl("Boşluğu doğru terimle tamamla.","“Düzenli çalışırsan başarılı olursun.” cümlesinde","ilişkisi vardır.",
+["koşul-sonuç","amaç-sonuç","sebep-sonuç","karşılaştırma"],"koşul-sonuç",
+"“-sa/-se” eki ile kurulan, bir şarta bağlı sonuç bildiren cümleler koşul-sonuç cümleleridir.")
+]);
+
+lesson(TR,"Anlam Bilgisi","tr-parca","Parçada Anlam","Ana fikir, anlatım biçimleri, düşünceyi geliştirme",
+N("Parçada anlam, bir metnin bütününden çıkarılan yargıları ve metnin kuruluşunu inceler.",[
+"<b>Konu:</b> Parçada üzerinde durulan şeydir. <b>Ana fikir:</b> Yazarın okuyucuya vermek istediği temel mesajdır.",
+"<b>Yardımcı fikirler:</b> Ana fikri destekleyen yan düşüncelerdir.",
+"<b>Paragraf yapısı:</b> giriş – gelişme – sonuç.",
+"<b>Anlatım biçimleri:</b> açıklayıcı (bilgi verir), tartışmacı (savunur/karşı çıkar), betimleyici (gözümüzde canlandırır), öyküleyici (olay anlatır).",
+"<b>Düşünceyi geliştirme yolları:</b> tanımlama, örneklendirme, karşılaştırma, tanık gösterme, sayısal verilerden yararlanma, benzetme."
+],null,"Ana fikri bulmak için “Yazar bana ne söylemek istiyor?” sorusunu sor."),
+[
+mc("Okuyucunun gözünde bir varlığı veya yeri canlandırmayı amaçlayan anlatım biçimi hangisidir?",
+"Betimleme",
+["Öyküleme","Açıklama","Tartışma"],
+"Betimleme (tasvir), varlıkların özelliklerini ayrıntılı anlatarak gözümüzde canlandırır."),
+mc("“Kütüphane, kitapların düzenli biçimde saklandığı ve okunduğu yerdir.” cümlesinde hangi düşünceyi geliştirme yolu kullanılmıştır?",
+"Tanımlama",
+["Örneklendirme","Karşılaştırma","Tanık gösterme"],
+"Bir kavramın ne olduğu açıklandığı için tanımlama yoluna başvurulmuştur."),
+tf("Bir parçanın ana fikri, sadece ilk cümleden çıkarılabilir.",false,
+"Ana fikir, parçanın bütününden çıkarılır. İlk cümle bazen konuyu verir ama ana fikri tek başına belirlemez.")
+]);
+
+lesson(TR,"Dil Bilgisi","tr-fiilimsi","Fiilimsiler","İsim-fiil, sıfat-fiil, zarf-fiil",
+N("Fiilimsi, fiil kök veya gövdesinden türeyen; ancak fiil gibi çekimlenmeyip cümlede <b>isim, sıfat veya zarf</b> görevi üstlenen sözcüktür.",[
+"<b>İsim-fiil:</b> -ma/-me, -mak/-mek, -ış/-iş ekleriyle yapılır. <i>Yüzmek sağlıklıdır.</i>",
+"<b>Sıfat-fiil:</b> -an/-en, -dık/-dik, -acak/-ecek, -mış, -mez ekleriyle yapılır, bir adı niteler. <i>Yağan yağmur</i>",
+"<b>Zarf-fiil:</b> -arak/-erek, -ıp/-ip, -ınca/-ince, -ken, -madan, -dıkça ekleriyle yapılır, fiili niteler. <i>Koşarak geldi.</i>"
+],null,"Sözcüğün neyi nitelediğine bak: bir <b>ada</b> bağlıysa sıfat-fiil, bir <b>fiile</b> bağlıysa zarf-fiildir."),
+[
+mc("Aşağıdaki cümlelerin hangisinde sıfat-fiil (ortaç) kullanılmıştır?",
+"Yağan yağmur bahçeyi ıslattı.",
+["Koşarak okula yetişti.","Kitap okumak en büyük zevkimdir.","Eve gelince seni arayacağım."],
+"“Yağan”, yağ- fiiline -an eki gelerek “yağmur” adını niteler; sıfat-fiildir."),
+mc("Aşağıdaki cümlelerin hangisinde isim-fiil vardır?",
+"Yüzmek sağlık için çok faydalıdır.",
+["Gelen misafirleri kapıda karşıladık.","Eve varınca bize haber verdi.","Gülerek odaya girdi."],
+"“Yüzmek”, -mek ekiyle yapılmış ve cümlede isim görevinde kullanılmıştır."),
+fl("Boşluğu doğru terimle tamamla.","“Gülerek odaya girdi.” cümlesindeki “gülerek” sözcüğü bir","türündedir.",
+["zarf-fiil","sıfat-fiil","isim-fiil","edat"],"zarf-fiil",
+"“Gülerek”, girdi fiilini nasıl sorusuyla niteler; -erek ekli zarf-fiildir.")
+]);
+
+lesson(TR,"Dil Bilgisi","tr-oge","Cümlenin Ögeleri","Yüklem, özne, nesne, dolaylı tümleç, zarf tümleci",
+N("Cümleyi oluşturan görevli sözcüklere öge denir.",[
+"<b>Yüklem:</b> Cümlede iş, oluş, durum bildirir; genellikle sondadır.",
+"<b>Özne:</b> Yüklemi yapan varlıktır. “Kim? Ne?” sorusunun cevabıdır.",
+"<b>Nesne:</b> İşten etkilenen varlıktır. “Neyi? Kimi?” (belirtili nesne -ı/-i ekli).",
+"<b>Dolaylı tümleç (yer tamlayıcısı):</b> -e, -de, -den ekleriyle “kime, nereye, nerede, nereden” sorularına cevap verir.",
+"<b>Zarf tümleci:</b> Yüklemin zamanını, durumunu, miktarını bildirir: “nasıl, ne zaman, ne kadar”.",
+"<b>Cümle vurgusu:</b> Vurgulanmak istenen öge, yüklemden hemen önce getirilir."
+],"Ali, kitabı <b>masaya</b> bıraktı. → masaya: dolaylı tümleç; kitabı: nesne."),
+[
+mc("“Ali, kitabı masaya bıraktı.” cümlesinde dolaylı tümleç hangisidir?",
+"masaya",
+["kitabı","Ali","bıraktı"],
+"“Nereye bıraktı?” sorusunun cevabı “masaya”dır; -e ekli dolaylı tümleçtir. “Kitabı” nesnedir."),
+mc("“Çocuklar bahçede neşeyle oynadı.” cümlesinde “neşeyle” sözcüğü hangi ögedir?",
+"Zarf tümleci",
+["Nesne","Özne","Yüklem"],
+"“Nasıl oynadı?” sorusuna cevap verir; yüklemin durumunu bildirdiği için zarf tümlecidir."),
+tf("Cümlede vurgulanmak istenen öge genellikle yüklemden hemen önce yer alır.",true,
+"Türkçede vurgulanan öge yükleme yakın konumlanır.")
+]);
+
+lesson(TR,"Dil Bilgisi","tr-cati","Fiilde Çatı","Etken-edilgen, geçişli-geçişsiz",
+N("Çatı, fiilin özneyle ve nesneyle ilişkisine göre türünü gösterir.",[
+"<b>Etken fiil:</b> Öznesi işi yapandır. <i>Ali kapıyı kapattı.</i>",
+"<b>Edilgen fiil:</b> Öznesi işi yapan değil, işten etkilenendir; -ıl/-il/-ın/-in eki alır. <i>Kapı kapatıldı.</i>",
+"<b>Geçişli fiil:</b> Nesne alır (“neyi, kimi?”). <i>Kitabı okudu.</i>",
+"<b>Geçişsiz fiil:</b> Nesne almaz. <i>Çocuk uyudu.</i>"
+],null,"Edilgen fiilin öznesi işi yapan değildir; “kim tarafından?” sorusuyla gerçek yapıcı bulunabilir."),
+[
+mc("Aşağıdaki cümlelerin hangisinde edilgen çatılı fiil vardır?",
+"Ödevler zamanında teslim edildi.",
+["Öğretmen ödevi kontrol etti.","Ödevleri zamanında teslim etti.","Kapıyı yavaşça açtı."],
+"“Edildi”, -il eki alan edilgen fiildir; özne (ödevler) işi yapan değildir."),
+mc("Aşağıdaki cümlelerin hangisinde geçişsiz fiil kullanılmıştır?",
+"Çocuk erkenden uyudu.",
+["Çocuk sütünü içti.","Ahmet kapıyı kapattı.","Annem yemeği hazırladı."],
+"“Uyudu” fiili “neyi?” sorusuna cevap almaz; geçişsizdir."),
+tf("Edilgen çatılı fiillerde özne, işi yapan değil işten etkilenen varlıktır.",true,
+"Edilgen fiillerde özne işi yapmaz, işten etkilenir.")
+]);
+
+lesson(TR,"Dil Bilgisi","tr-cumleturu","Cümle Türleri","Anlam, yüklem, yer ve yapıya göre cümleler",
+N("Cümleler farklı ölçütlere göre sınıflandırılır.",[
+"<b>Anlamına göre:</b> olumlu, olumsuz, soru, ünlem.",
+"<b>Yüklemin türüne göre:</b> <i>isim cümlesi</i> (yüklem isim veya ek-fiille kurulur), <i>fiil cümlesi</i> (yüklem fiildir).",
+"<b>Yüklemin yerine göre:</b> <i>kurallı</i> (yüklem sonda), <i>devrik</i> (yüklem sonda değil).",
+"<b>Yapısına göre:</b> tek yüklemli (basit), fiilimsili, birden çok yüklemli (sıralı/bağlı), bağlaçlı cümleler."
+],"“Geldi sonunda beklenen misafir.” → devrik fiil cümlesi."),
+[
+mc("Aşağıdaki cümlelerin hangisi devrik cümledir?",
+"Geldi sonunda beklenen misafir.",
+["Beklenen misafir sonunda geldi.","Hava çok güzeldi.","Çocuklar bahçede oynuyor."],
+"Yüklem (geldi) cümlenin başında olduğu için cümle devriktir."),
+mc("Aşağıdaki cümlelerin hangisi isim cümlesidir?",
+"Bu akşam hava çok soğuk.",
+["Bu akşam eve erken geldim.","Çocuklar parkta koşuyor.","Kitabı masaya bıraktı."],
+"Yüklem “soğuk” bir isim (sıfat) olduğu için isim cümlesidir. Diğerleri fiil cümlesidir."),
+mc("Aşağıdaki cümlelerin hangisi fiilimsili cümledir?",
+"Eve gelince seni arayacağım.",
+["Hava soğudu, kapıyı kapattım.","Ders çalıştı ve uyudu.","Hem güldü hem ağladı."],
+"“Gelince” zarf-fiildir; cümlede tek yüklem (arayacağım) vardır. Diğerleri birden çok yüklemlidir.")
+]);
+
+lesson(TR,"Dil Bilgisi","tr-anlatim","Anlatım Bozuklukları","Anlama ve yapıya dayalı bozukluklar",
+N("Anlatım bozukluğu, cümlenin anlam veya dil bilgisi yönünden hatalı olmasıdır.",[
+"<b>Anlama dayalı:</b> gereksiz sözcük kullanımı (<i>geri dönmek</i>), anlamca çelişen sözcükler, mantık hatası, yanlış anlamda sözcük kullanımı.",
+"<b>Yapıya dayalı:</b> özne-yüklem uyumsuzluğu, çatı uyuşmazlığı, ek ve bağlaç eksikliği veya fazlalığı, tamlama hataları."
+],"“Ben ve arkadaşım okula gittim.” → özne-yüklem uyumsuzluğu (doğrusu: gittik).","Cümleyi önce yüklemden başlayarak oku; özne ve yüklem uyuyor mu, anlam tutarlı mı diye kontrol et."),
+[
+mc("Aşağıdaki cümlelerin hangisinde anlama dayalı anlatım bozukluğu vardır?",
+"Yaşlı adam, mutluluktan ağlayıp çok üzülüyordu.",
+["Sınavdan önce konuları tekrar ettim.","Misafirler akşam yemeğinde geldi.","Bu yaz tatilde deniz kenarına gideceğiz."],
+"Aynı kişi için “mutluluk” ve “üzülmek” birbiriyle çelişir; anlamca tutarsız bir cümledir."),
+tf("“Hepimiz birlikte toplu halde yürüdük.” cümlesinde gereksiz sözcük kullanımı vardır.",true,
+"“Birlikte” ve “toplu halde” aynı anlamı karşıladığı için gereksiz sözcük kullanımı söz konusudur."),
+mc("Aşağıdaki cümlelerin hangisinde özne-yüklem uyumsuzluğu vardır?",
+"Ben ve arkadaşım okula gittim.",
+["Ben ve arkadaşım okula gittik.","Annem pazardan elma aldı.","Kardeşim yarın dedemlere gidecek."],
+"“Ben ve arkadaşım” birden çok kişiyi ifade eder; yüklem “gittik” olmalıdır.")
+]);
+
+lesson(TR,"Yazım ve Noktalama","tr-yazim","Yazım Kuralları","De/da, ki, mi, sayılar, birleşik sözcükler",
+N("Türkçede yazım kuralları anlamı ve doğru yazımı korur.",[
+"<b>Büyük harf:</b> Cümle başı ve özel adlar büyük harfle başlar.",
+"<b>“de/da”:</b> Bağlaç olan <i>de/da</i> ayrı yazılır (<i>Ben de geldim.</i>); bulunma eki bitişik yazılır (<i>evde</i>).",
+"<b>“ki”:</b> Bağlaç olan <i>ki</i> ayrı yazılır (<i>Duydum ki yarın tatilmiş.</i>); ilgi/sıfat yapan <i>-ki</i> bitişik yazılır (<i>evdeki</i>).",
+"<b>“mi”:</b> Soru eki ayrı yazılır (<i>Geldi mi?</i>).",
+"<b>Sayılar:</b> Sözcükle yazılırken ayrı yazılır (<i>yirmi beş</i>).",
+"<b>Birleşik sözcükler:</b> Bazı sözcükler bitişik yazılır (<i>birkaç, hiçbir, herkes, kırkayak</i>)."
+],null,"“De” bağlacı cümleden çıkarılınca anlam bozulmuyorsa ayrı yazılır."),
+[
+mc("Aşağıdaki cümlelerin hangisinde yazım yanlışı vardır?",
+"Duydumki yarın tatilmiş.",
+["Ben de seninle geleceğim.","Evdeki yemek soğudu.","Geldi mi?"],
+"Bağlaç olan “ki” ayrı yazılır: “Duydum ki yarın tatilmiş.”"),
+mc("Aşağıdakilerden hangisi doğru yazılmıştır?",
+"kırkayak",
+["bir kaç","her kes","hiç bir"],
+"Doğru yazımlar: birkaç, herkes, hiçbir. “Kırkayak” bitişik yazılan bir sözcüktür."),
+tf("Soru eki “mi”, kendisinden önceki sözcükten ayrı yazılır.",true,
+"Soru eki “mi” her zaman ayrı yazılır: “Geldi mi?”")
+]);
+
+lesson(TR,"Yazım ve Noktalama","tr-noktalama","Noktalama İşaretleri","Nokta, virgül, iki nokta, kesme, soru ve ünlem",
+N("Noktalama işaretleri anlamı netleştirir.",[
+"<b>Nokta (.):</b> Cümle sonu, kısaltmalar, sıra sayıları.",
+"<b>Virgül (,):</b> Sıralı sözcükler, hitap, ara söz ve eş görevli sözler arasında.",
+"<b>İki nokta (:):</b> Açıklama veya örnek verilecek cümlenin sonunda.",
+"<b>Noktalı virgül (;):</b> Birbirine yakın anlamlı bağımsız cümleler veya öbekler arasında.",
+"<b>Soru işareti (?):</b> Soru bildiren cümle sonunda.",
+"<b>Ünlem (!):</b> Sevinç, şaşkınlık, seslenme bildiren ifadelerde.",
+"<b>Kesme işareti (’):</b> Özel adlara gelen ekleri ayırır (<i>Ankara’ya</i>). Ortak adlara gelmez."
+],null,"Soru anlamı taşımayan bir cümlede (“Ne yapacağımı bilmiyorum.”) soru sözcüğü olsa bile soru işareti konmaz."),
+[
+mc("Aşağıdaki cümlelerin hangisinde kesme işareti yanlış kullanılmıştır?",
+"Çocuklar’ın sesi bahçeden duyuluyordu.",
+["Ankara’ya yarın gideceğiz.","Atatürk’ün sözleri hâlâ güncel.","Ayşe’nin kitabını getirdim."],
+"“Çocuklar” ortak ad olduğu için ek kesme işaretiyle ayrılmaz: “Çocukların”."),
+mc("Aşağıdakilerden hangisinde iki nokta (:) doğru kullanılmıştır?",
+"Sepete şunları koydum: elma, armut, muz.",
+["Ben: okula gittim.","Hava: çok soğuktu bugün.","Dün: parka gittik."],
+"İki nokta, kendisinden sonra açıklama veya örnek gelecek cümlenin sonunda kullanılır."),
+tf("İçinde soru sözcüğü bulunsa bile soru anlamı taşımayan cümlenin sonuna soru işareti konmaz.",true,
+"“Ne yapacağını bilmiyorum.” cümlesi soru değil, bilgi bildirir.")
+]);
+
+lesson(TR,"Görsel Okuma ve Mantık","tr-mantik","Sözel Mantık ve Muhakeme","Sıralama, şifreleme, tablolama",
+N("Sözel mantık sorularında verilen bilgilerden kesin sonuçlar çıkarılır.",[
+"Bilgileri bir <b>tabloya</b> veya sıralama çizgisine aktar.",
+"Kesin bilgilerden başla, <b>eleme</b> yöntemini kullan.",
+"Yalnızca verilen bilgilere dayan; varsayım yapma."
+],"Ayşe &gt; Beril, Ceren &gt; Ayşe ise sıralama: Ceren &gt; Ayşe &gt; Beril."),
+[
+mc("Ayşe, Beril ve Ceren bir yarışta ilk üç sıraya girmiştir. Ayşe, Beril’den önce; Ceren de Ayşe’den önce bitirmiştir. Yarışı kim birinci bitirmiştir?",
+"Ceren",
+["Ayşe","Beril","Belirlenemez"],
+"Sıralama: Ceren – Ayşe – Beril. Birinci Ceren’dir."),
+mc("Ece, Fatih ve Gül’ün yaşları farklıdır. Ece, Fatih’ten büyük; Gül, Ece’den küçüktür ama Fatih’ten büyüktür. En küçük kimdir?",
+"Fatih",
+["Ece","Gül","Belirlenemez"],
+"Yaş sıralaması: Ece &gt; Gül &gt; Fatih. En küçük Fatih’tir."),
+tf("Sözel mantık sorularında yalnızca verilen bilgilere dayanarak sonuç çıkarılır.",true,
+"Varsayımlar değil, verilen kesin bilgiler esas alınır.")
+]);
+
+lesson(TR,"Görsel Okuma ve Mantık","tr-gorsel","Görsel Okuma ve Grafik Yorumlama","Karikatür, infografik, tablo ve grafik",
+N("Görsel okuma, metin dışındaki görsellerden anlam çıkarmayı gerektirir.",[
+"<b>Karikatür:</b> Bir durumu abartılı çizimle eleştiren, mizah içeren görsel.",
+"<b>İnfografik:</b> Verileri kısa metin ve görsellerle özetleyen çalışma.",
+"<b>Tablo ve grafik:</b> Başlığa, eksenlere, birimlere ve karşılaştırma yapılan verilere dikkat et.",
+"<b>Harita:</b> Anahtar (lejant) ve ölçek bilgisi yorumlamada önemlidir."
+],null,"Yorumlamadan önce başlığa, eksenlere ve birimlere bak."),
+[
+mc("Bir toplumsal sorunu abartılı çizimlerle eleştiren görsel türü hangisidir?",
+"Karikatür",
+["Grafik","Harita","Tablo"],
+"Karikatür, mizah ve abartı yoluyla eleştiri içerir."),
+mc("Bir grafiği yorumlarken ilk olarak nelere bakılmalıdır?",
+"Grafiğin başlığına, eksenlerine ve birimlerine",
+["Kullanılan renklerin sayısına","Grafiğin hangi yazı tipiyle hazırlandığına","Grafiğin ne kadar yer kapladığına"],
+"Başlık, eksenler ve birimler, verinin neyi anlattığını belirler."),
+tf("Verileri kısa metinler ve görsellerle özetleyen çalışmaya infografik denir.",true,
+"İnfografik, bilgiyi görsel ve kısa metinle sunar.")
+]);
+
+lesson(TR,"Görsel Okuma ve Mantık","tr-tur","Metin Türleri ve Söz Sanatları","Roman, hikâye, deneme, anı, biyografi; benzetme, kişileştirme, abartma",
+N("Metin türleri yazarın amacına ve anlatış biçimine göre ayrılır.",[
+"<b>Roman:</b> Uzun, kurmaca anlatı. <b>Hikâye:</b> Kısa, tek olayı anlatan kurmaca metin.",
+"<b>Deneme:</b> Kişisel görüşlerin kanıtlama kaygısı olmadan anlatıldığı yazı. <b>Makale:</b> Bir düşüncenin kanıtlanarak savunulduğu yazı.",
+"<b>Anı:</b> Yaşanmış olayların anlatıldığı yazı. <b>Biyografi:</b> Bir kişinin yaşamının başkası tarafından anlatılması; <b>otobiyografi:</b> kişinin kendi yaşamını anlatması.",
+"<b>Benzetme:</b> Aralarında ilgi bulunan iki şeyin (gibi, sanki ile) birbirine benzetilmesi.",
+"<b>Kişileştirme:</b> İnsan dışındaki varlıklara insan özelliği vermek.",
+"<b>Konuşturma:</b> İnsan dışındaki varlıkları konuşturmak.",
+"<b>Abartma:</b> Bir durumu olduğundan çok büyük veya küçük göstermek.",
+"<b>Tezat:</b> Karşıt kavramları bir arada kullanmak."
+]),
+[
+mc("“Güneş, dağların ardından gülümseyerek doğdu.” cümlesinde hangi söz sanatı vardır?",
+"Kişileştirme",
+["Abartma","Benzetme","Tezat"],
+"Güneşe “gülümseme” gibi insana özgü bir özellik verilmiştir."),
+mc("Aşağıdaki cümlelerin hangisinde abartma sanatı vardır?",
+"Dünyanın en yüksek dağını bir hamlede aşarım.",
+["Gözleri deniz gibi maviydi.","Hava çok sıcaktı.","Okul bahçesinde çocuklar oynuyordu."],
+"Gerçekte imkânsız olacak kadar büyütülmüş bir ifade (abartma) vardır."),
+mc("Bir kişinin kendi yaşamını kendisinin anlattığı edebî tür hangisidir?",
+"Otobiyografi",
+["Biyografi","Makale","Roman"],
+"Kendi yaşam öyküsünü yazan kişinin eserine otobiyografi denir.")
+]);
+
+/* ================= MATEMATİK ================= */
+const MAT=subj("mat","Matematik","🧮","#1cb0f6");
+
+lesson(MAT,"1. Ünite","mat-carp","Çarpanlar ve Katlar","EBOB, EKOK, aralarında asal sayılar",
+N("Bir sayıyı <b>asal çarpanlarına</b> ayırmak EBOB ve EKOK bulmanın temelidir. Örneğin 12 = 2² · 3 ve 18 = 2 · 3² olur.",[
+"<b>EBOB:</b> Sayıların ortak bölenlerinin en büyüğü. Ortak asal çarpanların en küçük üslüleri çarpılır.",
+"<b>EKOK:</b> Sayıların ortak katlarının en küçüğü. Tüm asal çarpanların en büyük üslüleri çarpılır.",
+"<b>Aralarında asal:</b> EBOB’u 1 olan sayılardır."
+],"12 ve 18 için EBOB = 2 · 3 = 6, EKOK = 2² · 3² = 36.","“Bölme, parçalara ayırma, en büyük” → EBOB. “Birlikte tekrar, aynı anda buluşma, en az” → EKOK."),
+[
+mc("Ali her 12 günde, Ayşe her 18 günde bir kütüphaneye gidiyor. İkisi bugün kütüphanede karşılaştığına göre bir sonraki karşılaşmaları kaç gün sonra olur?",
+"36 gün",
+["6 gün","24 gün","216 gün"],
+"Aynı anda tekrar buluşma EKOK ile bulunur. EKOK(12, 18) = 36."),
+mc("Boyutları 48 cm ve 72 cm olan dikdörtgen biçimli karton, artmayacak şekilde birbirine eş ve en büyük karelere ayrılacaktır. Karelerin bir kenarı kaç cm olur?",
+"24 cm",
+["6 cm","12 cm","36 cm"],
+"Eş ve en büyük parçalara ayırmada EBOB kullanılır. 48 = 2⁴·3 ve 72 = 2³·3², EBOB = 2³·3 = 24."),
+tf("12 ve 35 sayıları aralarında asaldır.",true,
+"12 = 2²·3 ve 35 = 5·7 ortak asal çarpana sahip değildir; EBOB(12, 35) = 1.")
+]);
+
+lesson(MAT,"1. Ünite","mat-uslu","Üslü İfadeler","Üslü sayılar, işlemler, bilimsel gösterim",
+N("<b>Üslü ifade:</b> aⁿ, a sayısının n kez çarpımıdır.",[
+"aᵐ · aⁿ = aᵐ⁺ⁿ &nbsp; | &nbsp; aᵐ ÷ aⁿ = aᵐ⁻ⁿ &nbsp; | &nbsp; (aᵐ)ⁿ = aᵐ·ⁿ",
+"a⁰ = 1 (a ≠ 0) &nbsp; | &nbsp; a⁻ⁿ = 1 / aⁿ",
+"Negatif bir sayının çift kuvveti pozitif, tek kuvveti negatiftir.",
+"<b>Bilimsel gösterim:</b> a · 10ⁿ biçimindedir ve 1 ≤ a &lt; 10 olmalıdır."
+],"0,00045 = 4,5 · 10⁻⁴"),
+[
+mc("2³ · 2⁴ işleminin sonucu hangisidir?",
+"2⁷",
+["2¹²","4⁷","2¹"],
+"Taban aynı olduğunda üsler toplanır: 3 + 4 = 7."),
+mc("(−3)² + 3⁰ işleminin sonucu kaçtır?",
+"10",
+["8","9","11"],
+"(−3)² = 9 ve 3⁰ = 1 olduğundan 9 + 1 = 10."),
+mc("0,00045 sayısının bilimsel gösterimi hangisidir?",
+"4,5 · 10⁻⁴",
+["4,5 · 10⁻³","45 · 10⁻⁵","4,5 · 10⁴"],
+"Virgül 4 basamak sağa kaydırılarak 4,5 elde edilir; bu yüzden üs −4’tür.")
+]);
+
+lesson(MAT,"2. Ünite","mat-kok","Kareköklü İfadeler","Karekök, a√b biçimi, işlemler, gerçek sayılar",
+N("<b>Karekök:</b> √(a²) = a (a ≥ 0). Tam kare sayıların karekökü tam sayıdır.",[
+"<b>a√b biçimi:</b> √18 = √(9·2) = 3√2",
+"<b>Toplama-çıkarma:</b> Kök içleri aynı olan ifadeler toplanıp çıkarılır. 2√3 + 3√3 = 5√3",
+"<b>Çarpma-bölme:</b> √a · √b = √(ab), √a ÷ √b = √(a/b)",
+"<b>Ondalık ifadeler:</b> √0,25 = 0,5",
+"<b>Gerçek sayılar:</b> Rasyonel ve irrasyonel sayıların birleşimidir. √2, π irrasyoneldir."
+]),
+[
+mc("√50 ifadesi a√b biçiminde nasıl yazılır?",
+"5√2",
+["25√2","10√5","5√5"],
+"√50 = √(25·2) = 5√2."),
+mc("√12 + √27 işleminin sonucu kaçtır?",
+"5√3",
+["√39","5√6","6√3"],
+"√12 = 2√3 ve √27 = 3√3 olduğundan toplam 5√3 olur."),
+mc("Aşağıdakilerden hangisi irrasyonel bir sayıdır?",
+"√7",
+["√49","√0,25","3/4"],
+"√49 = 7, √0,25 = 0,5 ve 3/4 rasyoneldir. √7 ise sonsuz ve devirsiz ondalık açılıma sahiptir.")
+]);
+
+lesson(MAT,"2. Ünite","mat-veri","Veri Analizi","Sütun, çizgi ve daire grafikleri",
+N("Veriler grafiklerle gösterilir ve yorumlanır.",[
+"<b>Sütun grafiği:</b> Kategorileri karşılaştırmak için kullanılır.",
+"<b>Çizgi grafiği:</b> Bir değerin zamanla değişimini gösterir.",
+"<b>Daire grafiği:</b> Bir bütünün parçalarını gösterir. Dilimin merkez açısı = yüzde × 3,6° (toplam 360°)."
+],"%25’lik dilimin merkez açısı: 360° ÷ 4 = 90°."),
+[
+mc("Bir daire grafiğinde %25’lik dilimin merkez açısı kaç derecedir?",
+"90°",
+["25°","45°","180°"],
+"360° × 1/4 = 90°."),
+mc("Bir daire grafiğinde merkez açısı 90° olan dilim, 40 kişilik grubun kaç kişisini gösterir?",
+"10",
+["9","20","25"],
+"90°/360° = 1/4 ve 40 × 1/4 = 10."),
+tf("Çizgi grafiği, bir değerin zamana göre değişimini göstermek için uygundur.",true,
+"Çizgi grafiği zaman içindeki artış ve azalışları göstermek için en uygun grafiktir.")
+]);
+
+lesson(MAT,"3. Ünite","mat-olasilik","Basit Olayların Olma Olasılığı","Olasılık hesaplama",
+N("<b>Olasılık</b> = istenen durum sayısı ÷ tüm durumların sayısı.",[
+"Olasılık 0 ile 1 arasındadır.",
+"<b>İmkânsız olay:</b> olasılığı 0. <b>Kesin olay:</b> olasılığı 1."
+],"Bir zar atıldığında çift sayı gelme olasılığı 3/6 = 1/2."),
+[
+mc("Bir torbada 3 kırmızı, 5 mavi, 2 sarı top vardır. Torbadan rastgele çekilen topun mavi olma olasılığı kaçtır?",
+"1/2",
+["1/5","3/10","5/3"],
+"Toplam 10 top vardır; mavi 5 tanedir: 5/10 = 1/2."),
+mc("Hileli olmayan bir zar atıldığında asal sayı gelme olasılığı kaçtır?",
+"1/2",
+["1/3","2/3","1/6"],
+"Asal sayılar 2, 3 ve 5’tir: 3/6 = 1/2."),
+tf("Bir zar atıldığında 7 gelmesi imkânsız bir olaydır ve olasılığı 0’dır.",true,
+"Zarda 7 yoktur; imkânsız olayın olasılığı 0’dır.")
+]);
+
+lesson(MAT,"3. Ünite","mat-cebir","Cebirsel İfadeler ve Özdeşlikler","Tam kare, iki kare farkı, çarpanlara ayırma",
+N("Özdeşlikler çarpma ve çarpanlara ayırmada kolaylık sağlar.",[
+"(a + b)² = a² + 2ab + b²",
+"(a − b)² = a² − 2ab + b²",
+"a² − b² = (a − b)(a + b)",
+"Ortak çarpan parantezine alınarak da çarpanlara ayrılabilir: ax + ay = a(x + y)"
+],"x² − 16 = (x − 4)(x + 4)"),
+[
+mc("(x + 3)² ifadesinin açılımı hangisidir?",
+"x² + 6x + 9",
+["x² + 9","x² + 3x + 9","x² + 6x + 6"],
+"(a + b)² = a² + 2ab + b² özdeşliğinden x² + 6x + 9 bulunur."),
+mc("x² − 16 ifadesinin çarpanlara ayrılmış hâli hangisidir?",
+"(x − 4)(x + 4)",
+["(x − 8)²","(x − 4)²","(x + 16)(x − 1)"],
+"İki kare farkı: x² − 4² = (x − 4)(x + 4)."),
+mc("(2x − 1)² ifadesinin açılımı hangisidir?",
+"4x² − 4x + 1",
+["4x² − 1","2x² − 4x + 1","4x² + 4x + 1"],
+"(2x)² − 2·2x·1 + 1² = 4x² − 4x + 1.")
+]);
+
+lesson(MAT,"4. Ünite","mat-dogrusal","Doğrusal Denklemler","Eğim, koordinat sistemi, doğru denklemi",
+N("Birinci dereceden bir bilinmeyenli denklemler eşitliğin korunmasıyla çözülür.",[
+"<b>Doğrusal denklem:</b> y = mx + n. m eğim, n ise doğrunun y eksenini kestiği noktadır (0, n).",
+"<b>Eğim:</b> m = (y₂ − y₁) / (x₂ − x₁) = dikey değişim / yatay değişim."
+],"A(1, 2) ve B(3, 6) için eğim = (6 − 2)/(3 − 1) = 2."),
+[
+mc("A(1, 2) ve B(3, 6) noktalarından geçen doğrunun eğimi kaçtır?",
+"2",
+["4","1/2","3"],
+"Eğim = (6 − 2) / (3 − 1) = 4/2 = 2."),
+mc("y = 3x − 2 doğrusu y eksenini hangi noktada keser?",
+"(0, −2)",
+["(0, 3)","(−2, 0)","(3, −2)"],
+"x = 0 için y = −2 bulunur; doğru y eksenini (0, −2) noktasında keser."),
+mc("2x + 5 = 13 denkleminin çözümü kaçtır?",
+"4",
+["3","6","9"],
+"2x = 8 ve x = 4.")
+]);
+
+lesson(MAT,"4. Ünite","mat-esitsizlik","Eşitsizlikler","Birinci dereceden eşitsizlikler ve sayı doğrusu",
+N("Eşitsizlikler eşitlik kurallarıyla çözülür; fakat bir kural farklıdır.",[
+"Her iki tarafı <b>negatif</b> bir sayıyla çarpar veya bölersek eşitsizliğin yönü değişir.",
+"Sayı doğrusunda ≤ ve ≥ için içi dolu, &lt; ve &gt; için içi boş halka kullanılır."
+],"−2x ≤ 6 ise x ≥ −3."),
+[
+mc("3x − 4 > 8 eşitsizliğinin çözümü hangisidir?",
+"x > 4",
+["x < 4","x > 12","x > 8/3"],
+"3x &gt; 12 ve x &gt; 4."),
+mc("−2x ≤ 6 eşitsizliğinin çözümü hangisidir?",
+"x ≥ −3",
+["x ≤ −3","x ≥ 3","x ≤ 3"],
+"−2’ye bölünce eşitsizlik yönü değişir: x ≥ −3."),
+tf("Bir eşitsizliğin her iki tarafı negatif bir sayıyla çarpılırsa eşitsizliğin yönü değişir.",true,
+"Negatif sayıyla çarpma veya bölmede eşitsizlik yönü tersine döner.")
+]);
+
+lesson(MAT,"5. Ünite","mat-ucgen","Üçgenler","Kenarortay, açıortay, yükseklik, Pisagor, üçgen eşitsizliği",
+N("Üçgenlerde özel doğru parçaları ve kenar bağıntıları sorulur.",[
+"<b>Kenarortay:</b> Köşeyi karşı kenarın orta noktasına birleştirir.",
+"<b>Açıortay:</b> Açıyı iki eşit parçaya böler. <b>Yükseklik:</b> Köşeden karşı kenara dik inen doğru parçasıdır.",
+"<b>Üçgen eşitsizliği:</b> |b − c| &lt; a &lt; b + c.",
+"<b>Pisagor:</b> Dik üçgende a² + b² = c² (c hipotenüs).",
+"İç açıların toplamı 180°’dir."
+],"3 cm ve 8 cm olan iki kenarlı üçgenin üçüncü kenarı 5 &lt; x &lt; 11 olmalıdır."),
+[
+mc("İki kenar uzunluğu 3 cm ve 8 cm olan bir üçgenin üçüncü kenarı aşağıdakilerden hangisi olabilir?",
+"6 cm",
+["4 cm","5 cm","11 cm"],
+"Üçüncü kenar 8 − 3 = 5 ile 8 + 3 = 11 arasında olmalıdır; 6 cm uygundur."),
+mc("Dik kenarları 6 cm ve 8 cm olan dik üçgenin hipotenüsü kaç cm’dir?",
+"10",
+["14","12","9"],
+"Pisagor: √(6² + 8²) = √100 = 10."),
+mc("Bir köşeyi karşı kenarın orta noktasına birleştiren doğru parçasına ne denir?",
+"Kenarortay",
+["Açıortay","Yükseklik","Orta dikme"],
+"Köşeyi karşı kenarın orta noktasına birleştiren doğru parçası kenarortaydır.")
+]);
+
+lesson(MAT,"5. Ünite","mat-benzerlik","Eşlik ve Benzerlik","Eş ve benzer şekiller, benzerlik oranı",
+N("<b>Eş şekiller</b> aynı biçim ve aynı boyuttadır. <b>Benzer şekiller</b> aynı biçimde fakat farklı boyuttadır.",[
+"Benzer şekillerde karşılıklı açılar eşit, karşılıklı kenarlar orantılıdır.",
+"<b>Benzerlik oranı (k):</b> karşılıklı kenarların oranıdır.",
+"Eş şekillerde benzerlik oranı 1’dir."
+],"AB = 4 ve DE = 12 ise k = 3; BC = 5 ise EF = 15."),
+[
+mc("ABC ve DEF üçgenleri benzerdir. AB = 4 cm, DE = 12 cm ve BC = 5 cm ise EF kaç cm’dir?",
+"15",
+["10","17","20"],
+"Benzerlik oranı 12/4 = 3 olduğundan EF = 5 × 3 = 15 cm."),
+mc("İki benzer üçgenle ilgili aşağıdakilerden hangisi her zaman doğrudur?",
+"Karşılıklı açıların ölçüleri eşittir.",
+["Karşılıklı kenarları eşittir.","Çevreleri eşittir.","Alanları eşittir."],
+"Benzer şekillerde karşılıklı açılar eşit, kenarlar orantılıdır."),
+tf("Eş şekillerin benzerlik oranı 1’dir.",true,
+"Eş şekillerde karşılıklı kenarlar eşit olduğundan oran 1 olur.")
+]);
+
+lesson(MAT,"6. Ünite","mat-donusum","Dönüşüm Geometrisi","Öteleme ve yansıma",
+N("Dönüşümlerde şeklin biçimi ve boyutu değişmez.",[
+"<b>Öteleme:</b> Şeklin her noktasını aynı yönde ve aynı miktarda kaydırmaktır. (x, y) → (x + a, y + b)",
+"<b>Yansıma:</b> Şeklin bir doğruya göre simetriğidir.",
+"x eksenine göre yansıma: (x, y) → (x, −y). y eksenine göre yansıma: (x, y) → (−x, y)."
+]),
+[
+mc("A(2, 3) noktasının x eksenine göre yansıması hangisidir?",
+"(2, −3)",
+["(−2, 3)","(−2, −3)","(3, 2)"],
+"x eksenine göre yansımada y koordinatının işareti değişir."),
+mc("A(1, 4) noktası 3 birim sağa, 2 birim aşağı ötelenirse yeni koordinatı ne olur?",
+"(4, 2)",
+["(−2, 6)","(4, 6)","(−2, 2)"],
+"x: 1 + 3 = 4, y: 4 − 2 = 2."),
+tf("Yansıma ve öteleme sonucunda şeklin boyutları ve açıları değişmez.",true,
+"Dönüşüm geometrisinde şekil yalnızca konum değiştirir; eş kalır.")
+]);
+
+lesson(MAT,"6. Ünite","mat-cisim","Geometrik Cisimler","Prizma, silindir, piramit, koni",
+N("Geometrik cisimlerin hacim ve yüzey alanı formülleri:",[
+"<b>Dik prizma:</b> Hacim = taban alanı × yükseklik.",
+"<b>Silindir:</b> Hacim = πr²h, yüzey alanı = 2πr(r + h).",
+"<b>Dik piramit:</b> Hacim = (1/3) × taban alanı × yükseklik.",
+"<b>Dik koni:</b> Hacim = (1/3)πr²h."
+],"Taban alanı 12 cm², yüksekliği 5 cm olan piramidin hacmi: 1/3 · 12 · 5 = 20 cm³."),
+[
+mc("Yarıçapı 3 cm, yüksekliği 5 cm olan dik silindirin hacmi kaç cm³’tür?",
+"45π",
+["15π","30π","90π"],
+"V = π · 3² · 5 = 45π."),
+mc("Taban alanı 12 cm², yüksekliği 5 cm olan dik piramidin hacmi kaç cm³’tür?",
+"20",
+["60","30","17"],
+"V = (1/3) · 12 · 5 = 20."),
+tf("Aynı taban yarıçapına ve yüksekliğe sahip koninin hacmi, silindirin hacminin üçte biridir.",true,
+"Koninin hacmi (1/3)πr²h, silindirin hacmi πr²h’tır.")
+]);
+
+/* ================= FEN BİLİMLERİ ================= */
+const FEN=subj("fen","Fen Bilimleri","🧬","#58cc02");
+
+lesson(FEN,"1. Ünite: Mevsimler ve İklim","fen-mevsim","Mevsimlerin Oluşumu","Eksen eğikliği, gün dönümü, ekinoks",
+N("Mevsimler, Dünya’nın <b>eksen eğikliği</b> ve <b>Güneş etrafındaki dolanımı</b> sonucu oluşur.",[
+"Güneş ışınlarının geliş açısı ve gündüz süresi yıl boyunca değişir.",
+"<b>21 Haziran:</b> Kuzey Yarım Küre’de en uzun gündüz (yaz gün dönümü).",
+"<b>22 Aralık:</b> Kuzey Yarım Küre’de en kısa gündüz (kış gün dönümü).",
+"<b>21 Mart ve 23 Eylül:</b> Gece ile gündüz süreleri eşittir (ekinoks)."
+],null,"Dünya’nın Güneş’e olan uzaklığı mevsimlerin nedeni değildir."),
+[
+mc("Mevsimlerin oluşmasının asıl nedeni hangisidir?",
+"Dünya’nın eksen eğikliği ve Güneş etrafındaki dolanımı",
+["Dünya’nın kendi ekseni etrafında dönmesi","Dünya ile Güneş arasındaki uzaklığın değişmesi","Ay’ın Dünya etrafında dolanması"],
+"Eksen eğikliği ve dolanım hareketi sayesinde Güneş ışınlarının geliş açısı değişir; mevsimler oluşur."),
+mc("Kuzey Yarım Küre’de gündüzün en uzun olduğu tarih hangisidir?",
+"21 Haziran",
+["21 Mart","23 Eylül","22 Aralık"],
+"21 Haziran’da Kuzey Yarım Küre’de gündüz en uzundur."),
+tf("21 Mart ve 23 Eylül tarihlerinde gece ve gündüz süreleri yaklaşık eşittir.",true,
+"Bu tarihlere ekinoks (gece-gündüz eşitliği) denir.")
+]);
+
+lesson(FEN,"1. Ünite: Mevsimler ve İklim","fen-iklim","İklim ve Hava Hareketleri","Hava durumu, iklim, basınç, küresel ısınma",
+N("<b>Hava durumu</b> kısa süreli atmosfer olaylarıdır; <b>iklim</b> ise geniş bir bölgede uzun yıllar boyunca görülen hava olaylarının ortalamasıdır.",[
+"<b>Yüksek basınç:</b> Hava alçalır, genellikle açık hava görülür.",
+"<b>Alçak basınç:</b> Hava yükselir, bulutlanma ve yağış görülür.",
+"<b>Rüzgâr:</b> Yüksek basınçtan alçak basınca doğru eser.",
+"<b>Küresel iklim değişikliği:</b> Sera gazlarının (CO₂, CH₄) artmasıyla yeryüzü sıcaklığının yükselmesidir."
+]),
+[
+mc("Rüzgâr hangi yönde oluşur?",
+"Yüksek basınçtan alçak basınca",
+["Alçak basınçtan yüksek basınca","Yalnızca iki yüksek basınç alanı arasında","Yalnızca iki alçak basınç alanı arasında"],
+"Hava, basıncın yüksek olduğu yerden alçak olduğu yere hareket eder; bu hareket rüzgârdır."),
+mc("Küresel ısınmaya en çok katkı sağlayan etken hangisidir?",
+"Sera gazı salımının artması",
+["Ozon tabakasının kalınlaşması","Ormanların artması","Güneş ışınlarının azalması"],
+"CO₂ gibi sera gazlarının artması atmosferde ısının tutulmasını artırır."),
+tf("İklim, bir bölgede kısa süreli görülen hava olaylarını ifade eder.",false,
+"İklim, uzun yıllar boyunca görülen hava olaylarının ortalamasıdır. Kısa süreli olaylar hava durumudur.")
+]);
+
+lesson(FEN,"2. Ünite: DNA ve Genetik Kod","fen-dna","DNA ve Genetik Kod","Nükleotit, baz eşleşmesi, gen, kromozom",
+N("<b>DNA</b>, canlıların kalıtsal bilgisini taşıyan çift sarmal yapıdaki moleküldür.",[
+"<b>Yapı birimi nükleotittir:</b> fosfat + şeker + organik baz.",
+"<b>Organik bazlar:</b> Adenin (A), Timin (T), Guanin (G), Sitozin (C).",
+"<b>Baz eşleşmesi:</b> A ile T, G ile C eşleşir.",
+"<b>Gen:</b> DNA’nın belirli bir özelliği kodlayan bölümüdür.",
+"<b>Kromozom:</b> DNA’nın proteinlerle sarılıp paketlenmiş hâlidir.",
+"<b>DNA’nın kendini eşlemesi:</b> Hücre bölünmeden önce DNA kendinin aynısını oluşturur."
+],"Bir zincir A–T–G–C ise karşısındaki zincir T–A–C–G olur."),
+[
+tf("DNA’da adenin (A) bazı sitozin (C) ile, guanin (G) bazı timin (T) ile eşleşir.",false,
+"DNA’da eşleşmeler her zaman A–T ve G–C şeklindedir."),
+mc("Aşağıdakilerden hangisi DNA’nın yapı birimidir?",
+"Nükleotit",
+["Amino asit","Glikoz","Yağ asidi"],
+"DNA, nükleotit adı verilen yapı birimlerinden oluşur. Amino asitler proteinlerin yapı birimidir."),
+mc("DNA’nın bir zincirindeki baz dizilimi A–T–G–C ise karşısındaki zincirin dizilimi nasıl olur?",
+"T–A–C–G",
+["A–T–G–C","U–A–C–G","C–G–T–A"],
+"A↔T ve G↔C eşleşir. U bazı DNA’da değil RNA’da bulunur."),
+mc("Aşağıdaki sıralamalardan hangisi büyükten küçüğe doğru verilmiştir?",
+"Kromozom – DNA – gen – nükleotit",
+["Nükleotit – gen – DNA – kromozom","Gen – DNA – kromozom – nükleotit","DNA – kromozom – gen – nükleotit"],
+"Kromozom DNA ve proteinden oluşur; DNA genleri, gen ise nükleotit dizilerini içerir.")
+]);
+
+lesson(FEN,"2. Ünite: DNA ve Genetik Kod","fen-kalitim","Kalıtım","Genotip, fenotip, baskın-çekinik, çaprazlama",
+N("<b>Kalıtım</b>, özelliklerin ebeveynlerden yavrulara aktarılmasıdır.",[
+"<b>Genotip:</b> Canlının gen yapısı (AA, Aa, aa). <b>Fenotip:</b> Dışarıdan görülen özelliği.",
+"<b>Baskın gen</b> (A) varlığında özelliğini gösterir; <b>çekinik gen</b> (a) sadece ikisi de çekinik olduğunda ortaya çıkar.",
+"<b>Saf döl:</b> AA veya aa. <b>Melez döl:</b> Aa.",
+"Aa × Aa çaprazlamasında oran: AA : Aa : aa = 1 : 2 : 1 (fenotipte 3 baskın : 1 çekinik).",
+"<b>Akraba evliliği</b> çekinik genlerle taşınan hastalık riskini artırır.",
+"<b>Cinsiyet:</b> Kadında XX, erkekte XY kromozomu bulunur."
+]),
+[
+mc("Aa × Aa çaprazlamasında yavruların kaçta kaçı çekinik fenotiplidir?",
+"1/4",
+["1/2","3/4","0"],
+"Aa × Aa → AA, Aa, Aa, aa. Çekinik fenotip yalnızca aa genotipindedir (1/4)."),
+mc("Melez döl genotipi hangisidir?",
+"Aa",
+["AA","aa","A"],
+"Bir baskın bir çekinik gen taşıyan bireyler melezdir (Aa)."),
+tf("Akraba evlilikleri, çekinik genlerle taşınan hastalıkların ortaya çıkma riskini artırır.",true,
+"Akrabaların aynı çekinik geni taşıma olasılığı yüksektir.")
+]);
+
+lesson(FEN,"2. Ünite: DNA ve Genetik Kod","fen-mutasyon","Mutasyon ve Modifikasyon","Çevrenin gene etkisi",
+N("Çevresel etkenler canlının genini veya gen işleyişini etkileyebilir.",[
+"<b>Mutasyon:</b> DNA’da meydana gelen kalıcı değişimdir; kalıtsal olabilir (radyasyon, UV, kimyasallar).",
+"<b>Modifikasyon:</b> Çevre etkisiyle genlerin işleyişinde görülen geçici değişimdir; kalıtsal değildir."
+],"Güneşte esmerleşme, spor yapınca kasların gelişmesi modifikasyondur."),
+[
+mc("Aşağıdakilerden hangisi modifikasyona örnektir?",
+"Güneşte uzun süre kalan kişinin teninin kararması",
+["Albino bireyin doğması","Kalıtsal renk körlüğü","Radyasyon nedeniyle DNA’da kalıcı değişim oluşması"],
+"Modifikasyon geçicidir, gen yapısını değiştirmez ve kalıtsal değildir."),
+mc("Mutasyonla ilgili aşağıdakilerden hangisi doğrudur?",
+"Genetik materyalde meydana gelen kalıcı bir değişimdir.",
+["Her zaman faydalıdır.","Sonraki nesillere asla aktarılmaz.","Sadece beslenmeyle oluşur."],
+"Mutasyonlar DNA’yı değiştirir ve bazen kalıtsal olabilir."),
+tf("Modifikasyonlar kalıtsal değildir.",true,
+"Modifikasyon gen yapısını değiştirmediği için sonraki nesillere aktarılmaz.")
+]);
+
+lesson(FEN,"2. Ünite: DNA ve Genetik Kod","fen-adapt","Adaptasyon","Çevreye uyum, varyasyon, doğal seçilim",
+N("<b>Adaptasyon</b>, canlıların yaşadıkları çevreye uyumlu özellikler kazanmasıdır.",[
+"<b>Varyasyon:</b> Aynı türün bireyleri arasındaki farklılıklardır.",
+"<b>Doğal seçilim:</b> Çevreye uygun özelliklere sahip bireylerin hayatta kalıp üreme şansının artmasıdır.",
+"Örnek: Devenin hörgücünde yağ depolaması, kutup ayısının kalın kürkü."
+]),
+[
+mc("Çevre koşullarına uygun özelliklere sahip bireylerin hayatta kalıp çoğalması olayına ne denir?",
+"Doğal seçilim",
+["Mutasyon","Klonlama","Gen tedavisi"],
+"Doğal seçilimde uygun bireyler şansı yakalar; bu özellikler sonraki nesillere aktarılır."),
+mc("Devenin hörgücünde yağ depolaması hangi kavrama örnektir?",
+"Adaptasyon",
+["Mutasyon","Klonlama","Gen tedavisi"],
+"Develer çöl koşullarına hörgücündeki yağ depolayarak uyum sağlamıştır."),
+tf("Varyasyon, aynı türün bireyleri arasında görülen farklılıklardır.",true,
+"Varyasyonlar doğal seçilimin dayanağıdır.")
+]);
+
+lesson(FEN,"2. Ünite: DNA ve Genetik Kod","fen-biyotek","Biyoteknoloji","Genetik mühendisliği, klonlama, gen tedavisi",
+N("<b>Biyoteknoloji</b>, canlıların veya canlı süreçlerin ürün elde etmek için kullanılmasıdır.",[
+"<b>Genetik mühendisliği:</b> Genlerin başka canlıya aktarılarak istenen özelliğin kazandırılması.",
+"Uygulamalar: klonlama, gen tedavisi, DNA parmak izi, insülin ve aşı üretimi.",
+"<b>Olumlu yönleri:</b> hastalık tedavisi, verim artışı. <b>Olumsuz yönleri:</b> etik sorunlar, ekolojik ve sağlık riskleri."
+]),
+[
+mc("Adli olaylarda kişi kimliğinin belirlenmesinde kullanılan yöntem hangisidir?",
+"DNA parmak izi",
+["Klonlama","Fotosentez","Mutasyon"],
+"Her bireyin DNA dizilimi farklı olduğu için DNA parmak izi kimlik tespitinde kullanılır."),
+mc("İnsülin hormonunun bakterilere aktarılan insan geni ile üretilmesi hangi alana örnektir?",
+"Genetik mühendisliği",
+["Doğal seçilim","Modifikasyon","Adaptasyon"],
+"Bakterilere gen aktarımı genetik mühendisliği uygulamasıdır."),
+tf("Genetiği değiştirilmiş organizmaların kullanımı etik ve ekolojik tartışmalar doğurmaktadır.",true,
+"Biyoteknolojinin hem yararları hem de riskleri vardır.")
+]);
+
+lesson(FEN,"3. Ünite: Basınç","fen-kati","Katı Basıncı","Ağırlık ve yüzey alanı",
+N("<b>Basınç</b> = Kuvvet ÷ Yüzey alanı (P = F/A).",[
+"Katı basıncı <b>ağırlıkla doğru</b>, <b>yüzey alanıyla ters</b> orantılıdır.",
+"Bıçağın keskin olması (alan küçük), kar ayakkabısı (alan büyük) ve paletli araçlar günlük hayattan örneklerdir."
+],"Ağırlığı 600 N, tabanı 0,03 m² olan cismin basıncı 600 / 0,03 = 20 000 Pa."),
+[
+mc("Bıçağın keskin olmasının nedeni aşağıdakilerden hangisidir?",
+"Kesme yüzeyinin küçük olması nedeniyle basıncın büyük olması",
+["Ağırlığının çok olması","Yüzey alanının büyük olması","Sıcaklığının yüksek olması"],
+"Aynı kuvvet küçük alana uygulanırsa basınç artar."),
+mc("Ağırlığı 600 N olan bir cismin yere temas eden yüzeyi 0,03 m² ise cismin yere uyguladığı basınç kaç Pa’dır?",
+"20 000",
+["200","2000","18"],
+"P = F / A = 600 / 0,03 = 20 000 Pa."),
+tf("Aynı ağırlıktaki bir cisim küçük yüzeyi üzerine konursa uygulanan basınç artar.",true,
+"Basınç, yüzey alanıyla ters orantılıdır.")
+]);
+
+lesson(FEN,"3. Ünite: Basınç","fen-sivi","Sıvı Basıncı","Derinlik, yoğunluk, Pascal Prensibi",
+N("Sıvılar, bulundukları kabın çeperlerine ve içindeki cisimlere basınç uygular.",[
+"Sıvı basıncı <b>derinlik</b> ve <b>sıvının yoğunluğu</b> arttıkça artar.",
+"Kabın şekline ve sıvı miktarına bağlı değildir.",
+"<b>Pascal Prensibi:</b> Kapalı bir kaptaki sıvıya uygulanan basınç, her noktaya aynen iletilir.",
+"Uygulamalar: hidrolik fren, kriko, itfaiye merdiveni."
+]),
+[
+mc("Aşağıdakilerden hangisi sıvı basıncını etkilemez?",
+"Kabın şekli",
+["Sıvının derinliği","Sıvının yoğunluğu","Yer çekimi ivmesi"],
+"Sıvı basıncı derinlik, yoğunluk ve yer çekimine bağlıdır; kabın şekline bağlı değildir."),
+mc("Hidrolik frenler hangi prensibe göre çalışır?",
+"Pascal Prensibi",
+["Arşimet Prensibi","Toricelli Prensibi","Newton’un üçüncü yasası"],
+"Kapalı sıvıya uygulanan basıncın her yöne aynen iletilmesi Pascal Prensibi’dir."),
+tf("Sıvı basıncı derinlik arttıkça artar.",true,
+"Daha derinde üstteki sıvı sütunu daha yüksektir; basınç artar.")
+]);
+
+lesson(FEN,"3. Ünite: Basınç","fen-gaz","Gaz Basıncı","Açık hava basıncı, Toricelli, kapalı kap",
+N("Gazlar da kabın çeperlerine basınç uygular.",[
+"<b>Açık hava basıncı:</b> Atmosferin ağırlığından kaynaklanır. Deniz seviyesinde 76 cmHg’dir (Toricelli deneyi).",
+"Yükseldikçe açık hava basıncı azalır.",
+"<b>Kapalı kapta gaz basıncı:</b> Gaz moleküllerinin çeperlere çarpması ile oluşur. Sıcaklık artarsa basınç artar."
+]),
+[
+mc("Deniz seviyesinde Toricelli deneyinde cıva sütunu kaç cm yükselir?",
+"76",
+["760","7,6","100"],
+"Deniz seviyesinde açık hava basıncı 76 cmHg’dir."),
+mc("Yükseklere çıkıldıkça açık hava basıncı nasıl değişir?",
+"Azalır",
+["Artar","Değişmez","Önce artar sonra azalır"],
+"Üstteki hava miktarı azaldığı için basınç düşer."),
+tf("Kapalı bir kapta gazın sıcaklığı artırılırsa gaz basıncı artar.",true,
+"Sıcaklık artınca moleküller hızlanır ve çeperlere daha çok çarpar.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-periyodik","Periyodik Sistem","Grup, periyot, element sınıfları",
+N("Periyodik sistem, elementlerin atom numaralarına göre dizildiği tablodur.",[
+"<b>Periyot:</b> Yatay sıralar (7 tane). <b>Grup:</b> Dikey sütunlar (18 tane).",
+"Aynı gruptaki elementlerin kimyasal özellikleri benzerdir.",
+"<b>Metaller:</b> parlak, ısı ve elektriği iyi iletir. <b>Ametaller:</b> mat, iletkenlikleri zayıftır.",
+"<b>Yarı metaller:</b> ikisinin özelliğini taşır (Si, B). <b>Soy gazlar:</b> kararlı, tepkimeye isteksiz (He, Ne, Ar)."
+]),
+[
+mc("Periyodik sistemde dikey sütunlara ne ad verilir?",
+"Grup",
+["Periyot","Katman","Yörünge"],
+"Dikey sütunlar grup, yatay sıralar periyottur."),
+mc("Aşağıdakilerden hangisi bir soy gazdır?",
+"Neon (Ne)",
+["Sodyum (Na)","Demir (Fe)","Karbon (C)"],
+"Helyum, neon ve argon soy gazlardır."),
+tf("Metaller genellikle ısı ve elektriği iyi iletir.",true,
+"İletkenlik metallerin temel özelliklerindendir.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-degisim","Fiziksel ve Kimyasal Değişimler","Maddenin kimliği değişir mi?",
+N("Değişimler, maddenin kimliğinin değişip değişmemesine göre sınıflandırılır.",[
+"<b>Fiziksel değişim:</b> Maddenin kimliği değişmez (hal değişimi, çözünme, kırılma, yırtılma).",
+"<b>Kimyasal değişim:</b> Yeni madde oluşur (yanma, paslanma, çürüme, ekşime, kararma)."
+]),
+[
+mc("Aşağıdakilerden hangisi kimyasal değişimdir?",
+"Demirin paslanması",
+["Buzun erimesi","Suyun buharlaşması","Şekerin suda çözünmesi"],
+"Paslanmada yeni bir madde oluşur; kimyasal değişimdir."),
+mc("Aşağıdakilerden hangisi fiziksel değişimdir?",
+"Kâğıdın yırtılması",
+["Sütün ekşimesi","Odunun yanması","Gümüşün kararması"],
+"Yırtılmada maddenin yapısı değişmez."),
+tf("Fiziksel değişimlerde maddenin kimliği değişmez.",true,
+"Yalnızca görünüm veya hâl değişir.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-tepkime","Kimyasal Tepkimeler","Kütlenin korunumu, bağ oluşumu ve kırılımı",
+N("Kimyasal tepkimede girenler (tepkimeye giren maddeler) ürünlere dönüşür.",[
+"<b>Kütlenin korunumu:</b> Tepkimeden önceki toplam kütle, sonraki toplam kütleye eşittir.",
+"Atomların türü ve sayısı korunur; atomlar yok olmaz, yeni atom oluşmaz.",
+"Girenlerdeki bağlar kırılır, ürünlerdeki yeni bağlar oluşur."
+]),
+[
+mc("Kapalı bir kapta 10 g A ile 15 g B tam olarak tepkimeye girerek C maddesini oluşturuyor. Oluşan C’nin kütlesi kaç gramdır?",
+"25",
+["5","10","150"],
+"Kütle korunur: 10 + 15 = 25 g."),
+mc("Bir kimyasal tepkimede aşağıdakilerden hangisi değişmez?",
+"Toplam kütle",
+["Maddelerin kimlikleri","Moleküllerin yapısı","Bağ türleri"],
+"Kütlenin korunumu: toplam kütle sabit kalır."),
+tf("Kimyasal tepkimelerde atomlar yok olur ve yeni atomlar oluşur.",false,
+"Atomlar yok olmaz; sadece yeniden düzenlenir.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-asitbaz","Asitler ve Bazlar","pH, indikatör, asit yağmuru",
+N("Asitler ve bazlar günlük hayatta sıkça karşılaşılan maddelerdir.",[
+"<b>Asit:</b> Ekşi tatlıdır, mavi turnusolu kırmızıya çevirir, pH &lt; 7 (limon, sirke).",
+"<b>Baz:</b> Acımsı ve kayganlık hissi verir, kırmızı turnusolu maviye çevirir, pH &gt; 7 (sabun, çamaşır suyu).",
+"<b>Nötr:</b> pH = 7 (saf su).",
+"<b>İndikatör:</b> Asit-baz ayırt eden ayıraç (turnusol kâğıdı, fenolftalein).",
+"<b>Asit yağmurları:</b> Hava kirliliği (SO₂, NOₓ) sonucu oluşur; ormanlara, binalara ve toprağa zarar verir."
+],null,"Sağlık için asit ve bazları tatmak veya koklamak tehlikelidir."),
+[
+mc("pH değeri 3 olan bir çözelti için ne söylenebilir?",
+"Asit özelliği gösterir.",
+["Baz özelliği gösterir.","Nötrdür.","Tuz çözeltisidir."],
+"pH &lt; 7 olan çözeltiler asidiktir."),
+mc("Asit yağmurlarının sonuçlarından biri hangisidir?",
+"Ormanların ve tarihî eserlerin zarar görmesi",
+["Ozon tabakasının onarılması","Toprağın bazikleşmesi","Havanın temizlenmesi"],
+"Asit yağmurları bitkilere, topraklara ve mermer yapılara zarar verir."),
+tf("Baz çözeltileri kırmızı turnusol kâğıdını maviye çevirir.",true,
+"Bazlar kırmızı turnusolu maviye çevirir.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-isi","Maddenin Isı ile Etkileşimi","Öz ısı, hal değişimi, grafikler",
+N("Maddeler ısı alınca veya verince sıcaklıkları veya hâlleri değişir.",[
+"<b>Öz ısı (c):</b> 1 g maddenin sıcaklığını 1 °C artırmak için gereken ısıdır.",
+"Q = m · c · ΔT. Öz ısısı büyük maddeler zor ısınır, zor soğur (su).",
+"<b>Hal değişiminde</b> saf maddenin sıcaklığı sabit kalır (erime, donma, buharlaşma, yoğuşma)."
+]),
+[
+mc("Saf bir maddenin hal değişimi sırasında sıcaklığı nasıl değişir?",
+"Sabit kalır",
+["Artar","Azalır","Önce artar sonra azalır"],
+"Hal değişimi sırasında verilen ısı sıcaklığı artırmak yerine hâl değişimine harcanır."),
+mc("Deniz kenarındaki bölgelerde gece-gündüz sıcaklık farkının az olmasının nedeni nedir?",
+"Suyun öz ısısının büyük olması",
+["Suyun öz ısısının küçük olması","Suyun yoğunluğunun büyük olması","Karaların öz ısısının büyük olması"],
+"Suyun öz ısısı büyük olduğundan su geç ısınır ve geç soğur."),
+tf("Aynı kütleli iki maddeden öz ısısı büyük olan, aynı ısıyı alınca daha az ısınır.",true,
+"Öz ısısı büyük olan madde sıcaklığını zor değiştirir.")
+]);
+
+lesson(FEN,"4. Ünite: Madde ve Endüstri","fen-kimyaend","Türkiye’de Kimya Endüstrisi","Hammaddeler, ürünler, meslekler",
+N("Kimya endüstrisi; plastik, ilaç, gübre, boya, deterjan gibi birçok ürünü kapsar.",[
+"<b>Petrokimya:</b> Petrolden plastik, sentetik elyaf gibi ürünler elde edilir (PETKİM).",
+"<b>Bor:</b> Türkiye, dünyanın en büyük bor rezervlerine sahip ülkelerindendir (Eti Maden).",
+"Meslekler: kimya mühendisi, eczacı, kimyager."
+]),
+[
+mc("Türkiye’de bor madeni işleten kuruluş aşağıdakilerden hangisidir?",
+"Eti Maden",
+["TÜPRAŞ","PETKİM","TÜBİTAK"],
+"Eti Maden, Türkiye’de bor üretiminin ana kuruluşudur."),
+mc("Aşağıdakilerden hangisi petrokimya endüstrisinin bir ürünüdür?",
+"Plastik",
+["Pamuk","Buğday","Mermer"],
+"Plastikler petrokimya ürünlerindendir."),
+tf("Türkiye, dünyanın önemli bor rezervlerine sahip bir ülkedir.",true,
+"Bor, Türkiye’nin stratejik madenlerinden biridir.")
+]);
+
+lesson(FEN,"5. Ünite: Basit Makineler","fen-basitmak","Basit Makineler","Kaldıraç, makara, eğik düzlem, dişli, vida",
+N("Basit makineler işi kolaylaştırır ancak <b>iş ve enerjiden kazanç sağlamaz</b>.",[
+"Kuvvetten kazanç varsa yoldan kayıp vardır (iş = kuvvet × yol).",
+"<b>Kaldıraç:</b> Kuvvet × kuvvet kolu = yük × yük kolu.",
+"<b>Sabit makara:</b> Yön değiştirir, kuvvetten kazanç sağlamaz. <b>Hareketli makara:</b> Kuvvetten 2 kat kazanç sağlar.",
+"<b>Eğik düzlem:</b> Boyu uzadıkça kuvvetten kazanç artar.",
+"<b>Çıkrık, dişli çark, kasnak, vida:</b> Kuvvetten ya da hızdan kazanç ya da yön değişimi sağlar."
+],"Kuvvet kolu 40 cm, yük kolu 10 cm, yük 20 N ise F · 40 = 20 · 10 → F = 5 N."),
+[
+mc("Basit makinelerle aşağıdakilerden hangisi kazanılamaz?",
+"İş ve enerji",
+["Kuvvetten kazanç","Yön değiştirme","Kolaylık sağlama"],
+"Hiçbir basit makine iş ve enerjiden kazanç sağlamaz."),
+mc("İdeal bir hareketli makara kuvvetten kaç kat kazanç sağlar?",
+"2",
+["1","3","4"],
+"Hareketli makara yükü iki ipte taşıdığı için kuvvet yarıya düşer."),
+mc("Kuvvet kolu 40 cm, yük kolu 10 cm olan bir kaldıraçla 20 N’luk yükü dengelemek için gereken kuvvet kaç N’dur?",
+"5",
+["80","10","2,5"],
+"F · 40 = 20 · 10 → F = 5 N.")
+]);
+
+lesson(FEN,"6. Ünite: Enerji Dönüşümleri ve Çevre Bilimi","fen-besin","Besin Zinciri ve Enerji Akışı","Üretici, tüketici, ayrıştırıcı",
+N("Canlılar arasındaki beslenme ilişkisi besin zincirini oluşturur.",[
+"<b>Üreticiler:</b> Fotosentez yapan canlılar (bitkiler).",
+"<b>Tüketiciler:</b> Otçul, etçil, hepçil canlılar.",
+"<b>Ayrıştırıcılar:</b> Bakteri ve mantarlar; ölü canlıları ayrıştırır.",
+"Enerji üreticiden başlayarak aktarılır ve her basamakta yaklaşık %10’u bir sonrakine geçer.",
+"<b>Ekoloji piramidi:</b> Üreticiler en çok, üst basamak tüketiciler en azdır."
+]),
+[
+mc("Aşağıdakilerden hangisi besin zincirinde ayrıştırıcı grubunda yer alır?",
+"Mantar",
+["Ot","Tavşan","Kartal"],
+"Bakteri ve mantarlar ayrıştırıcıdır."),
+mc("Besin zincirinde enerjinin yaklaşık yüzde kaçı bir sonraki basamağa aktarılır?",
+"%10",
+["%90","%50","%100"],
+"Enerjinin büyük kısmı ısı olarak kaybolur; yaklaşık %10’u aktarılır."),
+tf("Besin zincirinin ilk halkasını üreticiler oluşturur.",true,
+"Üreticiler fotosentezle besin üretir ve zincirin başlangıcıdır.")
+]);
+
+lesson(FEN,"6. Ünite: Enerji Dönüşümleri ve Çevre Bilimi","fen-enerjidon","Fotosentez ve Hücresel Solunum","Enerji dönüşümleri",
+N("Canlılar enerjiyi dönüştürerek yaşamsal faaliyetlerini sürdürür.",[
+"<b>Fotosentez:</b> CO₂ + H₂O + ışık → glikoz + O₂ (kloroplastta). Işık, CO₂, su ve sıcaklık etkilidir.",
+"<b>Hücresel solunum:</b> Glikoz + O₂ → CO₂ + H₂O + enerji (mitokondride).",
+"<b>Oksijensiz solunum / fermantasyon:</b> Oksijen yokluğunda gerçekleşir. Maya hücreleri alkol ve CO₂, kas hücreleri laktik asit üretir."
+]),
+[
+mc("Fotosentez hücrenin hangi organelinde gerçekleşir?",
+"Kloroplast",
+["Mitokondri","Ribozom","Çekirdek"],
+"Klorofil içeren kloroplastlarda fotosentez yapılır."),
+mc("Mayanın oksijensiz solunumda (fermantasyon) ürettiği maddeler hangileridir?",
+"Etil alkol ve karbondioksit",
+["Laktik asit","Oksijen ve su","Glikoz ve su"],
+"Maya fermantasyonunda etil alkol ve CO₂ oluşur."),
+tf("Hücresel solunum mitokondride gerçekleşir ve enerji açığa çıkarır.",true,
+"Oksijenli solunum mitokondride gerçekleşir.")
+]);
+
+lesson(FEN,"6. Ünite: Enerji Dönüşümleri ve Çevre Bilimi","fen-madde","Madde Döngüleri ve Sürdürülebilir Kalkınma","Su, karbon, oksijen, azot; geri dönüşüm",
+N("Doğadaki maddeler döngüler hâlinde yeniden kullanılır.",[
+"<b>Su döngüsü:</b> buharlaşma, yoğuşma, yağış, yer altına sızma.",
+"<b>Karbon döngüsü:</b> Fotosentezle CO₂ alınır; solunum ve yanmayla verilir.",
+"<b>Azot döngüsü:</b> Azot bağlayıcı bakteriler, atmosferdeki azotu bitkilerin kullanabileceği hâle getirir.",
+"<b>Sürdürülebilir kalkınma:</b> Kaynakları gelecek nesilleri düşünerek kullanma; geri dönüşüm, tasarruf, katı atık yönetimi."
+]),
+[
+mc("Atmosferdeki azotu bitkilerin kullanabileceği hâle getiren canlılar hangileridir?",
+"Azot bağlayıcı bakteriler",
+["Otçul hayvanlar","Mantarlar","Üretici bitkiler"],
+"Bazı bakteriler azotu bağlayarak toprağa katar."),
+mc("Atmosferdeki karbondioksiti azaltan olay hangisidir?",
+"Fotosentez",
+["Solunum","Yanma","Çürüme"],
+"Fotosentezde CO₂ alınır; diğer olaylar CO₂ açığa çıkarır."),
+tf("Geri dönüşüm, doğal kaynakların daha uzun süre kullanılmasına katkı sağlar.",true,
+"Geri dönüşüm hammadde ve enerji tasarrufu sağlar.")
+]);
+
+lesson(FEN,"7. Ünite: Elektrik","fen-elektrik","Elektrik Yükleri ve Elektriklenme","Sürtünme, dokunma, etki, topraklama",
+N("Cisimler elektron alıp vererek yüklenir.",[
+"<b>Aynı cins yükler birbirini iter</b>, zıt cins yükler çeker.",
+"<b>Sürtünme ile elektriklenme:</b> Cisimler birbirine sürtülünce zıt yüklenir (tarak ve saç).",
+"<b>Dokunma ile elektriklenme:</b> Yüklü cisim yüksüz cisme dokunursa aynı cins yük kazandırır.",
+"<b>Etki ile elektriklenme:</b> Yüklü cisim dokunmadan yaklaştırılırsa iletkende yük dağılımı değişir.",
+"<b>Elektroskop:</b> Yük varlığını ve cinsini anlamaya yarar. <b>Topraklama:</b> Fazla yükü yere aktarır."
+]),
+[
+mc("Aşağıdakilerden hangisi sürtünme ile elektriklenmeye örnektir?",
+"Saçı tarayan plastik tarağın kâğıt parçalarını çekmesi",
+["Pilin ampulü yakması","Mıknatısın demiri çekmesi","Suyun kaynaması"],
+"Sürtünme ile yüklenen tarak kâğıt parçalarını çeker."),
+mc("Topraklamanın amacı aşağıdakilerden hangisidir?",
+"Cisimde biriken fazla yükü yere aktarmak",
+["Elektrik enerjisini artırmak","Cismi yüklemek","Yıldırım oluşturmak"],
+"Topraklama, yükün yere aktarılarak tehlikenin önlenmesini sağlar."),
+tf("Aynı cins elektrik yükleri birbirini iter.",true,
+"Aynı yükler iter, zıt yükler çeker.")
+]);
+
+lesson(FEN,"7. Ünite: Elektrik","fen-elenerji","Elektrik Enerjisinin Dönüşümü","Isı, ışık, hareket; santraller ve tasarruf",
+N("Elektrik enerjisi başka enerji türlerine dönüşür.",[
+"<b>Isı:</b> ütü, ocak. <b>Işık:</b> ampul. <b>Hareket:</b> elektrik motoru, vantilatör.",
+"<b>Sigorta:</b> Aşırı akımda devreyi açarak yangın ve zararı önler.",
+"<b>Santral türleri:</b> hidroelektrik, termik, nükleer, rüzgâr, güneş, jeotermal.",
+"<b>Yenilenebilir enerji:</b> su, rüzgâr, güneş gibi doğada kendini yenileyen kaynaklardır.",
+"Tasarruf için LED ampuller ve enerji verimliliği yüksek cihazlar tercih edilmelidir."
+]),
+[
+mc("Aşağıdakilerden hangisinde elektrik enerjisi hareket enerjisine dönüşür?",
+"Elektrik motoru",
+["Elektrikli ısıtıcı","Ampul","Tost makinesi"],
+"Elektrik motoru ve vantilatörde elektrik enerjisi hareket enerjisine dönüşür."),
+mc("Aşağıdakilerden hangisi yenilenebilir enerji kaynağıdır?",
+"Rüzgâr",
+["Kömür","Doğal gaz","Petrol"],
+"Rüzgâr, güneş ve su yenilenebilir kaynaklardır."),
+mc("Sigortanın görevi nedir?",
+"Aşırı akımda devreyi açarak zararı önlemek",
+["Akımı artırmak","Gerilimi yükseltmek","Pili şarj etmek"],
+"Sigorta, aşırı akımda erir veya devreyi keserek cihazları ve yangını önler.")
+]);
+
+/* ================= T.C. İNKILAP TARİHİ ================= */
+const INK=subj("ink","T.C. İnkılap Tarihi","🇹🇷","#ff9600");
+
+lesson(INK,"1. Ünite: Bir Kahraman Doğuyor","ink-osmanli","19. Yüzyılda Osmanlı Devleti","Fransız İhtilali, Sanayi İnkılabı, fikir akımları",
+N("19. yüzyılda Osmanlı Devleti hem dış baskılarla hem de yeni fikirlerle karşı karşıya kaldı.",[
+"<b>Fransız İhtilali (1789):</b> Milliyetçilik ve eşitlik fikirlerini yaydı; Osmanlı’daki gayrimüslim topluluklarda bağımsızlık isyanlarını artırdı.",
+"<b>Sanayi İnkılabı:</b> Avrupa’nın hammadde ve pazar arayışını artırdı; Osmanlı ekonomisini olumsuz etkiledi.",
+"<b>Osmanlıcılık:</b> Tüm tebaayı Osmanlı kimliği altında birleştirmeyi amaçlar.",
+"<b>İslamcılık (Ümmetçilik):</b> Müslümanların birliğini hedefler.",
+"<b>Türkçülük:</b> Türk kimliğine dayalı birlik fikridir.",
+"<b>Batıcılık:</b> Batı’nın bilim ve kurumlarını örnek almayı savunur."
+]),
+[
+mc("Osmanlı tebaasını din ve mezhep ayrımı yapmadan Osmanlı kimliği altında birleştirmeyi amaçlayan fikir akımı hangisidir?",
+"Osmanlıcılık",
+["Türkçülük","İslamcılık","Batıcılık"],
+"Osmanlıcılık, Osmanlı Devleti’nin dağılmasını önlemek için tüm tebaayı ortak bir kimlik altında toplamayı hedefledi."),
+mc("Fransız İhtilali’nin Osmanlı Devleti üzerindeki etkisi aşağıdakilerden hangisidir?",
+"Milliyetçilik fikrinin yayılmasıyla gayrimüslim topluluklarda bağımsızlık isyanlarının çıkması",
+["Cumhuriyetin ilan edilmesi","Saltanatın kaldırılması","Sanayi devriminin başlaması"],
+"Milliyetçilik akımı, Osmanlı’daki farklı milletlerin bağımsızlık isteklerini artırdı."),
+tf("Sanayi İnkılabı, Avrupa devletlerinin hammadde ve pazar arayışını artırarak Osmanlı ekonomisini olumsuz etkilemiştir.",true,
+"Avrupa’da üretilen ucuz mallar Osmanlı pazarlarına girdi; yerli üretim zarar gördü.")
+]);
+
+lesson(INK,"1. Ünite: Bir Kahraman Doğuyor","ink-hayat","Atatürk’ün Hayatı ve Askerlik Hayatı","Selanik’ten Sofya’ya",
+N("Mustafa Kemal 1881’de Selanik’te doğdu.",[
+"<b>Okulları:</b> Mahalle mektebi, Şemsi Efendi Okulu, Selanik Askerî Rüştiyesi, Manastır Askerî İdadisi, Harbiye, Harp Akademisi.",
+"<b>Şam:</b> Subay olarak ilk görev yeri.",
+"<b>Trablusgarp Savaşı (1911):</b> Tobruk’ta başarı gösterdi.",
+"<b>Balkan Savaşları (1912–1913)</b> ve <b>Picardie Manevraları (1910, Fransa)</b>.",
+"<b>Sofya Askerî Ateşeliği (1913–1914):</b> Diplomatik tecrübe kazandı."
+]),
+[
+mc("Mustafa Kemal hangi şehirde doğmuştur?",
+"Selanik",
+["İstanbul","Manastır","Edirne"],
+"Mustafa Kemal 1881’de Selanik’te dünyaya gelmiştir."),
+mc("Mustafa Kemal’in Tobruk’ta başarı gösterdiği savaş hangisidir?",
+"Trablusgarp Savaşı",
+["Balkan Savaşları","Sakarya Meydan Muharebesi","Kafkas Cephesi"],
+"1911’deki Trablusgarp Savaşı’nda Tobruk’ta başarı gösterdi."),
+mc("Mustafa Kemal’in 1910’da izlediği Fransa’daki askerî tatbikata ne denir?",
+"Picardie Manevraları",
+["Sofya Ateşeliği","Şam Görevi","Çanakkale Cephesi"],
+"Fransa’da yapılan Picardie Manevraları’na katılarak Batı ordularını yakından gözlemledi.")
+]);
+
+lesson(INK,"2. Ünite: Milli Uyanış","ink-bds","Birinci Dünya Savaşı","Nedenler, Osmanlı’nın savaşa girişi, cepheler",
+N("I. Dünya Savaşı 1914’te başladı.",[
+"<b>Genel nedenler:</b> Sömürge yarışı, silahlanma yarışı, milliyetçilik ve bloklaşma (İtilaf: İngiltere, Fransa, Rusya; İttifak: Almanya, Avusturya-Macaristan, İtalya).",
+"<b>Özel neden:</b> Avusturya-Macaristan Veliahtı Ferdinand’ın Saraybosna’da öldürülmesi (28 Haziran 1914).",
+"<b>Osmanlı’nın girişi:</b> Alman bandıralı Goeben ve Breslau gemileriyle Karadeniz’de Rus limanlarının bombalanması.",
+"<b>Cepheler:</b> Çanakkale, Kafkas, Irak, Kanal, Hicaz–Yemen, Galiçya ve diğerleri."
+]),
+[
+mc("I. Dünya Savaşı’nın çıkış nedeni (özel neden) aşağıdakilerden hangisidir?",
+"Avusturya-Macaristan Veliahtı’nın Saraybosna’da öldürülmesi",
+["Çanakkale Savaşı’nın başlaması","Sanayi İnkılabı","Bolşevik İhtilali"],
+"Saraybosna suikastı savaşı başlatan olaydır."),
+mc("Osmanlı Devleti’nin I. Dünya Savaşı’na girişini hızlandıran olay hangisidir?",
+"Osmanlı donanmasındaki Alman gemilerinin Rus limanlarını bombalaması",
+["Trablusgarp Savaşı’nın başlaması","Sevr Antlaşması’nın imzalanması","Misak-ı Millî’nin kabulü"],
+"Ekim 1914’te Karadeniz’de Rus limanlarının bombalanmasıyla Osmanlı fiilen savaşa girmiş oldu."),
+tf("Osmanlı Devleti I. Dünya Savaşı’nda İttifak Devletleri safında yer almıştır.",true,
+"Osmanlı, Almanya ve Avusturya-Macaristan ile birlikte İttifak Devletleri’nin yanında savaştı.")
+]);
+
+lesson(INK,"2. Ünite: Milli Uyanış","ink-mondros","Mondros, Cemiyetler ve Kuva-yi Milliye","İşgaller ve halkın direnişi",
+N("30 Ekim 1918’de imzalanan Mondros Ateşkesi ile Osmanlı fiilen yenilgiyi kabul etti.",[
+"<b>7. madde:</b> İtilaf Devletleri güvenliklerini tehdit eden her bölgeyi işgal edebilir.",
+"<b>24. madde:</b> Doğu Anadolu’daki altı ilde karışıklık çıkarsa işgal edilebilecektir.",
+"<b>Millî cemiyetler:</b> Trakya-Paşaeli, Redd-i İlhak, Anadolu ve Rumeli Müdafaa-i Hukuk, Kilikyalılar.",
+"<b>Zararlı cemiyetler:</b> Teali İslam, İngiliz Muhipleri, Kürt Teali, Sulh ve Selamet-i Osmaniye.",
+"<b>Kuva-yi Milliye:</b> İşgallere karşı halkın kendi imkânlarıyla kurduğu düzensiz direniş birlikleri; Doğu ve Güney cephelerinde etkili oldu."
+]),
+[
+mc("Mondros Ateşkes Antlaşması’nın hangi maddesi İtilaf Devletleri’ne güvenliklerini tehdit eden bölgeleri işgal hakkı vermiştir?",
+"7. madde",
+["24. madde","1. madde","10. madde"],
+"7. madde işgallerin hukuki dayanağı oldu."),
+mc("Aşağıdakilerden hangisi millî bir cemiyettir?",
+"Trakya-Paşaeli Müdafaa-i Hukuk Cemiyeti",
+["İngiliz Muhipleri Cemiyeti","Teali İslam Cemiyeti","Kürt Teali Cemiyeti"],
+"Trakya-Paşaeli Müdafaa-i Hukuk, işgallere karşı kurulan millî cemiyetlerdendir."),
+mc("İşgallere karşı halkın kendi imkânlarıyla başlattığı düzensiz silahlı direniş birliklerine ne denir?",
+"Kuva-yi Milliye",
+["Tekâlif-i Milliye","Düzenli ordu","Temsil Heyeti"],
+"Kuva-yi Milliye, millî direnişin ilk aşamasıdır.")
+]);
+
+lesson(INK,"2. Ünite: Milli Uyanış","ink-hazirlik","Millî Mücadele’nin Hazırlık Dönemi","Samsun, genelgeler, kongreler",
+N("Millî Mücadele’nin hazırlık dönemi, Mustafa Kemal’in Anadolu’ya geçişiyle başlar.",[
+"<b>19 Mayıs 1919:</b> Samsun’a çıkış; Millî Mücadele’nin başlangıcı.",
+"<b>Havza Genelgesi (28 Mayıs 1919):</b> İşgallere karşı mitingler yapılması istendi.",
+"<b>Amasya Genelgesi (22 Haziran 1919):</b> Millî Mücadele’nin gerekçesi ve amacı ilk kez açıklandı; Sivas’ta kongre toplanması kararlaştırıldı.",
+"<b>Erzurum Kongresi (23 Temmuz – 7 Ağustos 1919):</b> Bölgesel kongre; manda ve himaye reddedildi, Temsil Heyeti seçildi.",
+"<b>Sivas Kongresi (4 – 11 Eylül 1919):</b> Ulusal kongre; Erzurum kararları ülke çapında benimsendi.",
+"<b>Amasya Görüşmeleri (Ekim 1919):</b> Temsil Heyeti ile İstanbul Hükümeti arasında yapıldı.",
+"<b>27 Aralık 1919:</b> Temsil Heyeti’nin Ankara’ya gelişi."
+],null,"Erzurum = bölgesel, Sivas = ulusal."),
+[
+fl("Cümledeki boşluğu doğru sözcükle tamamla.","Mustafa Kemal, 19 Mayıs 1919’da Bandırma Vapuru ile","şehrine çıkarak Millî Mücadele’nin ilk adımını attı.",
+["Samsun","Sivas","Erzurum","Amasya"],"Samsun",
+"Mustafa Kemal 19 Mayıs 1919’da Samsun’a çıktı. Bu tarih Millî Mücadele’nin başlangıcı kabul edilir.",true),
+mc("Amasya Genelgesi ile ilgili aşağıdakilerden hangisi doğrudur?",
+"Millî Mücadele’nin gerekçesi ve amacı ilk kez açıklanmıştır.",
+["Meclis-i Mebusan toplanmıştır.","Lozan Barış Antlaşması imzalanmıştır.","Cumhuriyet ilan edilmiştir."],
+"Amasya Genelgesi (22 Haziran 1919) Millî Mücadele’nin gerekçesini ve amacını ilk kez ortaya koyan belgedir."),
+mc("Aşağıdakilerden hangisi Erzurum Kongresi’nde alınan kararlardan biridir?",
+"Manda ve himaye kesinlikle kabul edilemez.",
+["Saltanat kaldırılmıştır.","Cumhuriyet ilan edilmiştir.","Halifelik kaldırılmıştır."],
+"Erzurum Kongresi’nde manda ve himaye reddedildi."),
+tf("Amasya Görüşmeleri, Temsil Heyeti ile İstanbul Hükümeti arasında yapılmıştır.",true,
+"Bahriye Nazırı Salih Paşa ile yapılan bu görüşmeler Ekim 1919’da gerçekleşti.")
+]);
+
+lesson(INK,"2. Ünite: Milli Uyanış","ink-bmm","Büyük Millet Meclisi","Açılış, özellikleri ve Sevr",
+N("İstanbul’un işgali (16 Mart 1920) ve Meclis-i Mebusan’ın dağıtılmasından sonra Ankara’da yeni bir meclis kuruldu.",[
+"<b>23 Nisan 1920:</b> TBMM Ankara’da açıldı; başkanı Mustafa Kemal oldu.",
+"<b>Özellikleri:</b> Millî egemenliğe dayalıdır, yasama ve yürütme yetkisi mecliste toplanmıştır (kuvvetler birliği).",
+"Meclise karşı Kuva-yi İnzibatiye ve bazı isyanlar çıkarıldı.",
+"<b>Sevr Antlaşması (10 Ağustos 1920):</b> İstanbul Hükümeti imzaladı, TBMM tanımadı; hiç yürürlüğe girmedi."
+]),
+[
+mc("TBMM hangi tarihte açılmıştır?",
+"23 Nisan 1920",
+["19 Mayıs 1919","29 Ekim 1923","30 Ağustos 1922"],
+"TBMM 23 Nisan 1920’de Ankara’da açıldı."),
+mc("TBMM’nin özelliklerinden biri aşağıdakilerden hangisidir?",
+"Yasama ve yürütme yetkilerini kendinde toplamıştır.",
+["Padişah başkanlığında toplanmıştır.","Yalnızca danışma meclisidir.","Yargı yetkisi saltanata bağlıdır."],
+"TBMM’de kuvvetler birliği ilkesi geçerliydi."),
+mc("Sevr Antlaşması ile ilgili aşağıdakilerden hangisi doğrudur?",
+"TBMM tarafından tanınmamış ve uygulanmamıştır.",
+["Millî Mücadele sonunda imzalanmıştır.","TBMM tarafından onaylanmıştır.","Lozan’dan sonra yürürlüğe girmiştir."],
+"TBMM, Sevr’i tanımadı; antlaşma hiç yürürlüğe girmedi.")
+]);
+
+lesson(INK,"3. Ünite: Ya İstiklal Ya Ölüm!","ink-bati","Millî Cepheler ve Tekâlif-i Milliye","Doğu, Güney, Batı Cephesi, Büyük Taarruz",
+N("Millî Mücadele’de farklı cephelerde savaşıldı.",[
+"<b>Doğu Cephesi:</b> Ermenilere karşı Kâzım Karabekir; <b>Gümrü Antlaşması (1920)</b> TBMM’nin ilk antlaşmasıdır.",
+"<b>Güney Cephesi:</b> Maraş, Antep, Urfa’da Fransızlara karşı halk direnişi.",
+"<b>Batı Cephesi:</b> I. İnönü (Ocak 1921), II. İnönü (Mart 1921), Kütahya-Eskişehir (Temmuz 1921), Sakarya (23 Ağustos – 13 Eylül 1921), Büyük Taarruz (26 Ağustos 1922).",
+"<b>Başkomutanlık Kanunu (5 Ağustos 1921):</b> Mustafa Kemal’e Başkomutanlık yetkisi verildi.",
+"<b>Tekâlif-i Milliye Emirleri:</b> Ordunun ihtiyaçlarının halktan karşılanması.",
+"<b>Sakarya Meydan Muharebesi:</b> “Hattı müdafaa yoktur, sathı müdafaa vardır.”"
+]),
+[
+mc("Başkomutanlık Kanunu hangi gelişmeden sonra kabul edilmiştir?",
+"Kütahya-Eskişehir Savaşları’nın ardından",
+["I. İnönü Savaşı’nın ardından","Büyük Taarruz’un ardından","Lozan’dan sonra"],
+"Kütahya-Eskişehir yenilgisi sonrası Mustafa Kemal Başkomutan oldu."),
+mc("“Hattı müdafaa yoktur, sathı müdafaa vardır.” sözü hangi muharebeyle ilgilidir?",
+"Sakarya Meydan Muharebesi",
+["I. İnönü Savaşı","Büyük Taarruz","Çanakkale Savaşı"],
+"Savunmanın tek hat değil, tüm yüzey olduğu anlayışı Sakarya Meydan Muharebesi’nde benimsendi."),
+mc("Büyük Taarruz hangi tarihte başlamıştır?",
+"26 Ağustos 1922",
+["30 Ağustos 1922","9 Eylül 1922","23 Ağustos 1921"],
+"Büyük Taarruz 26 Ağustos 1922’de başladı."),
+tf("Tekâlif-i Milliye Emirleri, ordunun ihtiyaçlarının halkın desteğiyle karşılanmasını amaçlamıştır.",true,
+"Halk, cephenin ihtiyaçlarını karşılamak için malının bir kısmını orduya verdi.")
+]);
+
+lesson(INK,"3. Ünite: Ya İstiklal Ya Ölüm!","ink-diplomasi","Diplomatik Başarılar","Moskova, Mudanya ve Lozan",
+N("Askerî başarıların ardından diplomatik zaferler kazanıldı.",[
+"<b>Moskova Antlaşması (16 Mart 1921):</b> Sovyet Rusya ile; doğu sınırı belirlendi.",
+"<b>Mudanya Ateşkes Antlaşması (11 Ekim 1922):</b> Doğu Trakya TBMM’ye bırakıldı.",
+"<b>Lozan Barış Antlaşması (24 Temmuz 1923):</b> Kapitülasyonlar kaldırıldı, Türkiye’nin bağımsızlığı uluslararası alanda tanındı.",
+"Boğazlar konusu ve Musul sorunu Lozan’da kesin çözüme kavuşmadı."
+]),
+[
+mc("Moskova Antlaşması hangi devletle imzalanmıştır?",
+"Sovyet Rusya",
+["İngiltere","Fransa","İtalya"],
+"Moskova Antlaşması 1921’de Sovyet Rusya ile imzalandı."),
+mc("Mudanya Ateşkes Antlaşması ile ne sağlanmıştır?",
+"Doğu Trakya’nın TBMM’ye bırakılması",
+["Kapitülasyonların kaldırılması","Boğazların tam egemenliği","Cumhuriyetin ilanı"],
+"Mudanya ile Doğu Trakya savaşsız olarak TBMM yönetimine verildi."),
+mc("Lozan Barış Antlaşması’nda aşağıdakilerden hangisi gerçekleşmiştir?",
+"Kapitülasyonlar kaldırılmıştır.",
+["Boğazların kontrolü tamamen Türkiye’ye bırakılmıştır.","Musul sorunu Türkiye lehine çözülmüştür.","Sevr’in bazı hükümleri kabul edilmiştir."],
+"Lozan’da kapitülasyonlar kaldırıldı; boğazlar ve Musul meselesi ise sonraki yıllarda çözüldü.")
+]);
+
+lesson(INK,"4. Ünite: Atatürkçülük ve Çağdaşlaşan Türkiye","ink-ilke","Atatürk İlkeleri","Cumhuriyetçilik, Milliyetçilik, Halkçılık, Devletçilik, Laiklik, İnkılapçılık",
+N("Atatürk ilkeleri, Türkiye Cumhuriyeti’nin temel yönetim anlayışını oluşturur.",[
+"<b>Cumhuriyetçilik:</b> Egemenlik millete aittir, millet kendi kendini yönetir.",
+"<b>Milliyetçilik:</b> Türk milletinin birlik ve bağımsızlığı.",
+"<b>Halkçılık:</b> Ayrıcalık yoktur, herkes kanun önünde eşittir.",
+"<b>Devletçilik:</b> Devlet, özel girişimin yapamadığı yatırımları üstlenir.",
+"<b>Laiklik:</b> Din ve devlet işlerinin ayrılması.",
+"<b>İnkılapçılık:</b> Sürekli yenilik ve gelişme."
+]),
+[
+mc("Devletin ekonomik hayata müdahale ederek özel sektörün yapamadığı yatırımları üstlenmesi hangi ilkeyle ilgilidir?",
+"Devletçilik",
+["Halkçılık","Laiklik","Cumhuriyetçilik"],
+"Devletçilik ilkesi ekonomide devletin görev almasını öngörür."),
+mc("Kanun önünde herkesin eşit sayılması hangi ilkenin gereğidir?",
+"Halkçılık",
+["Laiklik","Cumhuriyetçilik","İnkılapçılık"],
+"Halkçılıkta sınıf ve ayrıcalık yoktur."),
+mc("Din ve devlet işlerinin birbirinden ayrılması hangi ilkedir?",
+"Laiklik",
+["Milliyetçilik","Devletçilik","İnkılapçılık"],
+"Laiklik, devlet düzeninin dini kurallara dayandırılmaması demektir.")
+]);
+
+lesson(INK,"4. Ünite: Atatürkçülük ve Çağdaşlaşan Türkiye","ink-siyasi","Siyasi Alanda İnkılaplar","Saltanat, Cumhuriyet, Halifelik",
+N("Siyasi inkılaplar yeni devletin siyasal yapısını oluşturdu.",[
+"<b>1 Kasım 1922:</b> Saltanatın kaldırılması.",
+"<b>13 Ekim 1923:</b> Ankara’nın başkent olması.",
+"<b>29 Ekim 1923:</b> Cumhuriyetin ilanı.",
+"<b>3 Mart 1924:</b> Halifeliğin kaldırılması."
+]),
+[
+mc("Türkiye Cumhuriyeti hangi tarihte ilan edilmiştir?",
+"29 Ekim 1923",
+["1 Kasım 1922","3 Mart 1924","13 Ekim 1923"],
+"Cumhuriyet 29 Ekim 1923’te ilan edildi."),
+mc("Aşağıdakilerden hangisi en önce gerçekleşmiştir?",
+"Saltanatın kaldırılması",
+["Cumhuriyetin ilanı","Halifeliğin kaldırılması","Medeni Kanun’un kabulü"],
+"Saltanat 1922’de, Cumhuriyet 1923’te, Halifelik 1924’te kaldırıldı."),
+tf("Ankara, 13 Ekim 1923’te başkent ilan edilmiştir.",true,
+"Cumhuriyetten önce Ankara başkent yapıldı.")
+]);
+
+lesson(INK,"4. Ünite: Atatürkçülük ve Çağdaşlaşan Türkiye","ink-hukuk","Hukuk, Eğitim ve Kültür Alanında İnkılaplar","Medeni Kanun, Tevhid-i Tedrisat, Harf İnkılabı",
+N("Eğitim ve hukuk alanındaki yenilikler çağdaşlaşmanın temelini attı.",[
+"<b>Tevhid-i Tedrisat (3 Mart 1924):</b> Bütün okulları Millî Eğitim Bakanlığı’na bağladı.",
+"<b>Medeni Kanun (1926):</b> Kadın-erkek eşitliğini ve hukukta birliği sağladı.",
+"<b>Harf İnkılabı (1928):</b> Yeni Türk harfleri kabul edildi.",
+"<b>Türk Tarih Kurumu (1931)</b> ve <b>Türk Dil Kurumu (1932)</b> kuruldu."
+]),
+[
+mc("Bütün eğitim kurumlarını Millî Eğitim Bakanlığı’na bağlayan kanun hangisidir?",
+"Tevhid-i Tedrisat Kanunu",
+["Medeni Kanun","Harf İnkılabı","Kabotaj Kanunu"],
+"Eğitimde birliği sağlayan kanun Tevhid-i Tedrisat’tır."),
+mc("Kadın-erkek eşitliğini sağlayan Medeni Kanun hangi yıl kabul edilmiştir?",
+"1926",
+["1923","1928","1934"],
+"Medeni Kanun 1926’da kabul edildi."),
+mc("Türk tarihini bilimsel yöntemlerle araştırmak amacıyla kurulan kurum hangisidir?",
+"Türk Tarih Kurumu",
+["Türk Dil Kurumu","Halkevleri","Millet Mektepleri"],
+"Türk Tarih Kurumu 1931’de kuruldu.")
+]);
+
+lesson(INK,"4. Ünite: Atatürkçülük ve Çağdaşlaşan Türkiye","ink-toplum","Toplumsal ve Ekonomik Alanda İnkılaplar","Şapka, soyadı, kabotaj, İktisat Kongresi",
+N("Toplumsal yaşamda ve ekonomide birçok yenilik yapıldı.",[
+"<b>Şapka Kanunu (1925):</b> Kıyafette çağdaşlaşma.",
+"<b>Tekke ve zaviyelerin kapatılması (1925).</b>",
+"<b>Takvim, saat ve ölçülerde değişiklik:</b> Miladi takvim, uluslararası saat ve metre sistemi.",
+"<b>Soyadı Kanunu (1934).</b>",
+"<b>İzmir İktisat Kongresi (1923):</b> Ekonomik kalkınma ilkeleri belirlendi.",
+"<b>Kabotaj Kanunu (1926):</b> Türk kıyılarında ticaret ve taşımacılık yalnızca Türk gemilerine bırakıldı."
+]),
+[
+mc("Türk kıyılarında deniz taşımacılığı ve ticaretinin yalnızca Türk gemilerine bırakılmasını sağlayan kanun hangisidir?",
+"Kabotaj Kanunu",
+["Soyadı Kanunu","Şapka Kanunu","Medeni Kanun"],
+"Kabotaj Kanunu 1926’da kabul edildi."),
+mc("Soyadı Kanunu hangi yıl kabul edilmiştir?",
+"1934",
+["1923","1925","1928"],
+"Soyadı Kanunu 1934’te kabul edildi."),
+tf("Şapka Kanunu ile kıyafet alanında çağdaşlaşma hedeflenmiştir.",true,
+"Şapka Kanunu (1925) kıyafet birliği ve çağdaşlaşma amacı taşır.")
+]);
+
+lesson(INK,"5. Ünite: Demokratikleşme Çabaları","ink-demokrasi","Demokratikleşme Çabaları","Çok partili hayat denemeleri ve tehditler",
+N("Cumhuriyet döneminde çok partili hayata geçiş için denemeler yapıldı.",[
+"<b>Halk Fırkası</b> (sonradan Cumhuriyet Halk Fırkası) ilk partidir.",
+"<b>Terakkiperver Cumhuriyet Fırkası (1924):</b> Şeyh Sait İsyanı sonrası kapatıldı.",
+"<b>Serbest Cumhuriyet Fırkası (1930):</b> Ali Fethi Okyar kurdu; kısa sürede kendini feshetti.",
+"<b>Şeyh Sait İsyanı (1925), İzmir Suikastı (1926), Menemen Olayı (1930):</b> Cumhuriyete yönelik tehditlerdir.",
+"Menemen Olayı’nda öğretmen yedek subay Kubilay şehit edildi."
+]),
+[
+mc("Serbest Cumhuriyet Fırkası’nı kuran kişi kimdir?",
+"Ali Fethi Okyar",
+["İsmet İnönü","Kâzım Karabekir","Celal Bayar"],
+"Serbest Cumhuriyet Fırkası 1930’da Ali Fethi Okyar tarafından kuruldu."),
+mc("Menemen Olayı’nda şehit edilen öğretmen yedek subay kimdir?",
+"Kubilay",
+["Şeyh Sait","Ali Fuat","Fevzi Çakmak"],
+"Kubilay, Menemen Olayı’nda şehit edildi."),
+tf("Terakkiperver Cumhuriyet Fırkası, Şeyh Sait İsyanı sonrasında kapatılmıştır.",true,
+"Parti 1925’te kapatıldı.")
+]);
+
+lesson(INK,"6. Ünite: Atatürk Dönemi Türk Dış Politikası","ink-disp","Atatürk Dönemi Dış Politika","İlkeler ve gelişmeler",
+N("Atatürk döneminin dış politika sloganı “Yurtta sulh, cihanda sulh”tur.",[
+"<b>Temel ilkeler:</b> Bağımsızlık, barışçılık, gerçekçilik ve akılcılık.",
+"<b>Musul Sorunu:</b> Ankara Antlaşması (1926) ile Irak’a bırakıldı.",
+"<b>Nüfus Mübadelesi:</b> Türkiye–Yunanistan arasında nüfus değişimi.",
+"<b>Milletler Cemiyeti’ne giriş:</b> 1932.",
+"<b>Balkan Antantı (1934):</b> Türkiye, Yunanistan, Romanya, Yugoslavya.",
+"<b>Sadabat Paktı (1937):</b> Türkiye, İran, Irak, Afganistan.",
+"<b>Montrö Boğazlar Sözleşmesi (1936):</b> Boğazlarda Türk egemenliği sağlandı.",
+"<b>Hatay:</b> 1939’da ana vatana katıldı."
+]),
+[
+mc("Boğazlar üzerinde Türkiye’nin egemenlik haklarını sağlayan 1936 tarihli antlaşma hangisidir?",
+"Montrö Boğazlar Sözleşmesi",
+["Lozan Antlaşması","Sadabat Paktı","Balkan Antantı"],
+"Montrö ile Türkiye boğazlarda tam egemenlik kazandı."),
+mc("Sadabat Paktı hangi ülkeler arasında imzalanmıştır?",
+"Türkiye, İran, Irak, Afganistan",
+["Türkiye, Yunanistan, Romanya, Yugoslavya","Türkiye, Fransa, İngiltere, İtalya","Türkiye, Sovyetler, Bulgaristan, Macaristan"],
+"Sadabat Paktı Orta Doğu ülkeleri arasında 1937’de imzalandı."),
+mc("Hatay, hangi yıl Türkiye’ye katılmıştır?",
+"1939",
+["1923","1936","1945"],
+"Hatay 1939’da anavatana katıldı.")
+]);
+
+lesson(INK,"7. Ünite: Atatürk’ün Ölümü ve Sonrası","ink-ww2","Atatürk’ün Vefatı ve II. Dünya Savaşı","Tarafsızlık politikası",
+N("Atatürk 10 Kasım 1938’de İstanbul Dolmabahçe Sarayı’nda vefat etti.",[
+"İsmet İnönü ikinci Cumhurbaşkanı seçildi.",
+"<b>II. Dünya Savaşı:</b> 1 Eylül 1939’da Almanya’nın Polonya’ya saldırmasıyla başladı.",
+"Türkiye savaş boyunca <b>tarafsızlık ve denge politikası</b> izledi; 1945’te savaşın sonuna doğru savaşa dahil olmuştur (sembolik)."
+]),
+[
+mc("Atatürk hangi tarihte vefat etmiştir?",
+"10 Kasım 1938",
+["29 Ekim 1938","10 Kasım 1939","19 Mayıs 1938"],
+"Atatürk 10 Kasım 1938’de hayatını kaybetmiştir."),
+mc("II. Dünya Savaşı’nın başlangıcı sayılan olay hangisidir?",
+"Almanya’nın Polonya’ya saldırması",
+["Saraybosna suikastı","Versay Antlaşması’nın imzalanması","Sovyetler Birliği’nin kurulması"],
+"1 Eylül 1939’da Almanya’nın Polonya’ya saldırısı savaşın başlangıcıdır."),
+mc("Türkiye’nin II. Dünya Savaşı’nın büyük bölümünde izlediği politika hangisidir?",
+"Tarafsızlık ve denge politikası",
+["Almanya’nın yanında savaşa katılma","İtilaf Devletleri’ne savaş ilan etme","Tamamen izolasyon"],
+"Türkiye savaşın ağırlıklı bölümünde dengeli ve tarafsız bir politika yürüttü.")
+]);
+
+/* ================= DİN KÜLTÜRÜ VE AHLAK BİLGİSİ ================= */
+const DIN=subj("din","Din Kültürü","🕌","#ffc800");
+
+lesson(DIN,"1. Ünite: Kader İnancı","din-kader","Kader ve Kaza","Kavramlar, sünnetullah",
+N("Kader ve kaza, Allah’ın her şeyi bir ölçüye göre yaratmasıyla ilgilidir.",[
+"<b>Kader:</b> Allah’ın ezelî ilmiyle her şeyi bilmesi ve takdir etmesidir.",
+"<b>Kaza:</b> Takdir edilenin zamanı geldiğinde yaratılıp gerçekleşmesidir.",
+"<b>Sünnetullah:</b> Allah’ın evrende koyduğu değişmez yasalar (fiziksel, biyolojik, toplumsal)."
+]),
+[
+mc("Kader inancıyla ilgili aşağıdaki yorumlardan hangisi doğrudur?",
+"İnsan sebeplere başvurup elinden geleni yaptıktan sonra sonucu Allah’a bırakır (tevekkül).",
+["İnsanın iradesi olmadığı için yaptıklarından sorumlu tutulmaz.","Kötü bir sonuçla karşılaşan kişi hiçbir çaba göstermemelidir.","Allah’ın önceden bilmesi, insanın seçimlerini zorunlu kılar."],
+"İnsan, iradesini kullanarak çalışmakla sorumludur. Çabadan sonra sonucu Allah’a bırakmak tevekküldür."),
+mc("Kaza kavramı aşağıdakilerden hangisini ifade eder?",
+"Takdir edilen şeyin zamanı gelince yaratılıp gerçekleşmesini",
+["Allah’ın her şeyi ezelî ilmiyle bilip takdir etmesini","Olayların tesadüfen meydana gelmesini","İnsanın tüm davranışlarında mecbur olmasını"],
+"Kaza, takdir edilen şeyin gerçekleşmesidir. İlk seçenek kaderin tanımıdır."),
+mc("Allah’ın evrende koyduğu değişmez düzen ve yasalara ne ad verilir?",
+"Sünnetullah",
+["Tevekkül","Ecel","Zekât"],
+"Fiziksel, biyolojik ve toplumsal yasalara sünnetullah denir.")
+]);
+
+lesson(DIN,"1. Ünite: Kader İnancı","din-irade","İrade, Ecel, Rızık ve Tevekkül","Cüzi irade, külli irade ve kavramlar",
+N("İnsan iradesini kullanabilir ama Allah’ın iradesi sınırsızdır.",[
+"<b>Cüzi irade:</b> İnsanın seçme ve tercih yapma gücüdür; insan yaptıklarından sorumludur.",
+"<b>Külli irade:</b> Allah’ın her şeyi kapsayan mutlak iradesidir.",
+"<b>Ecel:</b> Ömrün sona erdiği zaman. <b>Ömür:</b> Yaşam süresi. <b>Rızık:</b> Yaşamı sürdürmek için verilen helal nimetler.",
+"<b>Tevekkül:</b> Gerekli çabayı gösterdikten sonra sonucu Allah’a bırakmaktır.",
+"Sağlık, hastalık, başarı, başarısızlık ve afetler insan için imtihandır."
+]),
+[
+mc("İnsanın seçme ve tercih yapabilme gücüne ne denir?",
+"Cüzi irade",
+["Külli irade","Ecel","Sünnetullah"],
+"Cüzi irade, insana verilen sınırlı irade ve seçme gücüdür."),
+mc("Aşağıdakilerden hangisi doğru tevekkül anlayışını yansıtır?",
+"Sınava çalışıp sonucu Allah’a bırakmak",
+["Hiç çalışmadan sonucu beklemek","Başarısızlığı kadere yükleyip pes etmek","Önlem almadan hastalığa yakalanmayı kadere bırakmak"],
+"Tevekkül, çalışma ve önlem aldıktan sonra güvenmektir."),
+tf("Ecel, kişinin yaşam süresinin sona erdiği zamandır.",true,
+"Ecel, ömrün bittiği vakittir.")
+]);
+
+lesson(DIN,"1. Ünite: Kader İnancı","din-musa","Hz. Musa ve Ayetü’l-Kürsi","Bir peygamber ve bir ayet tanıyorum",
+N("Hz. Musa (a.s.), İsrailoğullarına gönderilen peygamberdir.",[
+"Mısır’da Firavun’un zulmüne karşı mücadele etti ve İsrailoğullarını kurtardı.",
+"Kardeşi Hz. Harun ona yardımcı oldu; kendisine <b>Tevrat</b> verildi.",
+"<b>Ayetü’l-Kürsi</b> (Bakara Suresi, 255. ayet): Allah’ın birliğini, ilmini, kudretini ve her şeyi koruyuculuğunu anlatır."
+]),
+[
+mc("Hz. Musa’ya verilen kutsal kitap hangisidir?",
+"Tevrat",
+["İncil","Zebur","Kur’an-ı Kerim"],
+"Tevrat, Hz. Musa’ya indirilen kitaptır."),
+mc("Hz. Musa hangi zalim hükümdara karşı mücadele etmiştir?",
+"Firavun",
+["Nemrut","Ebrehe","Kral Herod"],
+"Hz. Musa, Mısır’da Firavun’un zulmüne karşı mücadele etti."),
+mc("Ayetü’l-Kürsi hangi surede yer alır?",
+"Bakara Suresi",
+["Âl-i İmran Suresi","Nisâ Suresi","İhlâs Suresi"],
+"Ayetü’l-Kürsi, Bakara Suresi’nin 255. ayetidir.")
+]);
+
+lesson(DIN,"2. Ünite: Zekât ve Sadaka","din-zekat","Zekât ve Sadaka","Yardımlaşma ve paylaşma",
+N("İslam, paylaşmaya ve yardımlaşmaya büyük önem verir.",[
+"<b>Zekât:</b> Belirli miktarda mala (nisap) sahip Müslümanın, malının belirli bir kısmını ihtiyaç sahiplerine vermesidir. Paralarda oran kırkta birdir (1/40, yüzde 2,5).",
+"<b>Sadaka:</b> Karşılıksız verilen yardımdır; miktarı ve zamanı sınırlı değildir.",
+"<b>Sadaka-i cariye:</b> Faydası uzun süre devam eden hayır işleri (çeşme, okul yaptırmak).",
+"<b>Fıtır sadakası (fitre):</b> Ramazan Bayramı namazından önce verilir.",
+"<b>Yardımlaşma adabı:</b> “Sağ elin verdiğini sol el görmemeli” — gösterişten uzak durulur."
+]),
+[
+mc("Ramazan Bayramı namazından önce verilen sadakaya ne denir?",
+"Fıtır sadakası (fitre)",
+["Kurban","Zekât","Adak"],
+"Fıtır sadakası Ramazan ayının sonunda bayram namazından önce verilir."),
+mc("Zekât paralarda hangi oranda verilir?",
+"Kırkta bir (1/40)",
+["Onda bir","Beşte bir","Yüzde on"],
+"Paralarda zekât oranı 1/40’tır."),
+tf("Sadaka-i cariye, faydası uzun süre devam eden hayır işlerini ifade eder.",true,
+"Çeşme, okul veya yol yaptırmak sadaka-i cariyeye örnektir.")
+]);
+
+lesson(DIN,"2. Ünite: Zekât ve Sadaka","din-suayb","Hz. Şuayb ve Maûn Suresi","Ölçü, adalet ve yardımlaşma",
+N("Hz. Şuayb (a.s.), Medyen halkına gönderilmiştir.",[
+"Halkını ölçü ve tartıda hile yapmaktan sakındırdı; adaleti ve dürüstlüğü anlattı.",
+"<b>Maûn Suresi:</b> Yetimi itip kakmayı, yoksulu doyurmayı teşvik etmemeyi, gösteriş yapmayı ve küçük yardımı esirgemeyi eleştirir."
+]),
+[
+mc("Hz. Şuayb hangi topluma gönderilmiştir?",
+"Medyen halkı",
+["Âd kavmi","Semûd kavmi","Lut kavmi"],
+"Hz. Şuayb Medyen halkına peygamber olarak gönderildi."),
+mc("Hz. Şuayb’ın halkını en çok uyardığı konu aşağıdakilerden hangisidir?",
+"Ölçü ve tartıda hile yapmamaları",
+["Gemi yapmaları","Yağmur duası etmeleri","Yeni şehir kurmaları"],
+"Ticarette adalet ve dürüstlüğü vurguladı."),
+mc("Maûn Suresi’nde kınanan davranış aşağıdakilerden hangisidir?",
+"Yetimi itip kakmak ve yoksulu doyurmayı teşvik etmemek",
+["Zekâtı fazla vermek","Gece namazı kılmak","Komşuya yardım etmek"],
+"Sure, yardımlaşmayı ihmal edenleri eleştirir.")
+]);
+
+lesson(DIN,"3. Ünite: Din ve Hayat","din-hayat","Din, Birey ve Toplum","Dinin temel hakları koruma gayesi",
+N("Din, bireyin ve toplumun huzurunu, ahlaki düzenini sağlar.",[
+"Dinin amacı insanın dünya ve ahiret mutluluğunu sağlamaktır.",
+"<b>Korunması gereken beş temel hak:</b> Canın, neslin, aklın, malın ve dinin korunması.",
+"Örnek: Hırsızlığın yasak olması malı, alkol ve uyuşturucunun yasak olması aklı korumaya yöneliktir."
+]),
+[
+mc("Aşağıdakilerden hangisi dinin korunmasını amaçladığı temel haklardan biridir?",
+"Aklın korunması",
+["Rütbenin korunması","Makamın korunması","Şöhretin korunması"],
+"Beş temel hak: can, nesil, akıl, mal ve din."),
+mc("Alkol ve uyuşturucunun yasaklanması hangi temel hakkın korunmasıyla ilgilidir?",
+"Aklın korunması",
+["Malın korunması","Neslin korunması","Dinin korunması"],
+"Bu yasaklar insan aklının zarar görmesini önler."),
+tf("Hırsızlığın yasaklanması, malın korunması ilkesiyle ilgilidir.",true,
+"Hırsızlık yasağı insanların malını güvence altına alır.")
+]);
+
+lesson(DIN,"3. Ünite: Din ve Hayat","din-yusuf","Hz. Yusuf ve Asr Suresi","İffet, sabır ve zamanın değeri",
+N("Hz. Yusuf (a.s.), sabrı ve iffetiyle bilinen bir peygamberdir.",[
+"Kardeşleri onu kuyuya attı; Mısır’da köle olarak satıldı, iftiraya uğradı ve hapse düşürüldü.",
+"Sabır, iffet ve doğruluğu sayesinde Mısır’da yüksek bir göreve getirildi.",
+"<b>Asr Suresi:</b> Zamana yemin eder; iman edip salih amel işleyenler, birbirine hakkı ve sabrı tavsiye edenler hariç insanın ziyanda olduğunu bildirir."
+]),
+[
+mc("Hz. Yusuf’u en çok hangi özellikleriyle tanırız?",
+"İffeti ve sabrı",
+["Gemi yapması","Asa mucizesi","Putları kırması"],
+"Hz. Yusuf, iftira ve zorluklara sabrederek iffetini korudu."),
+mc("Asr Suresi’ne göre ziyanda olmayanlar kimlerdir?",
+"İman edip salih amel işleyenler, birbirine hakkı ve sabrı tavsiye edenler",
+["Zengin olanlar","Çok bilenler","Güç sahibi olanlar"],
+"Sure, ziyandan kurtuluşun iman, salih amel, hak ve sabır tavsiyesiyle mümkün olduğunu bildirir."),
+tf("Asr Suresi, zamanın değerine dikkat çeker.",true,
+"Sure “Asra yemin olsun” ifadesiyle başlar ve zamanın önemini vurgular.")
+]);
+
+lesson(DIN,"4. Ünite: Hz. Muhammed’in Örnekliği","din-muhammed","Hz. Muhammed’in Örnekliği ve Kureyş Suresi","Güvenilirlik, merhamet, adalet, istişare",
+N("Hz. Muhammed (s.a.v.) örnek ahlakıyla insanlığa rehberdir.",[
+"<b>Muhammedü’l-Emin:</b> Doğruluğu ve güvenilirliğiyle peygamberlik öncesi de bu lakapla anıldı.",
+"Merhametli ve adaletliydi, kul hakkına büyük önem verirdi.",
+"<b>İstişare:</b> İşlerde danışarak karar verirdi.",
+"Davasında cesaret ve kararlılık gösterdi, insanlara değer verdi.",
+"<b>Kureyş Suresi:</b> Kureyş’e verilen nimetleri (ticaret yolculuklarının güvenliği, doyurulma ve korkudan emin kılınma) hatırlatır; Kâbe’nin Rabbine kulluk etmeyi emreder."
+]),
+[
+mc("Hz. Muhammed’e peygamberlik öncesinde verilen lakap hangisidir?",
+"Muhammedü’l-Emin",
+["Sıddık","Faruk","Zinnureyn"],
+"Güvenilirliği nedeniyle “Muhammedü’l-Emin” diye anıldı."),
+mc("“İstişare” ne demektir?",
+"Danışarak iş yapmak",
+["Gizli yardım etmek","Sabretmek","Bağışlamak"],
+"Hz. Peygamber kararlarını sahabeye danışarak alırdı."),
+mc("Kureyş Suresi’nde hangi nimet hatırlatılır?",
+"Ticaret yolculuklarında güven ve doyurulma",
+["Fil ordusunun yok edilmesi","Bedir Savaşı’nda zafer","Zemzem kuyusunun bulunması"],
+"Kureyş Suresi, ticaret yolculuklarındaki güvenlik ve rızık nimetini hatırlatır.")
+]);
+
+lesson(DIN,"5. Ünite: Kur’an-ı Kerim ve Özellikleri","din-kuran","Kur’an-ı Kerim ve Özellikleri","Ana konular ve temel özellikler",
+N("Kur’an-ı Kerim, Allah’ın insanlara gönderdiği son kutsal kitaptır.",[
+"<b>Ana konular:</b> İnanç (tevhid), ibadet, ahlak, sosyal hayat (muamelat) ve kıssalar.",
+"<b>Kıssalar:</b> Geçmiş peygamberlerin ve toplumların anlatıldığı bölümler.",
+"<b>Özellikleri:</b> Yol göstericidir, açıklayıcıdır, aklı kullanmaya ve düşünmeye teşvik eder."
+]),
+[
+mc("Kur’an-ı Kerim’de geçmiş peygamberlerin ve toplumların anlatıldığı bölümlere ne denir?",
+"Kıssalar",
+["Tevhid","Muamelat","İbadet"],
+"Kıssalar, geçmiş toplumlardan ibret almayı sağlar."),
+mc("Alışveriş, evlilik ve miras gibi insan ilişkilerini düzenleyen hükümler Kur’an’ın hangi ana konusunda yer alır?",
+"Sosyal hayat (muamelat)",
+["İnanç","İbadet","Kıssalar"],
+"İnsanlar arası ilişkiler muamelat bölümünde ele alınır."),
+tf("Kur’an-ı Kerim insanları aklını kullanmaya ve düşünmeye teşvik eder.",true,
+"Kur’an, düşünmeyi, gözlem yapmayı ve ibret almayı öğütler.")
+]);
+
+lesson(DIN,"5. Ünite: Kur’an-ı Kerim ve Özellikleri","din-nuh","Hz. Nuh","Sabır ve mücadele",
+N("Hz. Nuh (a.s.), uzun yıllar kavmini Allah’a imana davet etmiş bir peygamberdir.",[
+"Kavminin büyük bölümü inanmadı, alay etti.",
+"Allah’ın emriyle gemi yaptı; tufandan inananlar ve canlı çiftleri kurtuldu.",
+"Hz. Nuh’un hayatı <b>sabır</b> ve <b>azim</b> dersidir."
+]),
+[
+mc("Hz. Nuh’un hayatından alınabilecek en önemli ders hangisidir?",
+"Hak yolda sabırla mücadele etmek",
+["Zorluk görünce vazgeçmek","İnananları yalnız bırakmak","Mücadele etmeden beklemek"],
+"Hz. Nuh uzun yıllar sabırla tebliğ yaptı."),
+mc("Hz. Nuh tufandan kurtulmak için ne yapmıştır?",
+"Allah’ın emriyle gemi yapmıştır.",
+["Duvar ördü.","Çöle gitti.","Barınak kazdı."],
+"Tufan öncesinde gemi yapıldı ve inananlar bu gemiyle kurtuldu."),
+tf("Hz. Nuh, uzun yıllar kavmini Allah’a imana davet etmiştir.",true,
+"Kur’an’a göre Hz. Nuh kavmini uzun süre tebliğ etmiştir.")
+]);
+
+/* ================= İNGİLİZCE ================= */
+const ING=subj("ing","İngilizce","🇬🇧","#ff4b4b");
+
+lesson(ING,"1. Ünite","ing-friend","Friendship","Davet etme, kabul etme, reddetme, mazeret bildirme",
+N("<b>Davet, kabul ve ret</b> kalıpları arkadaşlık ünitesinin ana konusudur.",[
+"Davet: <i>Would you like to go to the cinema?</i>",
+"Kabul: <i>I’d love to. / Sure, great idea!</i>",
+"Ret ve mazeret: <i>I’m sorry, I can’t. I have to study.</i>",
+"<b>Kelimeler:</b> buddy (arkadaş), count on (güvenmek), back up (desteklemek), trust (güven), share (paylaşmak), honest (dürüst), get on well with (iyi geçinmek), refuse (reddetmek), accept (kabul etmek)."
+]),
+[
+bl("Diyaloğu tamamla: Leo’nun cevabını kelime bloklarıyla oluştur.","Mia","👧","Leo","👦",
+"Would you like to go to the cinema with me tonight?","Bu akşam benimle sinemaya gitmek ister misin?",
+"Cevap: “Çok isterdim ama ders çalışmam gerekiyor.”",
+"I’d love to, but I have to study.",
+["I’d","love","to,","but","I","have","to","study.","am","yesterday","can"],
+"“I’d love to, but I have to …” daveti nazikçe reddetmek için kullanılan bir kalıptır."),
+mc("A good friend is ______. He never tells lies.\n\nBoşluğa uygun sözcüğü seç.",
+"honest",
+["selfish","jealous","rude"],
+"“Never tells lies” (asla yalan söylemez) ifadesi “honest” (dürüst) sıfatını işaret eder."),
+mc("“I get on well with my classmates.” cümlesinde “get on well with” ne anlama gelir?",
+"iyi geçinmek",
+["kavga etmek","uzak durmak","kıskanmak"],
+"“Get on well with” = iyi anlaşmak, iyi geçinmek.")
+]);
+
+lesson(ING,"2. Ünite","ing-teen","Teen Life","Günlük rutinler, tercihler, sevilen ve sevilmeyen şeyler",
+N("<b>Teen Life</b> ünitesinde günlük aktiviteler, ilgi alanları ve tercihler anlatılır.",[
+"Tercih: <i>I prefer tea to coffee. / I would rather watch a film.</i>",
+"Sevme: <i>She is fond of chocolate. / He is keen on football.</i>",
+"<b>Kelimeler:</b> unbearable (katlanılmaz), trendy (modaya uygun), fond of / keen on (düşkün olmak), healthy (sağlıklı), regular (düzenli), ordinary (sıradan), exciting (heyecan verici)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Ece","👩","Can","🧑",
+"Which do you prefer, tea or coffee?","Çay mı, kahve mi tercih edersin?",
+"Cevap: “Çayı kahveye tercih ederim.”",
+"I prefer tea to coffee.",
+["I","prefer","tea","to","coffee.","than","rather","would"],
+"“Prefer … to …” kalıbıyla iki şey arasında tercih belirtilir."),
+mc("She is very fond ______ chocolate.",
+"of",
+["at","in","on"],
+"“Be fond of” = düşkün olmak."),
+mc("“Unbearable” sözcüğünün anlamı nedir?",
+"katlanılmaz",
+["heyecan verici","sıradan","modaya uygun"],
+"Unbearable = dayanılmaz, katlanılmaz.")
+]);
+
+lesson(ING,"3. Ünite","ing-kitchen","In the Kitchen","Yemek tarifleri, pişirme yöntemleri, tat sıfatları",
+N("<b>Tarif verirken sıra belirtmek için:</b> First, Second, Then, Next, Finally.",[
+"<b>Pişirme fiilleri:</b> bake (fırınlamak), boil (haşlamak), fry (kızartmak), grill (ızgara yapmak), dice (küp doğramak), chop (doğramak), peel (soymak).",
+"<b>Tat sıfatları:</b> sour (ekşi), sweet (tatlı), spicy (acı baharatlı), bitter (acı).",
+"<b>Ingredients:</b> malzemeler."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Nil","👧","Ali","👦",
+"How do you make mashed potatoes?","Patates püresi nasıl yapılır?",
+"Cevap: “Önce patatesleri soy ve haşla.”",
+"First, peel and boil the potatoes.",
+["First,","peel","and","boil","the","potatoes.","finally","fry","bake"],
+"Tarifin ilk adımı “First” ile başlar."),
+mc("Which word means “küp küp doğramak”?",
+"dice",
+["boil","fry","peel"],
+"Dice = küp küp doğramak."),
+mc("Lemon juice tastes ______.",
+"sour",
+["sweet","spicy","bitter"],
+"Limon ekşidir: sour.")
+]);
+
+lesson(ING,"4. Ünite","ing-phone","On the Phone","Telefon konuşmaları, mesaj bırakma",
+N("<b>Telefonda kullanılan kalıplar:</b>",[
+"<i>Can I speak to …, please?</i> / <i>Hold on, please.</i> / <i>I’ll put you through.</i>",
+"<i>Can I leave a message?</i> / <i>Could you repeat that, please?</i>",
+"<b>Kelimeler:</b> hold on (beklemek), hang up (telefonu kapatmak), put somebody through (birini bağlamak), pick up (telefonu açmak), available (müsait), leave a message (mesaj bırakmak), connect (bağlamak)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Receptionist","👩‍💼","You","🧑",
+"I’m sorry, Mr. Smith is not available now.","Üzgünüm, Bay Smith şu an müsait değil.",
+"Cevap: “Mesaj bırakabilir miyim?”",
+"Can I leave a message?",
+["Can","I","leave","a","message?","hang","up","hold"],
+"“Can I leave a message?” telefonda mesaj bırakmak için kullanılır."),
+mc("— Can I speak to Mr. Brown, please?\n— Sure, ______ a moment. I’ll put you through.",
+"hold on",
+["hang up","pick up","switch off"],
+"“Hold on” = Bir dakika bekleyin."),
+mc("“Hang up” ne anlama gelir?",
+"telefonu kapatmak",
+["telefonu açmak","birini bağlamak","mesaj bırakmak"],
+"Hang up = telefonu kapatmak.")
+]);
+
+lesson(ING,"5. Ünite","ing-internet","The Internet","İnternet alışkanlıkları ve güvenlik kuralları",
+N("<b>İnternet ünitesi</b> kelime ve güvenlik kurallarını içerir.",[
+"<b>Kelimeler:</b> download (indirmek), upload (yüklemek), connection (bağlantı), account (hesap), search engine (arama motoru), sign in / log in (giriş yapmak), password (şifre).",
+"<b>Güvenlik:</b> Never share your password. Don’t talk to strangers online. Use strong passwords."
+]),
+[
+mc("We use a ______ like Google to find information on the internet.",
+"search engine",
+["password","account","connection"],
+"Google gibi araçlar arama motorudur (search engine)."),
+mc("Which one is a safety rule on the internet?",
+"Never share your password with anyone.",
+["Click on every link in your emails.","Use the same password for every website.","Give your address to people you meet online."],
+"Şifre paylaşılmaz; bu temel bir güvenlik kuralıdır."),
+tf("“Upload” means to copy a file from the internet to your computer.",false,
+"Upload dosyayı internete yüklemektir; internetten indirmek için “download” kullanılır.")
+]);
+
+lesson(ING,"6. Ünite","ing-adv","Adventures","Ekstrem sporlar, karşılaştırma, tercihler",
+N("<b>Adventures</b> ünitesi macera sporlarını ve karşılaştırmaları işler.",[
+"Karşılaştırma: <i>Paragliding is more dangerous than hiking.</i>",
+"Tercih: <i>I prefer rafting to paragliding.</i>",
+"<b>Kelimeler:</b> extreme sports (ekstrem sporlar), challenging (zorlayıcı), risky (riskli), fascinating (büyüleyici), paragliding (yamaç paraşütü), white-water rafting, helmet (kask), life jacket (can yeleği)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Tom","👦","Zeynep","👧",
+"Which one do you prefer, rafting or paragliding?","Hangisini tercih edersin, rafting mi paraşüt mü?",
+"Cevap: “Raftingi yamaç paraşütüne tercih ederim.”",
+"I prefer rafting to paragliding.",
+["I","prefer","rafting","to","paragliding.","than","rather","more"],
+"“Prefer A to B” kalıbı kullanılır."),
+mc("Paragliding is ______ than hiking.",
+"more dangerous",
+["dangerouser","most dangerous","as dangerous"],
+"Uzun sıfatlarda karşılaştırma “more + sıfat + than” ile yapılır."),
+mc("You must wear a ______ for safety on the water.",
+"life jacket",
+["scarf","necklace","tie"],
+"Can yeleği (life jacket) su sporlarında güvenlik ekipmanıdır.")
+]);
+
+lesson(ING,"7. Ünite","ing-tourism","Tourism","Tatil deneyimleri, konaklama, turistik yerler",
+N("<b>Tourism</b> ünitesinde geçmiş tatil deneyimleri anlatılır.",[
+"Geçmiş zaman: <i>We went to Antalya last summer. We stayed in a hotel.</i>",
+"<b>Kelimeler:</b> accommodation (konaklama), all-inclusive (her şey dahil), historic sites (tarihî yerler), souvenir (hatıra eşya), incredible (inanılmaz), architecture (mimari), climate (iklim)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Ben","🧑","Ayşe","👩",
+"Where did you stay on your holiday?","Tatilinde nerede kaldın?",
+"Cevap: “Her şey dahil bir otelde kaldık.”",
+"We stayed in an all-inclusive hotel.",
+["We","stayed","in","an","all-inclusive","hotel.","stay","go"],
+"Geçmiş zaman için “stayed” kullanılır."),
+mc("Last summer, we ______ to Antalya.",
+"went",
+["go","goes","going"],
+"“Last summer” geçmiş zamanı gösterir; go fiilinin geçmiş hâli went’tir."),
+mc("A place where tourists stay is called ______.",
+"accommodation",
+["souvenir","climate","architecture"],
+"Accommodation = konaklama yeri.")
+]);
+
+lesson(ING,"8. Ünite","ing-chores","Chores","Ev işleri, sorumluluklar, zorunluluklar",
+N("<b>Chores</b> ünitesinde evdeki sorumluluklar anlatılır.",[
+"Zorunluluk: <i>I must tidy up my room. / I have to take out the garbage.</i>",
+"<b>Kelimeler:</b> responsibility (sorumluluk), obligation (yükümlülük), take out the garbage (çöpü çıkarmak), load the dishwasher (bulaşık makinesini doldurmak), mop the floor (yeri silmek), tidy up (toparlamak), make the bed (yatak yapmak)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Anne","👩","Sen","🧑",
+"What are your chores at home?","Evde hangi işleri yapıyorsun?",
+"Cevap: “Bulaşık makinesini doldurmalıyım.”",
+"I must load the dishwasher.",
+["I","must","load","the","dishwasher.","can","mop","did"],
+"“Must” zorunluluk bildirir."),
+mc("I ______ tidy my room every day. It’s my responsibility.",
+"have to",
+["can","would","may"],
+"Zorunluluk için “have to” kullanılır."),
+mc("“Take out the garbage” ne anlama gelir?",
+"çöpü dışarı çıkarmak",
+["bulaşık yıkamak","yatak yapmak","yeri silmek"],
+"Take out the garbage = çöpü çıkarmak.")
+]);
+
+lesson(ING,"9. Ünite","ing-science","Science","Bilimsel gelişmeler, icatlar, deneyler",
+N("<b>Science</b> ünitesinde icatlar ve bilimsel çalışmalar anlatılır.",[
+"<i>Alexander Graham Bell invented the telephone.</i>",
+"<b>Kelimeler:</b> invention (icat), discovery (keşif), conduct an experiment (deney yapmak), lab (laboratuvar), test tube (deney tüpü), high-tech (yüksek teknoloji), vaccine (aşı)."
+]),
+[
+bl("Diyaloğu tamamla: Cevabı kelime bloklarıyla oluştur.","Teacher","👩‍🏫","Student","🧑‍🎓",
+"Who invented the telephone?","Telefonu kim icat etti?",
+"Cevap: “Alexander Graham Bell onu icat etti.”",
+"Alexander Graham Bell invented it.",
+["Alexander","Graham","Bell","invented","it.","discovers","was"],
+"“Invent” fiili icat etmek anlamına gelir."),
+mc("Scientists ______ experiments in the lab.",
+"conduct",
+["bake","fry","download"],
+"Deney yapmak: conduct an experiment."),
+mc("Penicillin was a great ______ in medicine.",
+"discovery",
+["test tube","lab","vaccine"],
+"Bir şeyi ilk kez bulmak keşiftir: discovery.")
+]);
+
+lesson(ING,"10. Ünite","ing-forces","Natural Forces","Doğal afetler, nedenleri, sonuçları ve önlemler",
+N("<b>Natural Forces</b> ünitesinde doğal afetler ve önlemler işlenir.",[
+"<b>Kelimeler:</b> earthquake (deprem), flood (sel), avalanche (çığ), landslide (heyelan), global warming (küresel ısınma), eco-friendly (çevre dostu), protect (korumak), shortage (kıtlık).",
+"Önlem örneği: <i>We should recycle and use eco-friendly products.</i>"
+]),
+[
+mc("A very strong shaking of the ground is called an ______.",
+"earthquake",
+["flood","avalanche","landslide"],
+"Earthquake = deprem."),
+mc("To fight global warming, we should be ______.",
+"eco-friendly",
+["wasteful","careless","harmful"],
+"Eco-friendly = çevre dostu."),
+tf("An avalanche is a large amount of snow sliding down a mountain.",true,
+"Avalanche = çığ.")
+]);
+
+/* ================= SEÇMELİ: KÜLTÜR VE MEDENİYETİMİZE YÖN VERENLER ================= */
+const KMY=subj("kmy","Kültür ve Medeniyetimize Yön Verenler","🏛️","#2dd4bf",true);
+
+lesson(KMY,"1. Ünite: Kültür ve Medeniyet","kmy-kultur","Kültür ve Medeniyet","Temel kavramlar, unsurlar, medeniyet havzaları",
+N("<b>Kültür</b>, bir toplumun yaşayış biçimini oluşturan maddi ve manevi değerlerin bütünüdür. <b>Medeniyet</b> ise insanlığın ortak birikimidir.",[
+"<b>Manevi unsurlar:</b> dil, din, gelenek ve görenekler, atasözleri, değerler.",
+"<b>Maddi unsurlar:</b> mimari eserler, giyim, yemek, araç gereç.",
+"<b>Kültür millîdir</b> (her toplumun kendine özgü); <b>medeniyet evrenseldir</b> (kültürlerin ortak birikimidir).",
+"Medeniyet havzaları birbiriyle etkileşerek zenginleşir."
+]),
+[
+mc("Aşağıdakilerden hangisi kültürün manevi unsurlarından biridir?","Atasözleri",["Köprü","Çeşme","Kılıç"],
+"Dil, din, gelenek ve atasözleri manevi; yapı ve araçlar maddi unsurlardır."),
+mc("Kültür ve medeniyet arasındaki fark aşağıdakilerden hangisidir?","Kültür millî, medeniyet ise evrensel niteliktedir.",
+["Kültür evrensel, medeniyet millîdir.","İkisi de aynı anlama gelir.","Medeniyet yalnızca dil demektir."],
+"Kültür bir topluma özgüdür; medeniyet ise birçok kültürün ortak birikimidir."),
+tf("Farklı medeniyet havzaları birbirleriyle etkileşerek zenginleşir.",true,"Medeniyetler karşılıklı alışverişle gelişir.")
+]);
+
+lesson(KMY,"2. Ünite: Gönül Erleri","kmy-yesevi","Ahmet Yesevi ve Ahi Evran","Pîr-i Türkistan ve Ahilik",
+N("Bu iki şahsiyet Anadolu ve Türk dünyasının ahlak anlayışına yön vermiştir.",[
+"<b>Ahmet Yesevi:</b> “Pîr-i Türkistan” olarak anılır; eseri <b>Divan-ı Hikmet</b>. Hoşgörüyü ve halka hizmeti öğütledi.",
+"<b>Ahi Evran:</b> Ahilik teşkilatının temsilcisi; esnaf ve sanatkârın mesleki ve ahlaki yönden yetiştirilmesine önem verdi."
+]),
+[
+mc("Divan-ı Hikmet adlı eser kime aittir?","Ahmet Yesevi",["Yunus Emre","Mevlânâ","Hacı Bektaş-ı Velî"],"Divan-ı Hikmet, Ahmet Yesevi’nin eseridir."),
+mc("Ahilik teşkilatının temel amacı aşağıdakilerden hangisidir?","Esnaf ve sanatkârı mesleki ve ahlaki yönden yetiştirmek",["Ordu kurmak","Vergi toplamak","Yabancı ticareti engellemek"],"Ahilik, meslek ahlakı ve dayanışmayı esas alır."),
+tf("Ahmet Yesevi, “Pîr-i Türkistan” olarak anılır.",true,"Türk dünyasında manevi rehber kabul edilmiştir.")
+]);
+
+lesson(KMY,"2. Ünite: Gönül Erleri","kmy-mevlana","Mevlânâ ve Hacı Bektaş-ı Velî","Sevgi, hoşgörü ve kâmil insan",
+N("Mevlânâ ve Hacı Bektaş-ı Velî, sevgi ve hoşgörü anlayışıyla tanınır.",[
+"<b>Mevlânâ Celâleddîn-i Rûmî:</b> Konya’da yaşadı; eserleri <b>Mesnevi</b> ve Divan-ı Kebir. Evrensel sevgi ve kâmil insan anlayışını işledi.",
+"<b>Hacı Bektaş-ı Velî:</b> İlim, irfan ve insan sevgisini öğütledi. “Eline, beline, diline sahip ol” öğüdüyle bilinir."
+]),
+[
+mc("Mesnevi adlı eser kime aittir?","Mevlânâ",["Yunus Emre","Ahi Evran","Şeyh Edebali"],"Mesnevi, Mevlânâ’nın en bilinen eseridir."),
+mc("“Eline, beline, diline sahip ol.” öğüdü kime atfedilir?","Hacı Bektaş-ı Velî",["Mevlânâ","Ahi Evran","Şeyh Edebali"],"Bu söz Hacı Bektaş-ı Velî’nin öğütleri arasında anılır."),
+tf("Mevlânâ’nın düşüncesinde evrensel sevgi önemli bir yer tutar.",true,"Sevgi ve hoşgörü, öğretisinin temelidir.")
+]);
+
+lesson(KMY,"2. Ünite: Gönül Erleri","kmy-yunus","Yunus Emre ve Şeyh Edebali","Sade Türkçe ve devlet ahlakı",
+N("Bu iki şahsiyet halka yakın dil ve adaletli yönetim anlayışıyla bilinir.",[
+"<b>Yunus Emre:</b> Tasavvuf şiirinde yalın ve duru Türkçeyi kullandı; insan sevgisini, “Yaratılanı hoş gör” anlayışıyla anlattı.",
+"<b>Şeyh Edebali:</b> Osman Gazi’ye adalet ve devlet ahlakıyla ilgili öğütler verdi; Osmanlı’nın kuruluşunda manevi rehber oldu."
+]),
+[
+mc("Şiirlerinde sade Türkçeyi kullanan ve “Yaratılanı hoş gör” anlayışını savunan şair kimdir?","Yunus Emre",["Karacaoğlan","Mehmet Âkif Ersoy","Namık Kemal"],"Yunus Emre halka yalın bir dille seslenmiştir."),
+mc("Osman Gazi’ye adalet ve devlet ahlakıyla ilgili öğütler veren manevi rehber kimdir?","Şeyh Edebali",["Ahi Evran","Mevlânâ","Yunus Emre"],"Şeyh Edebali, Osmanlı’nın kuruluşunda manevi rehberdir."),
+tf("Yunus Emre, tasavvuf edebiyatının önemli temsilcilerindendir.",true,"Şiirlerinde ilahi aşk ve insan sevgisi öne çıkar.")
+]);
+
+lesson(KMY,"3. Ünite: Aydınlanma Yolcuları","kmy-harezmi","Harezmi, Farabi ve Biruni","Matematik, felsefe ve astronomi",
+N("Türk-İslam dünyasında bilim ve felsefenin öncü isimleridir.",[
+"<b>Harezmi:</b> Cebir biliminin kurucusu kabul edilir; onluk sistemin ve sıfırın yayılmasına katkıda bulundu. “Algoritma” sözcüğü onun adından türemiştir.",
+"<b>Farabi:</b> “Muallim-i Sânî” (İkinci Öğretmen) unvanlı filozof; felsefe, mantık ve müzikle ilgilendi.",
+"<b>Biruni:</b> Astronomi, coğrafya ve matematikte çalıştı; Dünya’nın yarıçapını hesapladı."
+]),
+[
+mc("Cebir biliminin kurucusu kabul edilen bilgin kimdir?","Harezmi",["Farabi","Biruni","Cezeri"],"Harezmi, cebir alanındaki çalışmalarıyla bilinir."),
+mc("“Muallim-i Sânî” (İkinci Öğretmen) unvanıyla anılan filozof kimdir?","Farabi",["İbn-i Sina","Harezmi","Biruni"],"Farabi, Aristoteles’ten sonra “ikinci öğretmen” sayılmıştır."),
+mc("Dünya’nın yarıçapını hesaplayan, astronomi ve coğrafya bilgini kimdir?","Biruni",["Cezeri","Kâtip Çelebi","İbn-i Sina"],"Biruni, bilimsel gözlem ve hesaplamalarıyla tanınır."),
+tf("“Algoritma” sözcüğü Harezmi’nin adından türemiştir.",true,"Harezmi’nin Latinceleştirilmiş adı algoritma sözcüğüne kaynaklık etmiştir.")
+]);
+
+lesson(KMY,"3. Ünite: Aydınlanma Yolcuları","kmy-sina","İbn-i Sina, Cezeri ve Kâtip Çelebi","Tıp, mühendislik ve coğrafya",
+N("Tıp, mühendislik ve coğrafya alanında önemli eserler bırakmışlardır.",[
+"<b>İbn-i Sina (Avicenna):</b> <i>el-Kanun fi’t-Tıb</i> adlı eseri yüzyıllarca Avrupa üniversitelerinde okutuldu.",
+"<b>Cezeri:</b> Su saatleri ve otomatik makineler yaptı; robotik ve otomasyonun öncülerinden sayılır.",
+"<b>Kâtip Çelebi:</b> <i>Cihannüma</i> (coğrafya) ve <i>Keşfü’z-Zunûn</i> (bibliyografya) eserlerini yazdı."
+]),
+[
+mc("“el-Kanun fi’t-Tıb” adlı tıp kitabı kime aittir?","İbn-i Sina",["Cezeri","Harezmi","Biruni"],"Bu eser yüzyıllarca tıp eğitiminde kullanıldı."),
+mc("Su saatleri ve otomatik makineleriyle tanınan bilgin kimdir?","Cezeri",["İbn-i Sina","Harezmi","Farabi"],"Cezeri, mekanik ve otomasyon alanında öncü kabul edilir."),
+mc("Cihannüma ve Keşfü’z-Zunûn adlı eserlerin yazarı kimdir?","Kâtip Çelebi",["Evliya Çelebi","Piri Reis","Harezmi"],"Kâtip Çelebi, coğrafya ve bibliyografya alanında önemli eserler yazmıştır.")
+]);
+
+lesson(KMY,"3. Ünite: Aydınlanma Yolcuları","kmy-yakin","Yakın Dönem Bilim İnsanları","Cahit Arf, Halil İnalcık, Oktay Sinanoğlu, Fuat Sezgin",
+N("Yakın dönemde Türk bilim insanları dünya çapında tanınmıştır.",[
+"<b>Cahit Arf:</b> Matematikçi; “Arf değişmezi” ile tanınır.",
+"<b>Halil İnalcık:</b> Osmanlı tarihi alanında dünyaca ünlü tarihçi.",
+"<b>Oktay Sinanoğlu:</b> Kimya alanındaki çalışmalarıyla tanınan bilim insanı.",
+"<b>Fuat Sezgin:</b> İslam bilim tarihi araştırmacısı."
+]),
+[
+mc("“Arf değişmezi” ile tanınan Türk matematikçi kimdir?","Cahit Arf",["Halil İnalcık","Oktay Sinanoğlu","Fuat Sezgin"],"Cahit Arf, matematikte çığır açan çalışmalar yapmıştır."),
+mc("İslam bilim tarihi araştırmalarıyla tanınan bilim insanı kimdir?","Fuat Sezgin",["Halil İnalcık","Cahit Arf","Oktay Sinanoğlu"],"Fuat Sezgin, İslam bilim tarihi üzerine kapsamlı çalışmalar yapmıştır."),
+mc("Osmanlı tarihi alanında dünyaca tanınan tarihçi kimdir?","Halil İnalcık",["Oktay Sinanoğlu","Cahit Arf","Fuat Sezgin"],"Halil İnalcık, Osmanlı tarihi uzmanıdır."),
+tf("Oktay Sinanoğlu kimya alanındaki çalışmalarıyla bilinir.",true,"Sinanoğlu kuramsal kimya alanında çalışmıştır.")
+]);
+
+lesson(KMY,"4. Ünite: Kültür ve Sanat Önderleri","kmy-mimar","Mimar Sinan, Turgut Cansever ve Osman Hamdi Bey","Mimari ve resim sanatı",
+N("Mimari ve görsel sanatlarda önder isimlerdir.",[
+"<b>Mimar Sinan:</b> Klasik Osmanlı mimarisinin ustası; Şehzade, Süleymaniye ve Selimiye camilerini yaptı. Selimiye’yi “ustalık eserim” diye niteledi.",
+"<b>Turgut Cansever:</b> Klasik estetiği modern mimari ve şehirciliğe taşıyan mimar.",
+"<b>Osman Hamdi Bey:</b> Türk müzeciliğinin ve arkeolojisinin kurucusu; <i>Kaplumbağa Terbiyecisi</i> tablosunun ressamı."
+]),
+[
+mc("Selimiye Camii’ni “ustalık eserim” olarak nitelendiren mimar kimdir?","Mimar Sinan",["Turgut Cansever","Osman Hamdi Bey","Ahi Evran"],"Selimiye, Mimar Sinan’ın ustalık eseridir."),
+mc("Kaplumbağa Terbiyecisi tablosunun ressamı kimdir?","Osman Hamdi Bey",["Mimar Sinan","Turgut Cansever","Namık Kemal"],"Osman Hamdi Bey aynı zamanda Türk müzeciliğinin kurucusudur."),
+mc("Klasik estetiği modern mimari ve şehirciliğe taşıyan mimar kimdir?","Turgut Cansever",["Mimar Sinan","Osman Hamdi Bey","Tanpınar"],"Turgut Cansever çağdaş Türk mimarisinin önemli isimlerindendir.")
+]);
+
+lesson(KMY,"4. Ünite: Kültür ve Sanat Önderleri","kmy-edebiyat","Âkif, Namık Kemal, Tanpınar ve Ömer Seyfettin","Edebiyat önderleri",
+N("Edebiyatta millî kimliğin oluşumuna katkı yapan isimler:",[
+"<b>Mehmet Âkif Ersoy:</b> İstiklal Marşı’nın şairi; <i>Safahat</i> adlı eseri vardır.",
+"<b>Namık Kemal:</b> Vatan ve hürriyet temalı eserleriyle tanınır; <i>Vatan yahut Silistre</i> oyununu yazdı.",
+"<b>Ahmet Hamdi Tanpınar:</b> Doğu-Batı sentezini işledi; <i>Huzur</i> romanının yazarıdır.",
+"<b>Ömer Seyfettin:</b> Türk öykücülüğünün önemli ismi; sade Türkçeyi savundu."
+]),
+[
+mc("İstiklal Marşı’nın şairi kimdir?","Mehmet Âkif Ersoy",["Namık Kemal","Ömer Seyfettin","Tanpınar"],"İstiklal Marşı’nı Mehmet Âkif Ersoy yazmıştır."),
+mc("Vatan yahut Silistre adlı oyun kime aittir?","Namık Kemal",["Mehmet Âkif Ersoy","Tanpınar","Ömer Seyfettin"],"Namık Kemal, vatan ve hürriyet temalarını işlemiştir."),
+mc("Huzur adlı romanın yazarı kimdir?","Ahmet Hamdi Tanpınar",["Ömer Seyfettin","Namık Kemal","Mehmet Âkif Ersoy"],"Tanpınar, Doğu-Batı sentezini eserlerinde işlemiştir."),
+tf("Ömer Seyfettin, Türk öykücülüğünün önemli isimlerindendir.",true,"Kısa öyküleriyle tanınır.")
+]);
+
+lesson(KMY,"4. Ünite: Kültür ve Sanat Önderleri","kmy-halk","Aşık Veysel, Karacaoğlan, Sadettin Kaynak ve Barış Manço","Halk kültürü ve müzik",
+N("Halk kültürünü ve müziği yaşatan isimler:",[
+"<b>Aşık Veysel:</b> Sivaslı saz ozanı; “Uzun ince bir yoldayım” şiiriyle tanınır.",
+"<b>Karacaoğlan:</b> 17. yüzyıl halk ozanı; doğa ve sevgi temalarını işledi.",
+"<b>Sadettin Kaynak:</b> Türk müziği bestekârı.",
+"<b>Barış Manço:</b> Geleneksel ezgileri modern müzikle buluşturan sanatçı."
+]),
+[
+mc("“Uzun ince bir yoldayım” dizesiyle tanınan saz ozanı kimdir?","Aşık Veysel",["Karacaoğlan","Barış Manço","Sadettin Kaynak"],"Aşık Veysel, halk kültürünü sazı ve sözüyle yaşatmıştır."),
+mc("17. yüzyılda yaşamış, doğa ve sevgi temalı şiirleriyle tanınan halk ozanı kimdir?","Karacaoğlan",["Aşık Veysel","Namık Kemal","Yunus Emre"],"Karacaoğlan, halk şiirinin önemli ismidir."),
+mc("Geleneksel ezgileri modern müzikle buluşturan sanatçı kimdir?","Barış Manço",["Sadettin Kaynak","Aşık Veysel","Karacaoğlan"],"Barış Manço, Anadolu ezgilerini modern müzikle harmanlamıştır."),
+mc("Aşağıdakilerden hangisi Türk müziği bestekârıdır?","Sadettin Kaynak",["Osman Hamdi Bey","Mimar Sinan","Namık Kemal"],"Sadettin Kaynak, Türk müziği alanında eserler vermiştir.")
+]);
+
+/* ================= SEÇMELİ: BEDEN EĞİTİMİ VE SPOR ================= */
+const BES=subj("bes","Beden Eğitimi ve Spor","⚽","#f472b6",true);
+
+lesson(BES,"1. Ünite: Hareket Beceri ve Kavramları","bes-takim","Takım Sporlarının Temel Teknikleri","Futbol, basketbol, voleybol, hentbol",
+N("Takım sporlarında temel teknikler oyunun temelini oluşturur.",[
+"<b>Futbol:</b> pas, top sürme, şut. <b>Basketbol:</b> top sürme (dribling), pas, şut.",
+"<b>Voleybol:</b> manşet (alttan, iki kolla), parmak pas (üstten), servis, smaç.",
+"<b>Hentbol:</b> Elle oynanır; pas, sürme ve şut temel tekniklerdir."
+]),
+[
+mc("Voleybolda topun iki kolla alttan karşılanmasına ne denir?","Manşet",["Parmak pas","Smaç","Servis"],"Manşet alttan, parmak pas üstten yapılır."),
+mc("Basketbolda topu yere vurarak ilerlemeye ne denir?","Top sürme (dribling)",["Şut","Blok","Korner"],"Basketbolda topla ilerlemek için dribling yapılır."),
+tf("Hentbol, topun elle oynandığı bir takım sporudur.",true,"Hentbolda top el ile oynanır.")
+]);
+
+lesson(BES,"1. Ünite: Hareket Beceri ve Kavramları","bes-bireysel","Bireysel Sporlar ve Koordinasyon","Atletizm, badminton, masa tenisi",
+N("Bireysel sporlarda kişisel beceri ve koordinasyon öne çıkar.",[
+"<b>Atletizm:</b> koşu, atlama ve atma branşlarını içerir.",
+"<b>Badminton:</b> Raketle, tüylü top (shuttle) ile oynanır.",
+"<b>Masa tenisi:</b> Küçük raket ve top ile masada oynanır.",
+"<b>Koordinasyon:</b> Vücut parçalarının uyumlu çalışmasıdır (el-göz, denge)."
+]),
+[
+mc("Aşağıdakilerden hangisi atletizm branşıdır?","Yüksek atlama",["Smaç","Manşet","Korner"],"Atlama branşları atletizme dahildir."),
+mc("Badmintonda hangi araçla oynanır?","Tüylü top (shuttle)",["Basketbol topu","Hentbol topu","Futbol topu"],"Badmintonda raket ve tüylü top kullanılır."),
+tf("El-göz koordinasyonu, topla oynanan sporlarda önemlidir.",true,"Topu doğru yönlendirmek için el-göz uyumu gerekir.")
+]);
+
+lesson(BES,"2. Ünite: Etkin Katılım ve Sağlıklı Yaşam","bes-nabiz","Nabız, Isınma ve Soğuma","Nabız ölçümü, ısınma-soğuma hareketleri",
+N("Nabız, kalbin bir dakikadaki atım sayısıdır.",[
+"Bilekten veya boyundan ölçülür; 15 saniyede sayılıp 4 ile çarpılabilir.",
+"Egzersiz sırasında nabız artar, dinlenince azalır.",
+"<b>Isınma:</b> Kasları ve eklemleri egzersize hazırlar, sakatlanma riskini azaltır.",
+"<b>Soğuma:</b> Nabzı ve solunumu yavaş yavaş normale döndürür."
+]),
+[
+mc("Nabzı 15 saniyede 20 atım olan bir kişinin dakikadaki nabzı kaçtır?","80",["35","20","120"],"20 × 4 = 80."),
+mc("Isınma hareketlerinin temel amacı nedir?","Kasları ve eklemleri egzersize hazırlayıp sakatlanma riskini azaltmak",["Yorgunluğu artırmak","Kasları kısaltmak","Nabzı sıfırlamak"],"Isınma, vücudu efora hazırlar."),
+tf("Egzersiz sırasında nabız artar.",true,"Kas çalışması arttığı için kalp daha hızlı atar.")
+]);
+
+lesson(BES,"2. Ünite: Etkin Katılım ve Sağlıklı Yaşam","bes-uygunluk","Vücut Kompozisyonu ve Fiziksel Uygunluk","Boy-kilo dengesi, kondisyon, esneklik, kuvvet",
+N("Vücut kompozisyonu ve fiziksel uygunluk sağlığın göstergesidir.",[
+"<b>Beden kitle indeksi (BKİ):</b> Vücut ağırlığı (kg) ÷ boyun karesi (m²).",
+"<b>Fiziksel uygunluk bileşenleri:</b> kondisyon (kalp-dolaşım dayanıklılığı), esneklik, kuvvet, dayanıklılık.",
+"Otur-uzan testi esnekliği, mekik ve şınav kuvveti ve dayanıklılığı ölçer."
+]),
+[
+mc("Beden kitle indeksi nasıl hesaplanır?","Ağırlık (kg) ÷ boyun karesi (m²)",["Boy ÷ ağırlık","Ağırlık × boy","Boy (cm) ÷ yaş"],"BKİ = kg / m²."),
+mc("Boyu 1,60 m, kütlesi 64 kg olan kişinin BKİ değeri kaçtır?","25",["40","4","10"],"1,6² = 2,56 ve 64 ÷ 2,56 = 25."),
+mc("Otur-uzan testi hangi özelliği ölçer?","Esneklik",["Kuvvet","Dayanıklılık","Hız"],"Otur-uzan testi esnekliği ölçer."),
+tf("Düzenli egzersiz kalp ve dolaşım sistemi sağlığına katkıda bulunur.",true,"Egzersiz kalbi güçlendirir.")
+]);
+
+lesson(BES,"3. Ünite: Spor Kültürü, Yönetimi ve Organizasyon","bes-olimpiyat","Olimpiyat Oyunları","Tarihi, felsefesi, organizasyonlar",
+N("Olimpiyat Oyunları, dünyanın en büyük spor organizasyonudur.",[
+"<b>Antik Olimpiyatlar:</b> Olympia’da düzenlenirdi.",
+"<b>Modern Olimpiyatlar:</b> İlk kez 1896’da Atina’da yapıldı; kurucusu Pierre de Coubertin’dir.",
+"Dört yılda bir yapılır; beş halka beş kıtayı ve dünya halklarının birliğini simgeler.",
+"Felsefesi: barış, dostluk ve karşılıklı saygıdır."
+]),
+[
+mc("Modern Olimpiyat Oyunları ilk kez nerede yapılmıştır?","Atina",["Paris","Londra","İstanbul"],"İlk modern olimpiyat 1896’da Atina’da yapıldı."),
+mc("Modern Olimpiyat Oyunları’nın kurucusu kimdir?","Pierre de Coubertin",["Mustafa Kemal","Harezmi","Mimar Sinan"],"Coubertin modern olimpiyatların kurucusu kabul edilir."),
+mc("Olimpiyat halkaları neyi simgeler?","Beş kıtanın ve dünya halklarının birliğini",["Beş ayrı spor dalını","Beş ayrı ülkeyi","Beş farklı rekoru"],"Halkalar kıtaların birliğini temsil eder."),
+tf("Olimpiyat Oyunları dört yılda bir düzenlenir.",true,"Yaz ve kış olimpiyatları dört yıllık periyotlarla yapılır.")
+]);
+
+lesson(BES,"3. Ünite: Spor Kültürü, Yönetimi ve Organizasyon","bes-fair","Fair Play ve Spor Ahlakı","Adil oyun, saygı, toplumsal barış",
+N("<b>Fair play (adil oyun)</b>, spor ahlakının temelidir.",[
+"Kurallara uymak, rakibe ve hakeme saygı göstermek, galibiyeti ve mağlubiyeti olgunlukla karşılamak fair play davranışlarıdır.",
+"Spor, insanlar arasında dostluk ve toplumsal barışa katkı sağlar.",
+"Türkiye’de <b>Kırkpınar Yağlı Güreşleri</b> yüzlerce yıllık geleneksel bir spor organizasyonudur."
+]),
+[
+mc("“Fair play” ne anlama gelir?","Adil oyun",["Hızlı oyun","Zorlu oyun","Takım oyunu"],"Fair play, dürüst ve kurallara uygun oyundur."),
+mc("Aşağıdakilerden hangisi fair play davranışıdır?","Rakibin yere düştüğünde ayağa kalkmasına yardım etmek",["Hakemi kandırmak","Rakibi kışkırtmak","Kurallara uymamak"],"Rakibe saygı fair play’in parçasıdır."),
+mc("Türkiye’de uzun geçmişi olan geleneksel spor organizasyonu hangisidir?","Kırkpınar Yağlı Güreşleri",["Tour de France","Wimbledon","Formula 1"],"Kırkpınar, Edirne’de yapılan geleneksel güreş organizasyonudur."),
+tf("Spor, toplumsal barışa katkıda bulunabilir.",true,"Spor insanları ortak değerler etrafında buluşturur.")
+]);
+
+/* ================= SEÇMELİ: BİLİŞİM TEKNOLOJİLERİ VE YAZILIM ================= */
+const BYT=subj("byt","Bilişim Teknolojileri ve Yazılım","💻","#818cf8",true);
+
+lesson(BYT,"1. Ünite: Bilişim Teknolojileri","byt-bilgisayar","Bilgisayar Sistemleri ve Dosya Yönetimi","Donanım, yazılım, işletim sistemi, dosya uzantıları",
+N("Bilgisayar sistemi donanım ve yazılımdan oluşur.",[
+"<b>Donanım:</b> Dokunulabilen fiziksel parçalar (fare, klavye, ekran, işlemci).",
+"<b>Yazılım:</b> Bilgisayara yaptırılacak işleri belirten programlar.",
+"<b>İşletim sistemi:</b> Donanım ve yazılımı yönetir (Windows, Linux, macOS, Android).",
+"<b>Dosya uzantıları:</b> .docx (belge), .jpg (görüntü), .mp3 (ses), .pdf (belge), .exe (çalıştırılabilir program)."
+]),
+[
+mc("Aşağıdakilerden hangisi bir donanım birimidir?","Fare",["İşletim sistemi","Tarayıcı","Oyun programı"],"Fare fiziksel bir donanım birimidir."),
+mc("Uzantısı “.mp3” olan dosya hangi tür dosyadır?","Ses dosyası",["Görüntü dosyası","Metin dosyası","Sunum dosyası"],".mp3 ses dosyası uzantısıdır."),
+mc("Aşağıdakilerden hangisi bir işletim sistemidir?","Linux",["Word","Chrome","Paint"],"Linux, Windows ve macOS işletim sistemleridir."),
+tf("Yazılım, bilgisayarın dokunulabilen fiziksel parçalarıdır.",false,"Fiziksel parçalar donanımdır; yazılım programlardır.")
+]);
+
+lesson(BYT,"1. Ünite: Bilişim Teknolojileri","byt-yeni","Bulut Bilişim ve Yapay Zekâ","Güncel teknolojiler",
+N("Yeni teknolojiler günlük yaşamı hızla değiştirmektedir.",[
+"<b>Bulut bilişim:</b> Dosyaların internet üzerindeki sunucularda saklanması ve farklı cihazlardan erişilmesidir.",
+"<b>Yapay zekâ:</b> Makinelerin öğrenme, karar verme ve problem çözme gibi insan zekâsına özgü işleri yapabilmesidir."
+]),
+[
+mc("Dosyaları internetteki sunucularda saklayıp farklı cihazlardan erişmeye ne denir?","Bulut bilişim",["Yedekleme kablosu","Çevrimdışı depolama","Format atma"],"Bulut bilişim uzaktaki sunucularda depolama sağlar."),
+mc("Yapay zekâ nedir?","Makinelerin öğrenme ve karar verme gibi insan zekâsına özgü görevleri yapabilmesi",["Bilgisayarın daha parlak ekrana sahip olması","İnternet hızının artması","Bir yazı tipi türü"],"Yapay zekâ, öğrenen ve karar veren sistemleri kapsar."),
+tf("Bulut depolamaya erişmek için genellikle internet bağlantısı gerekir.",true,"Bulut sunucularına internet üzerinden bağlanılır.")
+]);
+
+lesson(BYT,"2. Ünite: Etik ve Güvenlik","byt-etik","Bilişim Etiği ve Dijital Vatandaşlık","Telif hakkı, intihal, e-Devlet",
+N("Dijital dünyada da etik kurallara uymak gerekir.",[
+"<b>Fikri mülkiyet ve telif hakkı:</b> Eser sahibinin hakları korunur.",
+"<b>İntihal:</b> Başkasının eserini kaynak göstermeden kendi eseri gibi sunmaktır.",
+"<b>Dijital vatandaşlık:</b> Sorumlu, saygılı ve bilinçli internet kullanımı.",
+"<b>e-Devlet:</b> Kamu hizmetlerine internet üzerinden güvenli şekilde ulaşmayı sağlar."
+]),
+[
+mc("Başkasının eserini izinsiz ve kaynak göstermeden kendi eseri gibi sunmaya ne denir?","İntihal",["Atıf","Yedekleme","Lisanslama"],"İntihal etik dışıdır."),
+mc("e-Devlet uygulamasının amacı nedir?","Kamu hizmetlerine internet üzerinden ulaşmayı sağlamak",["Oyun oynatmak","Sosyal ağ kurmak","Müzik indirmek"],"e-Devlet, kamu hizmetlerini dijital ortama taşır."),
+tf("İnternetteki her görsel, kaynak gösterilmeden ve izinsiz kullanılabilir.",false,"Telif hakkı olan içerikler izinsiz kullanılamaz.")
+]);
+
+lesson(BYT,"2. Ünite: Etik ve Güvenlik","byt-guvenlik","Siber Zorbalık, Gizlilik ve Parola","Kişisel veriler, güçlü parola, dijital ayak izi",
+N("Dijital güvenlik, kişisel verileri ve hesapları korumayı içerir.",[
+"<b>Güçlü parola:</b> Uzun olmalı; büyük-küçük harf, rakam ve sembol içermeli; kişisel bilgilerden oluşmamalıdır.",
+"<b>Siber zorbalık:</b> İnternet üzerinden birini rahatsız etmek veya aşağılamaktır; karşılık vermeden kanıt saklanmalı, güvenilir bir yetişkine bildirilmelidir.",
+"<b>Dijital ayak izi:</b> İnternette bıraktığımız tüm izlerdir.",
+"<b>Kişisel veriler:</b> Yabancılarla paylaşılmamalıdır."
+]),
+[
+mc("Aşağıdakilerden hangisi güçlü bir parola özelliğidir?","Harf, rakam ve sembol içeren uzun bir parola olması",["Doğum tarihi olması","12345 gibi sıralı olması","Adının kendisi olması"],"Güçlü parolalar tahmin edilmesi zor olandır."),
+mc("Siber zorbalıkla karşılaşan bir kişi ne yapmalıdır?","Karşılık vermeden kanıt (ekran görüntüsü) alıp güvendiği bir yetişkine bildirmelidir.",["Aynı şekilde karşılık vermelidir.","Hesabını herkesle paylaşmalıdır.","Görmezden gelip kimseye söylememelidir."],"Kanıt toplayıp yardım istemek doğru davranıştır."),
+mc("Dijital ayak izi nedir?","İnternette bıraktığımız tüm izler",["Ekranda oluşan parmak izi","Bilgisayarın boyutu","İnternet hızı"],"Paylaşımlar ve aramalar dijital ayak izi oluşturur."),
+tf("Kişisel verilerin yabancılarla paylaşılmaması gerekir.",true,"Kişisel verilerin paylaşımı risk oluşturur.")
+]);
+
+lesson(BYT,"3. Ünite: İletişim, Araştırma ve İş Birliği","byt-ag","Bilgisayar Ağları","LAN, WAN, internet",
+N("Bilgisayarların birbirine bağlanmasıyla ağ oluşur.",[
+"<b>LAN (yerel ağ):</b> Küçük bir alanı (ev, okul) kapsar.",
+"<b>WAN (geniş alan ağı):</b> Şehirler veya ülkeler arasındaki geniş alanı kapsar.",
+"<b>İnternet:</b> Dünya çapındaki birçok ağın birbirine bağlanmasıyla oluşan küresel ağdır."
+]),
+[
+mc("Bir okul binasındaki bilgisayarları birbirine bağlayan ağ türü hangisidir?","LAN",["WAN","İnternet","Bluetooth"],"LAN, dar bir alandaki yerel ağdır."),
+mc("Dünya çapında birçok ağın bağlanmasıyla oluşan küresel ağ hangisidir?","İnternet",["Yerel ağ (LAN)","Intranet","Bluetooth"],"İnternet, ağların ağıdır."),
+tf("WAN, LAN’a göre daha geniş bir coğrafi alanı kapsar.",true,"WAN şehirler veya ülkeler arasında olabilir.")
+]);
+
+lesson(BYT,"3. Ünite: İletişim, Araştırma ve İş Birliği","byt-arama","Arama Stratejileri ve Bulut İş Birliği","Etkili arama, dijital iletişim, ortak çalışma",
+N("Doğru bilgiye ulaşmak ve ortak çalışmak için bazı stratejiler vardır.",[
+"Tam ifadeyi aramak için ifadeyi <b>tırnak içine</b> alın.",
+"Anahtar sözcükleri kısa ve net seçin; birden çok kaynağı karşılaştırın.",
+"Kaynağın güvenilirliğini kontrol edin.",
+"<b>Bulut tabanlı iş birliği:</b> Birden fazla kişi aynı belge veya proje üzerinde aynı anda çalışabilir."
+]),
+[
+mc("Arama motorunda tam bir ifadeyi aramak için hangi yöntem kullanılır?","İfadeyi tırnak işareti içine almak",["İfadeyi büyük harfle yazmak","İfadeyi parantez içine almak","Yıldız işareti koymak"],"Tırnak içindeki ifade aynen aranır."),
+mc("Bulut tabanlı ortak bir belgenin avantajı nedir?","Birden fazla kişinin aynı belge üzerinde birlikte çalışabilmesi",["Belgenin yalnızca tek kişiye ait olması","İnternet gerekmemesi","Belgenin silinememesi"],"Bulut ortak çalışmaya olanak verir."),
+tf("Bilgiye ulaşırken kaynağın güvenilirliği kontrol edilmelidir.",true,"Her bilgi doğru olmayabilir.")
+]);
+
+lesson(BYT,"4. Ünite: Problem Çözme ve Programlama","byt-algoritma","Algoritma ve Akış Şemaları","Bilgisayarca düşünme",
+N("<b>Algoritma</b>, bir problemi çözmek için izlenen adım adım yoldur.",[
+"<b>Akış şeması</b> algoritmanın şekillerle gösterimidir.",
+"Oval: başla/bitir. Dikdörtgen: işlem. Eşkenar dörtgen: karar. Paralelkenar: giriş/çıkış."
+]),
+[
+mc("Akış şemalarında karar adımı hangi şekille gösterilir?","Eşkenar dörtgen",["Dikdörtgen","Oval","Paralelkenar"],"Evet/hayır gibi kararlar eşkenar dörtgenle gösterilir."),
+mc("Algoritma nedir?","Bir problemin çözümü için izlenen adım adım yol",["Bir bilgisayar parçası","Bir internet sitesi","Bir dosya türü"],"Algoritma, çözüm adımlarının sıralı tanımıdır."),
+fl("Boşluğu doğru terimle tamamla.","Akış şemasında başlangıç ve bitiş adımı","şekliyle gösterilir.",["oval","dikdörtgen","eşkenar dörtgen","paralelkenar"],"oval","Başla ve bitir adımları oval ile gösterilir.")
+]);
+
+lesson(BYT,"4. Ünite: Problem Çözme ve Programlama","byt-prog","Programlama Temelleri","Değişken, döngü, karar yapısı, fonksiyon",
+N("Programlamada temel yapılar problemleri çözmek için kullanılır.",[
+"<b>Değişken:</b> Değer saklayan, adı olan bellek alanıdır.",
+"<b>Döngü:</b> Bir işlemi tekrar tekrar yapar.",
+"<b>Karar yapısı (if-else):</b> Koşula göre farklı yollardan birini seçer.",
+"<b>Fonksiyon:</b> Belirli bir görevi yapan, tekrar çağrılabilen kod bloğudur.",
+"Scratch ve App Inventor blok tabanlı programlama araçlarıdır."
+]),
+[
+mc("Bir işlemi tekrar tekrar yapmak için hangi yapı kullanılır?","Döngü",["Değişken","Yorum satırı","Hata mesajı"],"Döngüler tekrarlı işlemleri otomatikleştirir."),
+mc("Koşula göre farklı yollardan birini seçen yapı hangisidir?","if-else (karar yapısı)",["Döngü","Değişken","Fonksiyon adı"],"If-else, koşul sağlanırsa bir, sağlanmazsa başka işlem yapar."),
+mc("x = 3 iken “x = x + 2” işleminden sonra x’in değeri kaç olur?","5",["3","2","32"],"3 + 2 = 5."),
+tf("Fonksiyon, belirli bir görevi yapan ve tekrar çağrılabilen kod bloğudur.",true,"Fonksiyonlar kod tekrarını azaltır.")
+]);
+
+/* ================= DERS HARİTASI ================= */
+const ALL=[].concat.apply([],SUBJECTS.map(s=>s.lessons));
+const BY_ID={};ALL.forEach(l=>{BY_ID[l.id]=l;});
+const SUBJ_BY_ID={};SUBJECTS.forEach(s=>{SUBJ_BY_ID[s.id]=s;});
+
+function buildKarma(){
+  const qs=[];
+  SUBJECTS.filter(s=>!s.elective).forEach(s=>{
+    const pool=shuffle(s.lessons.reduce((a,l)=>a.concat(l.questions),[]));
+    qs.push.apply(qs,pool.slice(0,2));
+  });
+  return {id:'karma',subj:null,subject:'Karma Deneme',icon:'🏆',color:'#ffc800',topic:'12 Soruluk Deneme',
+    desc:'Zorunlu derslerden 2’şer rastgele soru',questions:shuffle(qs)};
+}
+
+/* ================= GÖREVLER & BAŞARIMLAR ================= */
+const QUESTS=[
+  {id:'q1',icon:'📚',title:'Bir konu tamamla',goal:1,key:'lessons',xp:20},
+  {id:'q2',icon:'🎯',title:'10 soruyu doğru cevapla',goal:10,key:'correct',xp:30},
+  {id:'q3',icon:'💎',title:'Hiç can kaybetmeden bir konu bitir',goal:1,key:'perfect',xp:40}
+];
+function topicsDone(u){return ALL.filter(l=>u.done[l.id]).length;}
+const ACH=[
+  {id:'first',icon:'🐣',name:'İlk Adım',desc:'İlk konunu tamamla.',goal:1,cur:u=>u.stats.lessons},
+  {id:'warm',icon:'🔥',name:'Isınma Turu',desc:'Toplam 10 doğru cevap ver.',goal:10,cur:u=>u.stats.correct},
+  {id:'hunter',icon:'🏹',name:'Soru Avcısı',desc:'Toplam 50 doğru cevap ver.',goal:50,cur:u=>u.stats.correct},
+  {id:'master',icon:'🧠',name:'Soru Ustası',desc:'Toplam 200 doğru cevap ver.',goal:200,cur:u=>u.stats.correct},
+  {id:'perfect',icon:'💎',name:'Kusursuz',desc:'Hiç can kaybetmeden bir konu bitir.',goal:1,cur:u=>u.stats.perfect},
+  {id:'streak3',icon:'⚡',name:'Ateşli Seri',desc:'3 günlük seri yakala.',goal:3,cur:u=>streakOf(u)},
+  {id:'allsub',icon:'🎓',name:'Çok Yönlü',desc:'6 zorunlu dersin hepsinden en az bir konu tamamla.',goal:6,cur:u=>SUBJECTS.filter(s=>!s.elective&&s.lessons.some(l=>u.done[l.id])).length},
+  {id:'secmeli',icon:'🎒',name:'Seçmeli Meraklısı',desc:'3 seçmeli dersin her birinden en az bir konu tamamla.',goal:3,cur:u=>SUBJECTS.filter(s=>s.elective&&s.lessons.some(l=>u.done[l.id])).length},
+  {id:'topics10',icon:'🗺️',name:'Konu Avcısı',desc:'10 farklı konuyu tamamla.',goal:10,cur:u=>topicsDone(u)},
+  {id:'topics30',icon:'📚',name:'Bilge Ejderha',desc:'30 farklı konuyu tamamla.',goal:30,cur:u=>topicsDone(u)},
+  {id:'karma',icon:'🏅',name:'Deneme Ustası',desc:'Karma Denemeyi tamamla.',goal:1,cur:u=>u.stats.karma||0},
+  {id:'quest',icon:'🎯',name:'Görev Avcısı',desc:'İlk görev ödülünü al.',goal:1,cur:u=>u.stats.claimed},
+  {id:'xp1000',icon:'🐉',name:'Ejderha Gücü',desc:'1000 XP topla.',goal:1000,cur:u=>u.xp}
+];
+const MAX_HEARTS=5;
+
+/* ================= YARDIMCILAR ================= */
+const $=s=>document.querySelector(s);
+const stage=$('#stage'),bottom=$('#bottom'),fbTitle=$('#fbTitle'),fbText=$('#fbText'),btnContinue=$('#btnContinue');
+const fillEl=$('#progressFill'),progressEl=$('#progress'),heartsEl=$('#hearts'),streakNum=$('#streakNum'),streakBox=$('#streak');
+const quizbar=$('#quizbar'),navbar=$('#navbar'),navBack=$('#navBack'),navTitle=$('#navTitle'),navStreak=$('#navStreak'),navXp=$('#navXp'),navAva=$('#navAva'),toastEl=$('#toast');
+
+function shuffle(a){const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=r[i];r[i]=r[j];r[j]=t;}return r;}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function todayStr(){return ymd(new Date());}
+function yesterdayStr(){const d=new Date();d.setDate(d.getDate()-1);return ymd(d);}
+function starsHTML(n){let s='';for(let i=1;i<=3;i++)s+='<span class="'+(i<=n?'':'off')+'">⭐</span>';return s;}
+
+/* ================= VERİTABANI (localStorage) ================= */
+const KEY='dragonlgs_db_v2';
+let mem={users:{},session:null};
+function loadDB(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.users)return d;}catch(e){}return mem;}
+let DB=loadDB();
+function saveDB(){mem=DB;try{localStorage.setItem(KEY,JSON.stringify(DB));}catch(e){}if(U&&U.google)scheduleCloud();}
+let U=null;
+
+/* ================= FIREBASE (GOOGLE İLE GİRİŞ + BULUT SENKRON) ================= */
+/* Firebase Console > Proje ayarları > Uygulamalarınız > Web uygulaması bölümündeki
+   yapılandırmayı aşağıya yapıştır. "BURAYA" ile başlayan değer varsa Google butonu gizlenir. */
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyCnbEjB35-LMkgH1ah2A0oPXaTzh1TvlZc",
+  authDomain:"hiskonlgs.firebaseapp.com",
+  projectId:"hiskonlgs",
+  storageBucket:"hiskonlgs.firebasestorage.app",
+  messagingSenderId:"831610405942",
+  appId:"1:831610405942:web:d9635458791be01b4c4497",
+  measurementId:"G-LWM63BXQXL"
+};
+const GOOGLE_ON=FIREBASE_CONFIG.apiKey.indexOf('BURAYA')!==0;
+let FB=null,fbLoading=null,cloudReady=false,cloudTimer=null;
+
+function loadFirebase(){
+  if(fbLoading)return fbLoading;
+  fbLoading=(async()=>{
+    const base='https://www.gstatic.com/firebasejs/10.14.1/';
+    const mods=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
+    const app=mods[0].initializeApp(FIREBASE_CONFIG);
+    FB={auth:mods[1].getAuth(app),db:mods[2].getFirestore(app),A:mods[1],F:mods[2]};
+    return FB;
+  })();
+  fbLoading.catch(()=>{fbLoading=null;});
+  return fbLoading;
+}
+function cloudData(u){
+  return JSON.parse(JSON.stringify({name:u.name||'',nameSet:!!u.nameSet,avatar:u.avatar||null,profileUpdated:u.profileUpdated||0,xp:u.xp||0,streak:u.streak||0,last:u.last||'',done:u.done||{},ach:u.ach||{},stats:u.stats||{},quest:u.quest||{},updated:Date.now()}));
+}
+function scheduleCloud(){
+  if(!cloudReady)return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(pushCloud,1500);
+}
+async function pushCloud(){
+  if(!FB||!U||!U.google||!cloudReady)return;
+  try{await FB.F.setDoc(FB.F.doc(FB.db,'users',U.uid),cloudData(U));}catch(e){}
+}
+function mergeProgress(l,c){
+  if((c.profileUpdated||0)>(l.profileUpdated||0)){if(c.name)l.name=c.name;l.nameSet=!!c.nameSet;if(c.avatar)l.avatar=c.avatar;l.profileUpdated=c.profileUpdated;}
+  l.done=l.done||{};l.ach=l.ach||{};l.stats=l.stats||{};
+  l.xp=Math.max(l.xp||0,c.xp||0);
+  if((c.last||'')>(l.last||'')){l.last=c.last;l.streak=c.streak||0;}
+  else if((c.last||'')===(l.last||'')){l.streak=Math.max(l.streak||0,c.streak||0);}
+  Object.keys(c.done||{}).forEach(k=>{l.done[k]=Math.max(l.done[k]||0,c.done[k]||0);});
+  Object.keys(c.ach||{}).forEach(k=>{if(!l.ach[k]||c.ach[k]<l.ach[k])l.ach[k]=c.ach[k];});
+  Object.keys(c.stats||{}).forEach(k=>{l.stats[k]=Math.max(l.stats[k]||0,c.stats[k]||0);});
+  const cq=c.quest;
+  if(cq&&cq.date){
+    if(!l.quest||!l.quest.date||cq.date>l.quest.date){l.quest=cq;}
+    else if(cq.date===l.quest.date){
+      ['lessons','correct','perfect'].forEach(k=>{l.quest[k]=Math.max(l.quest[k]||0,cq[k]||0);});
+      l.quest.claimed=Object.assign({},cq.claimed||{},l.quest.claimed||{});
+    }
+  }
+}
+async function pullCloud(){
+  try{
+    const snap=await FB.F.getDoc(FB.F.doc(FB.db,'users',U.uid));
+    if(snap.exists())mergeProgress(U,snap.data());
+    U.stats=Object.assign({correct:0,lessons:0,perfect:0,claimed:0,karma:0},U.stats||{});
+    ensureQuest();
+    cloudReady=true;saveDB();
+    await pushCloud();
+    return true;
+  }catch(e){
+    toast('⚠️','Bulut','İlerleme buluttan alınamadı; bu cihazdaki ilerleme kullanılıyor.');
+    return false;
+  }
+}
+async function googleLogin(user){
+  const key='g_'+user.uid;
+  const local=DB.users[key]||newUser(user.displayName||'Öğrenci','');
+  local.google=true;local.uid=user.uid;local.email=user.email||'';local.photoURL=user.photoURL||'';
+  if(!local.nameSet&&user.displayName)local.name=user.displayName;
+  if(!local.avatar)local.avatar=local.photoURL?{t:'google'}:{t:'emoji',v:'🐉'};
+  DB.users[key]=local;
+  U=local;DB.session=key;cloudReady=false;
+  await pullCloud();
+  ensureQuest();saveDB();
+  go('home');
+  toast('🎉','Google ile giriş yapıldı',esc(U.name));
+}
+function setupAuthListener(){
+  loadFirebase().then(fb=>{
+    fb.A.onAuthStateChanged(fb.auth,async user=>{
+      if(user){
+        if(U&&U.google&&U.uid===user.uid){
+          U.photoURL=user.photoURL||U.photoURL||'';
+          const wasQuiz=view==='quiz';
+          await pullCloud();refreshNav();
+          if(!wasQuiz&&view==='home'){stage.innerHTML='';viewHome();}
+        }else if(!U||view==='auth'){await googleLogin(user);}
+      }else if(U&&U.google){logoutLocal();}
+    });
+  }).catch(()=>{});
+}
+async function googleSignIn(){
+  const btn=$('#gBtn'),label=btn.querySelector('span');
+  if(location.protocol==='file:'){authError('Google girişi için siteyi https adresinden aç (dosyayı çift tıklayıp açınca çalışmaz).');return;}
+  btn.disabled=true;label.textContent='Bağlanıyor…';
+  let fb=null;
+  try{
+    fb=await loadFirebase();
+    await fb.A.signInWithPopup(fb.auth,new fb.A.GoogleAuthProvider());
+  }catch(err){
+    const c=err&&err.code;
+    if(fb&&(c==='auth/popup-blocked'||c==='auth/operation-not-supported-in-this-environment')){
+      try{await fb.A.signInWithRedirect(fb.auth,new fb.A.GoogleAuthProvider());return;}catch(e2){}
+    }
+    if(c!=='auth/popup-closed-by-user'&&c!=='auth/cancelled-popup-request'){
+      authError(c==='auth/unauthorized-domain'?'Bu site adresi Firebase’de yetkili alan adları arasında değil.':'Google girişi başarısız oldu. Tekrar dene.');
+    }
+    btn.disabled=false;label.textContent='Google ile giriş yap';
+  }
+}
+
+function newUser(name,pass){
+  return {name,pass,xp:0,streak:0,last:'',done:{},ach:{},
+    stats:{correct:0,lessons:0,perfect:0,claimed:0,karma:0},
+    quest:{date:'',lessons:0,correct:0,perfect:0,claimed:{}}};
+}
+function streakOf(u){return(u.last===todayStr()||u.last===yesterdayStr())?(u.streak||0):0;}
+function bumpStreak(){const t=todayStr();if(U.last===t)return;U.streak=(U.last===yesterdayStr()?(U.streak||0):0)+1;U.last=t;}
+function ensureQuest(){
+  const t=todayStr();
+  if(!U.quest||U.quest.date!==t)U.quest={date:t,lessons:0,correct:0,perfect:0,claimed:{}};
+}
+
+/* ================= TOAST & BAŞARIM ================= */
+const toastQ=[];let toasting=false;
+function toast(icon,title,text){toastQ.push({icon,title,text});if(!toasting)nextToast();}
+function nextToast(){
+  const t=toastQ.shift();
+  if(!t){toasting=false;return;}
+  toasting=true;
+  toastEl.innerHTML='<div class="ti">'+t.icon+'</div><div><b>'+t.title+'</b><span>'+t.text+'</span></div>';
+  toastEl.classList.add('show');
+  setTimeout(()=>{toastEl.classList.remove('show');setTimeout(nextToast,450);},2800);
+}
+function checkAch(){
+  let changed=false;
+  ACH.forEach(a=>{
+    if(!U.ach[a.id]&&a.cur(U)>=a.goal){U.ach[a.id]=Date.now();changed=true;toast(a.icon,'Başarım açıldı!',a.name);}
+  });
+  if(changed)saveDB();
+}
+
+/* ================= ÇERÇEVE & YÖNLENDİRME ================= */
+function setChrome(mode){
+  quizbar.classList.toggle('hidden',mode!=='quiz');
+  navbar.classList.toggle('hidden',mode!=='nav');
+  stage.classList.toggle('quiz',mode==='quiz');
+}
+const EMOJIS=['🐉','🦊','🐼','🦁','🐯','🐸','🦉','🐙','🦄','🐺','🐧','🦅','🚀','⚽','🎮','📚','🧠','⭐'];
+function avatarHTML(u){
+  const a=u.avatar||{t:'emoji',v:'🐉'};
+  if(a.t==='custom'&&typeof a.v==='string'&&a.v.indexOf('data:image/')===0)return '<img alt="" src="'+esc(a.v)+'">';
+  if(a.t==='google'&&u.photoURL)return '<img alt="" referrerpolicy="no-referrer" src="'+esc(u.photoURL)+'">';
+  return esc(a.t==='emoji'&&a.v?a.v:'🐉');
+}
+function refreshNav(){
+  if(!U)return;
+  navAva.innerHTML=avatarHTML(U);
+  navStreak.textContent='🔥 '+streakOf(U);
+  navXp.textContent='⭐ '+U.xp;
+  streakNum.textContent=streakOf(U);
+}
+let view='auth',viewArg=null;
+const PARENT={profile:'home',lessons:'home',lessonSubj:'lessons',notes:'home',notesSubj:'notes',quests:'home',ach:'home'};
+function titleFor(v,arg){
+  if(v==='lessonSubj'||v==='notesSubj'){const s=SUBJ_BY_ID[arg];return s.icon+' '+s.name;}
+  return({profile:'👤 Profil',home:'🐉 HiskonLGS',lessons:'📚 Dersler',quests:'🎯 Görevler',ach:'🏆 Başarımlar',notes:'📝 Konu Anlatımları'})[v];
+}
+function go(v,arg){
+  hideBottom();
+  view=v;viewArg=arg;
+  setChrome(v==='auth'?'auth':'nav');
+  if(v!=='auth'){navTitle.textContent=titleFor(v,arg);navBack.classList.toggle('invisible',v==='home');refreshNav();}
+  stage.innerHTML='';
+  window.scrollTo(0,0);
+  const map={auth:viewAuth,home:viewHome,profile:viewProfile,lessons:viewLessons,lessonSubj:viewLessonSubj,quests:viewQuests,ach:viewAch,notes:viewNotes,notesSubj:viewNotesSubj};
+  map[v](arg);
+}
+navBack.addEventListener('click',()=>{const p=PARENT[view];if(p)go(p);});
+navAva.addEventListener('click',()=>{if(view!=='quiz'&&view!=='auth'&&U)go('profile');});
+
+/* ================= GİRİŞ (SADECE GOOGLE) ================= */
+function viewAuth(){
+  const w=el('section','center');
+  const isFile=location.protocol==='file:';
+  w.innerHTML=
+    '<div class="big float">🐉</div>'+
+    '<h1>Hiskon<span>LGS</span></h1>'+
+    '<p class="sub">LGS’ye ejderha gibi hazırlan! Devam etmek için Google hesabınla giriş yap. İlerlemen tüm cihazlarında seninle olur.</p>'+
+    (isFile?'<div class="auth-note">Bu sayfa dosya olarak açıldı. Google girişi için siteyi bir https adresinden (yayınlanmış hâliyle) açman gerekir.</div>':'')+
+    (!GOOGLE_ON?'<div class="auth-note">Google girişi henüz yapılandırılmamış (FIREBASE_CONFIG boş).</div>':'')+
+    '<button type="button" class="gbtn" id="gBtn"'+(GOOGLE_ON?'':' disabled')+'><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Google ile giriş yap</span></button>'+
+    '<div class="form-err" id="authErr" style="margin-top:12px"></div>'+
+    '<p class="note-s">🔒 Şifre tutmayız. Giriş Google üzerinden yapılır; ilerlemen hesabına bağlı olarak buluta kaydedilir.</p>';
+  stage.appendChild(w);
+  w.querySelector('#gBtn').addEventListener('click',googleSignIn);
+}
+function authError(msg){const e=$('#authErr');if(!e)return;e.textContent=msg;e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}
+function login(key){
+  DB.session=key;U=DB.users[key];
+  U.stats=Object.assign({correct:0,lessons:0,perfect:0,claimed:0,karma:0},U.stats||{});
+  U.done=U.done||{};U.ach=U.ach||{};
+  ensureQuest();saveDB();go('home');
+}
+function logoutLocal(){clearTimeout(cloudTimer);cloudReady=false;DB.session=null;U=null;saveDB();go('auth');}
+async function logout(){
+  if(U&&U.google&&FB){
+    try{await pushCloud();}catch(e){}
+    const f=FB;logoutLocal();
+    try{f.A.signOut(f.auth);}catch(e){}
+  }else logoutLocal();
+}
+
+/* ================= ANA MENÜ ================= */
+function viewHome(){
+  ensureQuest();
+  const w=el('section','page');
+  const lvl=Math.floor(U.xp/100)+1,pct=U.xp%100;
+  const qDone=QUESTS.filter(q=>U.quest[q.key]>=q.goal).length;
+  w.innerHTML=
+    '<button class="profile" id="profBtn"><div class="pavatar">'+avatarHTML(U)+'</div><div class="pinfo"><h2>Merhaba, '+esc(U.name)+'!</h2>'+
+    '<div class="lvl">Seviye '+lvl+' · '+pct+'/100 XP</div><div class="xpbar"><i style="width:'+pct+'%"></i></div></div><span class="arrow">›</span></button>'+
+    '<div class="menu-grid">'+
+      '<button class="tile" style="--c:var(--green)" data-go="lessons"><span class="ti">📚</span><div><h3>Dersler</h3><small>'+topicsDone(U)+'/'+ALL.length+' konu tamamlandı</small></div></button>'+
+      '<button class="tile" style="--c:var(--blue)" data-go="quests"><span class="ti">🎯</span><div><h3>Görevler</h3><small>'+qDone+'/'+QUESTS.length+' günlük görev</small></div></button>'+
+      '<button class="tile" style="--c:var(--yellow)" data-go="ach"><span class="ti">🏆</span><div><h3>Başarımlar</h3><small>'+Object.keys(U.ach).length+'/'+ACH.length+' kazanıldı</small></div></button>'+
+      '<button class="tile" style="--c:var(--purple)" data-go="notes"><span class="ti">📝</span><div><h3>Konu Anlatımları</h3><small>'+ALL.length+' konu notu</small></div></button>'+
+    '</div>';
+  const out=el('button','btn ghost','Çıkış Yap');
+  out.addEventListener('click',logout);
+  w.appendChild(out);
+  stage.appendChild(w);
+  w.querySelectorAll('.tile').forEach(t=>t.addEventListener('click',()=>go(t.dataset.go)));
+  w.querySelector('#profBtn').addEventListener('click',()=>go('profile'));
+}
+
+/* ================= PROFİL ================= */
+function saveProfile(){U.profileUpdated=Date.now();saveDB();refreshNav();}
+function readImage(file,cb){
+  if(!file||file.size>8*1024*1024){cb(null);return;}
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const s=Math.min(img.width,img.height),c=document.createElement('canvas');
+      c.width=c.height=128;
+      c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,128,128);
+      cb(c.toDataURL('image/jpeg',0.82));
+    };
+    img.onerror=()=>cb(null);
+    img.src=fr.result;
+  };
+  fr.onerror=()=>cb(null);
+  fr.readAsDataURL(file);
+}
+function viewProfile(){
+  const w=el('section','page');
+  const lvl=Math.floor(U.xp/100)+1;
+  w.innerHTML=
+    '<div class="pf-head"><div class="ava big">'+avatarHTML(U)+'</div><div class="pf-mail">'+esc(U.email||'')+'</div><div class="lvl">Seviye '+lvl+' · '+U.xp+' XP</div></div>'+
+    '<div class="stats"><div class="stat g"><b>'+topicsDone(U)+'</b><span>Konu</span></div><div class="stat y"><b>'+U.xp+'</b><span>XP</span></div><div class="stat r"><b>'+streakOf(U)+'</b><span>Seri</span></div></div>'+
+    '<div class="sec-title">Kullanıcı adı</div>'+
+    '<div class="pf-row"><input id="pfName" maxlength="20" value="'+esc(U.name)+'" autocomplete="off"><button class="pill" id="pfSave" type="button">Kaydet</button></div>'+
+    '<div class="form-err" id="pfErr" style="margin-top:8px"></div>'+
+    '<div class="sec-title">Profil resmi</div><div class="ava-grid" id="avaGrid"></div>'+
+    '<input type="file" id="pfFile" accept="image/*" class="hidden">';
+  const grid=w.querySelector('#avaGrid');
+  const cur=U.avatar||{t:'emoji',v:'🐉'};
+  function opt(html,sel,fn,cls){const b=el('button','ava-opt'+(sel?' sel':'')+(cls?' '+cls:''),html);b.type='button';b.addEventListener('click',fn);grid.appendChild(b);}
+  if(U.photoURL)opt('<img alt="" referrerpolicy="no-referrer" src="'+esc(U.photoURL)+'">',cur.t==='google',()=>{U.avatar={t:'google'};saveProfile();stage.innerHTML='';viewProfile();});
+  if(cur.t==='custom'&&cur.v)opt('<img alt="" src="'+esc(cur.v)+'">',true,()=>{});
+  EMOJIS.forEach(em=>opt(em,cur.t==='emoji'&&cur.v===em,()=>{U.avatar={t:'emoji',v:em};saveProfile();stage.innerHTML='';viewProfile();}));
+  const fileIn=w.querySelector('#pfFile');
+  opt('📷',false,()=>fileIn.click(),'up');
+  fileIn.addEventListener('change',()=>{
+    const f=fileIn.files&&fileIn.files[0];
+    readImage(f,data=>{
+      if(!data){toast('⚠️','Fotoğraf','Görsel okunamadı (en fazla 8 MB, resim dosyası olmalı).');return;}
+      U.avatar={t:'custom',v:data};saveProfile();stage.innerHTML='';viewProfile();
+      toast('📷','Profil resmi','Fotoğrafın güncellendi.');
+    });
+  });
+  w.querySelector('#pfSave').addEventListener('click',()=>{
+    const v=w.querySelector('#pfName').value.trim().replace(/\s+/g,' '),err=w.querySelector('#pfErr');
+    err.textContent='';
+    if(v.length<2||v.length>20){err.textContent='Kullanıcı adı 2-20 karakter olmalı.';return;}
+    if(/[<>]/.test(v)){err.textContent='Kullanıcı adında < ve > kullanılamaz.';return;}
+    U.name=v;U.nameSet=true;saveProfile();
+    toast('✅','Kullanıcı adı','Artık “'+esc(v)+'” olarak görünüyorsun.');
+  });
+  const out=el('button','btn ghost','Çıkış Yap');
+  out.addEventListener('click',logout);
+  w.appendChild(out);
+  stage.appendChild(w);
+}
+
+/* ================= DERSLER ================= */
+function subjectCard(s,target){
+  const done=s.lessons.filter(l=>U.done[l.id]).length,total=s.lessons.length;
+  const b=el('button','lcard');
+  b.style.setProperty('--c',s.color);
+  b.innerHTML='<div class="licon">'+s.icon+'</div><div class="lbody"><h3>'+s.name+'</h3><p>'+done+'/'+total+' konu tamamlandı</p>'+
+    '<div class="mini"><i style="width:'+Math.round(done/total*100)+'%"></i></div></div><span class="arrow">›</span>';
+  b.addEventListener('click',()=>go(target,s.id));
+  return b;
+}
+function viewLessons(){
+  const w=el('section','page');
+  w.appendChild(el('div','sec-title','Karma Deneme'));
+  const kb=el('button','lcard feat');
+  kb.style.setProperty('--c','#ffc800');
+  kb.innerHTML='<div class="licon">🏆</div><div class="lbody"><h3>Karma Deneme</h3><p>Her dersten 2 rastgele soru · 12 soru</p><div class="lstars">'+starsHTML(U.done.karma||0)+'</div></div><span class="pill">Başla</span>';
+  kb.addEventListener('click',()=>startLesson(buildKarma()));
+  w.appendChild(kb);
+  w.appendChild(el('div','sec-title','Zorunlu Dersler'));
+  SUBJECTS.filter(s=>!s.elective).forEach(s=>w.appendChild(subjectCard(s,'lessonSubj')));
+  w.appendChild(el('div','sec-title','Seçmeli Dersler'));
+  SUBJECTS.filter(s=>s.elective).forEach(s=>w.appendChild(subjectCard(s,'lessonSubj')));
+  stage.appendChild(w);
+}
+function viewLessonSubj(id){
+  const s=SUBJ_BY_ID[id];
+  const w=el('section','page');
+  let lastUnit=null;
+  s.lessons.forEach(l=>{
+    if(l.unit!==lastUnit){w.appendChild(el('div','sec-title',esc(l.unit)));lastUnit=l.unit;}
+    const b=el('button','lcard');
+    b.style.setProperty('--c',l.color);
+    b.innerHTML='<div class="licon">'+l.icon+'</div><div class="lbody"><h3>'+l.topic+'</h3><p>'+l.desc+' · '+l.questions.length+' soru</p><div class="lstars">'+starsHTML(U.done[l.id]||0)+'</div></div><span class="pill">Başla</span>';
+    b.addEventListener('click',()=>startLesson(l));
+    w.appendChild(b);
+  });
+  stage.appendChild(w);
+}
+
+/* ================= KONU ANLATIMLARI ================= */
+function viewNotes(){
+  const w=el('section','page');
+  w.appendChild(el('p','hint','Bir ders seç, konu özetlerini oku ve ardından soru çözerek pekiştir.'));
+  [['Zorunlu Dersler',false],['Seçmeli Dersler',true]].forEach(g=>{
+    w.appendChild(el('div','sec-title',g[0]));
+    SUBJECTS.filter(s=>s.elective===g[1]).forEach(s=>{
+      const b=el('button','lcard');
+      b.style.setProperty('--c',s.color);
+      b.innerHTML='<div class="licon">'+s.icon+'</div><div class="lbody"><h3>'+s.name+'</h3><p>'+s.lessons.length+' konu anlatımı</p></div><span class="arrow">›</span>';
+      b.addEventListener('click',()=>go('notesSubj',s.id));
+      w.appendChild(b);
+    });
+  });
+  stage.appendChild(w);
+}
+function viewNotesSubj(id){
+  const s=SUBJ_BY_ID[id];
+  const w=el('section','page');
+  let lastUnit=null;
+  s.lessons.forEach(L=>{
+    if(L.unit!==lastUnit){w.appendChild(el('div','sec-title',esc(L.unit)));lastUnit=L.unit;}
+    const d=el('details','note');
+    d.style.setProperty('--c',L.color);
+    d.innerHTML='<summary><span style="font-size:26px">'+L.icon+'</span><span>'+L.topic+'<small>'+L.desc+'</small></span></summary><div class="note-body">'+L.notes+'</div>';
+    const b=el('button','btn blue','Bu konuda soru çöz');
+    b.style.margin='6px 16px 16px';b.style.width='calc(100% - 32px)';
+    b.addEventListener('click',()=>startLesson(L));
+    d.appendChild(b);
+    w.appendChild(d);
+  });
+  stage.appendChild(w);
+}
+
+/* ================= GÖREVLER ================= */
+function viewQuests(){
+  ensureQuest();
+  const w=el('section','page');
+  w.appendChild(el('p','hint','Günlük görevler her gün yenilenir. Görevi tamamla, ödülünü al ve XP kazan!'));
+  QUESTS.forEach(q=>{
+    const cur=Math.min(U.quest[q.key],q.goal),done=cur>=q.goal,claimed=!!U.quest.claimed[q.id];
+    const c=el('div','qcard'+(done?' done':''));
+    c.innerHTML='<div class="qi">'+q.icon+'</div><div class="qb"><h3>'+q.title+'</h3><div class="mini"><i style="width:'+(cur/q.goal*100)+'%"></i></div><small>'+cur+'/'+q.goal+' · Ödül: +'+q.xp+' XP</small></div>';
+    const b=el('button','pill',claimed?'Alındı ✓':'XP Al');
+    b.disabled=!done||claimed;
+    b.addEventListener('click',()=>{
+      U.quest.claimed[q.id]=true;U.xp+=q.xp;U.stats.claimed++;saveDB();
+      toast('⭐','Görev ödülü','+'+q.xp+' XP kazandın!');
+      checkAch();refreshNav();stage.innerHTML='';viewQuests();
+    });
+    c.appendChild(b);
+    w.appendChild(c);
+  });
+  stage.appendChild(w);
+}
+
+/* ================= BAŞARIMLAR ================= */
+function viewAch(){
+  const w=el('section','page');
+  w.appendChild(el('p','hint',Object.keys(U.ach).length+'/'+ACH.length+' başarım kazanıldı.'));
+  const g=el('div','ach-grid');
+  ACH.forEach(a=>{
+    const got=!!U.ach[a.id],cur=Math.min(a.cur(U),a.goal);
+    const c=el('div','acard'+(got?' got':''));
+    c.innerHTML='<div class="ai">'+a.icon+'</div><h3>'+a.name+'</h3><p>'+a.desc+'</p><div class="mini"><i style="width:'+(cur/a.goal*100)+'%"></i></div><small>'+(got?'Kazanıldı ✓':cur+'/'+a.goal)+'</small>';
+    g.appendChild(c);
+  });
+  w.appendChild(g);
+  stage.appendChild(w);
+}
+
+/* ================= QUIZ MOTORU ================= */
+let S={lesson:null,queue:[],current:null,hearts:MAX_HEARTS,correct:0,wrong:0,total:1,locked:false};
+
+function renderHearts(lostIndex){
+  heartsEl.innerHTML='';
+  for(let i=0;i<MAX_HEARTS;i++)heartsEl.appendChild(el('span','heart'+(i>=S.hearts?' lost':'')+(i===lostIndex?' break':''),'❤️'));
+}
+function updateProgress(){
+  const pct=Math.round((S.correct/S.total)*100);
+  fillEl.style.width=pct+'%';
+  progressEl.setAttribute('aria-valuenow',pct);
+}
+function startLesson(L){
+  setChrome('quiz');
+  view='quiz';
+  stage.innerHTML='';
+  S={lesson:L,queue:L.questions.map(q=>Object.assign({},q)),current:null,hearts:MAX_HEARTS,correct:0,wrong:0,total:L.questions.length,locked:false};
+  streakNum.textContent=streakOf(U);
+  renderHearts();updateProgress();loadNext();
+}
+function leaveQuiz(){
+  if(S.lesson&&S.lesson.subj)go('lessonSubj',S.lesson.subj);else go('lessons');
+}
+$('#quitBtn').addEventListener('click',()=>{
+  if(window.confirm('Dersten çıkmak istiyor musun? Bu denemedeki ilerlemen kaybolur.'))leaveQuiz();
+});
+
+function loadNext(){
+  hideBottom();
+  S.locked=false;
+  S.current=S.queue.shift();
+  if(!S.current){completeLesson();return;}
+  const q=S.current;
+  stage.innerHTML='';
+  const wrap=el('section','qwrap');
+  wrap.appendChild(el('div','qhead',
+    '<span class="chip" style="--c:'+q.color+'">'+q.icon+' '+q.subject+'</span><span class="topic">'+q.topic+'</span>'+(q.retry?'<span class="retry-tag">🔁 TEKRAR</span>':'')));
+  if(q.type==='mcq')renderMCQ(q,wrap);
+  else if(q.type==='tf')renderTF(q,wrap);
+  else if(q.type==='fill')renderFill(q,wrap);
+  else renderBlocks(q,wrap);
+  stage.appendChild(wrap);
+  window.scrollTo({top:0});
+}
+
+function titleEl(text){const h=el('h2','qtitle');h.style.whiteSpace='pre-line';h.textContent=text;return h;}
+
+function lockOptions(items,chosen){
+  S.locked=true;
+  items.forEach(it=>{
+    it.b.disabled=true;
+    if(it.o.ok)it.b.classList.add('correct');
+    else if(it.b===chosen)it.b.classList.add('wrong');
+    else it.b.classList.add('dim');
+  });
+}
+function renderMCQ(q,wrap){
+  wrap.appendChild(titleEl(q.title));
+  const list=el('div'),items=[];
+  shuffle(q.options).forEach((o,i)=>{
+    const b=el('button','opt','<span class="key">'+'ABCD'[i]+'</span><span>'+o.t+'</span>');
+    items.push({b,o});
+    b.addEventListener('click',()=>{
+      if(S.locked)return;
+      lockOptions(items,b);
+      resolve(o.ok,items.filter(x=>x.o.ok)[0].o.t);
+    });
+    list.appendChild(b);
+  });
+  wrap.appendChild(list);
+}
+function renderTF(q,wrap){
+  wrap.appendChild(titleEl(q.title));
+  wrap.appendChild(el('div','flashcard','<span class="emoji">'+q.emoji+'</span><p>'+q.statement+'</p>'));
+  const row=el('div','tf-row'),items=[];
+  [{t:'✅ DOĞRU',v:true},{t:'❌ YANLIŞ',v:false}].forEach(x=>{
+    const b=el('button','opt',x.t),o={t:x.t,ok:x.v===q.answer};
+    items.push({b,o});
+    b.addEventListener('click',()=>{
+      if(S.locked)return;
+      lockOptions(items,b);
+      resolve(o.ok,q.answer?'Doğru':'Yanlış');
+    });
+    row.appendChild(b);
+  });
+  wrap.appendChild(row);
+}
+function renderFill(q,wrap){
+  if(q.surprise)wrap.appendChild(el('div','surprise','🎁 SÜRPRİZ SORU'));
+  wrap.appendChild(titleEl(q.title));
+  const blank=el('span','blank','&nbsp;');
+  const p=el('p','fill-sent');
+  p.appendChild(document.createTextNode(q.before+' '));
+  p.appendChild(blank);
+  p.appendChild(document.createTextNode(' '+q.after));
+  wrap.appendChild(p);
+  const chips=el('div','chips'),items=[];
+  shuffle(q.options).forEach(t=>{
+    const b=el('button','opt',esc(t)),o={t,ok:t===q.answer};
+    items.push({b,o});
+    b.addEventListener('click',()=>{
+      if(S.locked)return;
+      lockOptions(items,b);
+      blank.textContent=t;
+      blank.classList.add(o.ok?'correct':'wrong');
+      resolve(o.ok,q.answer);
+    });
+    chips.appendChild(b);
+  });
+  wrap.appendChild(chips);
+}
+function renderBlocks(q,wrap){
+  wrap.appendChild(titleEl(q.title));
+  wrap.appendChild(el('div','chat','<div class="avatar">'+q.whoIcon+'</div><div class="bubble"><b>'+q.who+':</b> '+q.line+'<small>'+q.lineTr+'</small></div>'));
+  wrap.appendChild(el('div','chat','<div class="avatar">'+q.meIcon+'</div><div class="bubble"><b>'+q.me+':</b> …<small>'+q.hint+'</small></div>'));
+  const zone=el('div','answer-zone'),bank=el('div','bank'),check=el('button','btn hidden','Kontrol Et');
+  wrap.appendChild(zone);wrap.appendChild(bank);wrap.appendChild(check);
+  const all=shuffle(q.blocks.map((t,i)=>({t,i})));
+  let placed=[];
+  function mk(b,inZone){
+    const e=el('button','block');
+    e.textContent=b.t;
+    e.addEventListener('click',()=>{
+      if(S.locked)return;
+      if(inZone)placed=placed.filter(x=>x!==b);else placed.push(b);
+      draw();
+    });
+    return e;
+  }
+  function draw(){
+    zone.innerHTML='';bank.innerHTML='';
+    placed.forEach(b=>zone.appendChild(mk(b,true)));
+    all.filter(b=>placed.indexOf(b)<0).forEach(b=>bank.appendChild(mk(b,false)));
+    check.classList.toggle('hidden',placed.length===0);
+  }
+  check.addEventListener('click',()=>{
+    if(S.locked||!placed.length)return;
+    S.locked=true;
+    const ok=placed.map(b=>b.t).join(' ')===q.answer;
+    zone.querySelectorAll('.block').forEach(b=>{b.disabled=true;b.classList.add(ok?'correct':'wrong');});
+    bank.querySelectorAll('.block').forEach(b=>{b.disabled=true;});
+    check.classList.add('hidden');
+    resolve(ok,q.answer);
+  });
+  draw();
+}
+
+/* ---- Sonuç yönetimi ---- */
+const PRAISE=['Harika!','Muhteşem!','Süpersin!','Tam isabet!','Doğru!'];
+function resolve(ok,answerText){
+  S.locked=true;
+  const q=S.current;
+  if(ok){
+    S.correct++;
+    updateProgress();
+    ensureQuest();U.stats.correct++;U.quest.correct++;saveDB();checkAch();
+    showFeedback(true,PRAISE[Math.floor(Math.random()*PRAISE.length)],q.explain);
+  }else{
+    S.wrong++;
+    S.hearts=Math.max(0,S.hearts-1);
+    renderHearts(S.hearts);
+    S.queue.push(Object.assign({},q,{retry:true}));
+    if(S.hearts<=0){setTimeout(gameOver,1200);return;}
+    showFeedback(false,'Yanlış cevap','Doğru cevap: <b>'+answerText+'</b><br>'+q.explain);
+  }
+}
+function showFeedback(ok,title,text){
+  bottom.classList.remove('ok','bad');
+  bottom.classList.add(ok?'ok':'bad');
+  fbTitle.textContent=(ok?'✅ ':'❌ ')+title;
+  fbText.innerHTML=text;
+  btnContinue.textContent=(S.correct>=S.total)?'Konuyu Bitir':'Devam Et';
+  bottom.classList.add('show');
+  setTimeout(()=>btnContinue.focus({preventScroll:true}),50);
+}
+function hideBottom(){bottom.classList.remove('show');}
+btnContinue.addEventListener('click',()=>{
+  if(!S.locked)return;
+  if(S.correct>=S.total)completeLesson();else loadNext();
+});
+
+/* ---- Oyun bitti ---- */
+function gameOver(){
+  hideBottom();
+  stage.innerHTML='';
+  const w=el('section','center');
+  w.innerHTML=
+    '<div class="big">💔</div><h1>Canın Bitti!</h1><p class="sub">Hatalarını temizle veya can pratiği yap.</p>'+
+    '<div class="stats"><div class="stat g"><b>'+S.correct+'/'+S.total+'</b><span>Doğru</span></div>'+
+    '<div class="stat r"><b>'+S.wrong+'</b><span>Hata</span></div><div class="stat y"><b>0</b><span>Can</span></div></div>';
+  const b1=el('button','btn blue stack','🧹 Hatalarını Temizle');
+  b1.addEventListener('click',()=>{S.hearts=MAX_HEARTS;renderHearts();loadNext();});
+  const b2=el('button','btn orange stack','💪 Can Pratiği Yap');
+  b2.addEventListener('click',()=>startLesson(S.lesson));
+  const b3=el('button','btn ghost','Derslere Dön');
+  b3.addEventListener('click',leaveQuiz);
+  w.appendChild(b1);w.appendChild(b2);w.appendChild(b3);
+  stage.appendChild(w);
+}
+
+/* ---- Tebrikler ---- */
+function completeLesson(){
+  hideBottom();
+  const L=S.lesson;
+  const perfect=S.wrong===0;
+  const stars=perfect?3:(S.wrong<=1?2:1);
+  const xp=Math.max(S.total*4,S.total*10-S.wrong*4)+20+(perfect?10:0);
+  ensureQuest();
+  U.xp+=xp;
+  U.stats.lessons++;U.quest.lessons++;
+  if(L.id==='karma')U.stats.karma=(U.stats.karma||0)+1;
+  if(perfect){U.stats.perfect++;U.quest.perfect++;}
+  U.done[L.id]=Math.max(U.done[L.id]||0,stars);
+  bumpStreak();saveDB();
+  streakNum.textContent=streakOf(U);
+  streakBox.classList.remove('bump');void streakBox.offsetWidth;streakBox.classList.add('bump');
+  checkAch();
+  stage.innerHTML='';
+  const w=el('section','center');
+  w.innerHTML=
+    '<div class="big bounce">🎆</div><h1>Tebrikler! Ünite Tamamlandı</h1>'+
+    '<div class="stars-big">'+starsHTML(stars)+'</div>'+
+    '<p class="sub">'+L.subject+' · '+L.topic+'<br>Günlük serin: <b style="color:var(--orange)">🔥 '+streakOf(U)+'</b></p>'+
+    '<div class="stats"><div class="stat g"><b>'+S.correct+'/'+S.total+'</b><span>Doğru</span></div>'+
+    '<div class="stat r"><b>'+S.wrong+'</b><span>Hata</span></div><div class="stat y"><b>+'+xp+'</b><span>XP</span></div></div>';
+  const b1=el('button','btn stack','Konu Listesine Dön');
+  b1.addEventListener('click',leaveQuiz);
+  const b2=el('button','btn ghost','Ana Menü');
+  b2.addEventListener('click',()=>go('home'));
+  w.appendChild(b1);w.appendChild(b2);
+  stage.appendChild(w);
+  confetti();
+}
+function confetti(){
+  const c=el('div','confetti'),em=['🎆','🎉','✨','🎊','🎇'];
+  for(let i=0;i<44;i++){
+    const s=el('span','',em[i%em.length]);
+    s.style.left=Math.random()*100+'%';
+    s.style.fontSize=(18+Math.random()*22)+'px';
+    s.style.animationDuration=(2.8+Math.random()*2.6)+'s';
+    s.style.animationDelay=(Math.random()*1.4)+'s';
+    c.appendChild(s);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),7500);
+}
+
+/* ================= BAŞLAT ================= */
+if(DB.session&&DB.users[DB.session]&&DB.users[DB.session].google){login(DB.session);}
+else{DB.session=null;go('auth');}
+if(GOOGLE_ON&&location.protocol!=='file:')setupAuthListener();
+})();
+</script>
+</body>
+</html>
