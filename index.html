@@ -627,6 +627,58 @@ textarea{min-height:84px;resize:vertical}
   .omr{padding:0 6mm;min-height:268mm;height:268mm;overflow:hidden;break-inside:avoid}
   .omr .cm{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* ===== SEZON / INTELLIGENCE ===== */
+.season-cover{position:relative;overflow:hidden;border-radius:24px;padding:22px 18px;margin-bottom:14px;text-align:center;background:linear-gradient(180deg,#0b2a4a 0%,#0d4f7a 55%,#0a2340 100%);border:1px solid rgba(120,200,255,.3)}
+.season-cover::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34px;background:repeating-linear-gradient(100deg,rgba(255,255,255,.1) 0 14px,transparent 14px 30px);opacity:.5}
+.season-cover small{letter-spacing:3px;font-weight:900;color:#7fd6ff;font-size:11px}
+.season-cover h2{font-size:23px;margin:4px 0;color:#fff;text-shadow:0 2px 0 #06223a}
+.sc-ship{font-size:34px;margin-bottom:4px}
+.sc-st{display:inline-block;background:rgba(0,0,0,.35);padding:5px 12px;border-radius:99px;font-weight:800;font-size:13px;color:#ffe08a}
+.final-v{border-color:#ff5a3c;background:linear-gradient(135deg,#3a1710,#1a0f2e);font-size:14px}
+.lbl2{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px}
+.season-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;text-align:center}
+.season-stats div{background:rgba(255,255,255,.05);border-radius:12px;padding:8px 4px}
+.season-stats b{display:block;font-size:17px}.season-stats span{font-size:11px;color:var(--muted)}
+.boost-on{margin-top:10px;background:rgba(255,200,0,.12);border:1px solid var(--yellow);color:var(--yellow);border-radius:10px;padding:7px 10px;font-weight:800;font-size:13px}
+.isl h3{font-size:14px}
+.tgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.tier{min-width:0;overflow:hidden}
+.tier{aspect-ratio:1;border-radius:14px;border:2px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:inherit;padding:0;opacity:.75}
+.tier small{font-size:10px;font-weight:900}.tier span{font-size:22px;line-height:1.1}
+.tier.done{opacity:1;border-color:var(--green);background:rgba(88,204,2,.15);color:#c4f58f}
+.tier.cur{opacity:1;border-color:var(--yellow);box-shadow:0 0 0 2px rgba(255,200,0,.35);animation:glowfr 1.8s ease-in-out infinite}
+.tier.big{border-width:3px}
+.contract{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.contract:last-child{border:0}.contract.done{opacity:.55}.cnum{font-weight:900;font-size:13px;color:var(--muted)}
+.season-home{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-bottom:14px;padding:14px;border-radius:20px;color:var(--text);cursor:pointer;font-family:inherit;border:1px solid rgba(120,200,255,.35);background:linear-gradient(135deg,#0d3a63,#14214f 60%,#2a1a4a)}
+.season-home small{letter-spacing:2px;font-weight:900;color:#7fd6ff;font-size:10.5px;display:block}
+.season-home b{font-size:15px;display:block}.sh-i{font-size:34px}
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px}
+.fcard{background:linear-gradient(165deg,#13204a,#0e1735);border:1px solid rgba(130,160,255,.16);border-radius:18px;padding:14px 8px;text-align:center}
+.fcard.own{border-color:var(--green)}.fcard b{display:block;font-size:13.5px;margin:8px 0 2px}.fcard small{display:block;color:var(--muted);font-size:11px;min-height:14px;margin-bottom:6px}
+.fshop-ava{width:64px;height:64px;font-size:34px;margin:0 auto}
+.intel-task{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid rgba(130,160,255,.2);border-radius:14px;padding:11px 12px;margin-bottom:8px;color:var(--text);cursor:pointer;font-family:inherit}
+.intel-task span{font-size:22px}.intel-task b{flex:1;font-size:14px}.intel-task i{color:var(--muted);font-style:normal}.intel-task.done{opacity:.55;text-decoration:line-through}
+.bars14{display:flex;align-items:flex-end;gap:4px;height:110px}
+.b14{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.b14 i{display:block;width:100%;background:linear-gradient(180deg,#1cb0f6,#58cc02);border-radius:5px 5px 0 0;min-height:2px}
+.b14 small{font-size:9.5px;color:var(--muted);margin-top:3px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}.dot.r{background:var(--red)}.dot.g{background:var(--green)}
+.hero.bg-ocean{background:linear-gradient(135deg,#0a3b63,#0d6a9a)}
+.hero.bg-flag{background:linear-gradient(135deg,#111,#3a0f14)}
+.hero.bg-storm{background:linear-gradient(135deg,#1b2433,#3b4a66 60%,#14181f)}
+.hero.bg-cursed{background:linear-gradient(135deg,#2b1405,#6b2a0c 55%,#1c0b2e)}
+.hero.bg-midnight{background:linear-gradient(135deg,#050a24,#16135a 60%,#050a24)}
+.fr-wood{box-shadow:0 0 0 4px #8a5a2b,0 0 0 6px #4d3217}
+.fr-anchor{box-shadow:0 0 0 3px #dfe7f2,0 0 0 5px #5c6b82,0 0 12px rgba(200,220,255,.5)}
+.fr-gcompass{box-shadow:0 0 0 3px #ffd24a,0 0 0 5px #9a6d00,0 0 16px rgba(255,210,74,.6)}
+.fr-pskull{box-shadow:0 0 0 3px #e8e8e8,0 0 0 6px #111,0 0 14px rgba(255,255,255,.4)}
+.fr-pearl{box-shadow:0 0 0 3px #1b1b24,0 0 0 5px #8c8cff,0 0 18px rgba(140,140,255,.7)}
+.fr-cursed{box-shadow:0 0 0 3px #ffb300,0 0 0 5px #6b2a0c,0 0 20px rgba(255,120,0,.7);animation:glowfr 2s ease-in-out infinite}
+.fr-kraken{box-shadow:0 0 0 3px #7a2be2,0 0 0 5px #0f3a52,0 0 22px rgba(122,43,226,.8);animation:glowfr 1.8s ease-in-out infinite}
+.fr-captain{box-shadow:0 0 0 3px #ffd700,0 0 0 6px #7a1f1f,0 0 26px rgba(255,215,0,.8);animation:glowfr 1.5s ease-in-out infinite}
+.fr-compass{box-shadow:0 0 0 3px #c89b5a,0 0 0 5px #6f4b1d}
+.fr-skullgold{box-shadow:0 0 0 3px #ffc800,0 0 0 5px #222,0 0 14px rgba(255,200,0,.6)}
+.fr-devil{box-shadow:0 0 0 3px #ff2d2d,0 0 0 6px #ffc800,0 0 30px rgba(255,45,45,.9);animation:glowfr 1.1s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -5494,7 +5546,7 @@ function defaults(){
   return {name:'',xp:0,streak:0,last:'',done:{},ach:{},
     stats:{correct:0,wrong:0,lessons:0,perfect:0,claimed:0,karma:0,boss:0,exams:0,focusSec:0,tests:0,tperfect:0},
     quest:{date:'',lessons:0,correct:0,perfect:0,wsolved:0,fmin:0,claimed:{}},
-    qs:{},daily:{},wrongs:{},marks:{},coll:{},customQs:{},exams:[],sessions:[],tests:{},testRun:null,
+    qs:{},daily:{},wrongs:{},marks:{},coll:{},customQs:{},exams:[],sessions:[],tests:{},testRun:null,season:null,pp:0,ppu:0,cos:{frames:{},avatars:{},bgs:{},titles:{},badges:{}},bg:'',rev:{},itask:null,
     plan:{tasks:{},goals:{dq:20,wf:120,wx:300},gu:0},bosses:{},dragons:{},league:'bronze',title:'',frame:'',created:Date.now()};
 }
 function normalizeUser(u){
@@ -5579,6 +5631,7 @@ function recordAnswer(q,ok,dt,quiet){
       ensureQuest();U.quest.wsolved++;
     }
   }
+  seasonEvent('q',ok);
 }
 function toggleSolved(id){
   const w=U.wrongs[id];if(!w)return;
@@ -5595,6 +5648,7 @@ function isOn(map,id){const c=U[map][id];return !!(c&&c.on);}
 
 function addXp(n){
   if(!n)return;
+  n=Math.round(n*xpMult());
   U.xp+=n;dayRec(todayStr(),true).xp+=n;
   checkLeague();
 }
@@ -5610,6 +5664,7 @@ function checkLeague(){
   }
 }
 function frameClass(u){
+  if(u.frame&&FRAMEDEFS[u.frame]&&u.cos&&u.cos.frames&&u.cos.frames[u.frame])return FRAMEDEFS[u.frame].cls;
   const cur=leagueOf(u.xp),pick=u.frame&&LEAGUES[leagueIdx(u.frame)]&&leagueIdx(u.frame)<=leagueIdx(cur.id)?LEAGUES[leagueIdx(u.frame)]:cur;
   return pick.cls;
 }
@@ -5687,7 +5742,7 @@ function loadFirebase(){
   fbLoading.catch(()=>{fbLoading=null;});
   return fbLoading;
 }
-const CLOUD_KEYS=['name','nameSet','avatar','profileUpdated','title','frame','xp','streak','last','done','ach','stats','quest','qs','daily','wrongs','marks','coll','customQs','exams','sessions','tests','plan','bosses','dragons','league','created'];
+const CLOUD_KEYS=['name','nameSet','avatar','profileUpdated','title','frame','xp','streak','last','done','ach','stats','quest','qs','daily','wrongs','marks','coll','customQs','exams','sessions','tests','season','pp','ppu','cos','bg','rev','plan','bosses','dragons','league','created'];
 function cloudData(u){
   const o={};CLOUD_KEYS.forEach(k=>{if(u[k]!==undefined)o[k]=u[k];});
   o.updated=Date.now();
@@ -5732,6 +5787,22 @@ function mergeProgress(l,c){
     m.last=((b.last||{}).ts||0)>((a.last||{}).ts||0)?b.last:a.last;
     l.tests[k]=m;
   });
+  if((c.ppu||0)>(l.ppu||0)){l.pp=c.pp||0;l.ppu=c.ppu;}
+  l.cos=l.cos||{};['frames','avatars','bgs','titles','badges'].forEach(k=>{l.cos[k]=Object.assign({},(c.cos||{})[k]||{},l.cos[k]||{});});
+  if(c.bg&&!l.bg)l.bg=c.bg;
+  Object.keys(c.rev||{}).forEach(k=>{l.rev=l.rev||{};const a=l.rev[k],b=c.rev[k];if(!a||(b.u||0)>(a.u||0))l.rev[k]=b;});
+  if(c.season&&c.season.id===SEASON.id){
+    const a=l.season;
+    if(!a||a.id!==SEASON.id)l.season=c.season;
+    else{
+      const cs=c.season,cc=cs.c||{};
+      a.sxp=Math.max(a.sxp||0,cs.sxp||0);a.claimed=Object.assign({},cs.claimed||{},a.claimed||{});a.tq=Math.max(a.tq||0,cs.tq||0);
+      a.kr=Object.assign({},cs.kr||{},a.kr||{});a.lc=Object.assign({},cs.lc||{},a.lc||{});
+      a.c=a.c||{q:0,exams:0,tt:{}};a.c.q=Math.max(a.c.q||0,cc.q||0);a.c.exams=Math.max(a.c.exams||0,cc.exams||0);a.c.tt=Object.assign({},cc.tt||{},a.c.tt||{});
+      if(cs.boost&&(!a.boost||cs.boost.until>a.boost.until))a.boost=cs.boost;
+      if(cs.lboost&&(!a.lboost||cs.lboost.until>a.lboost.until))a.lboost=cs.lboost;
+    }
+  }
   l.exams=mergeArr(l.exams,c.exams,30);l.sessions=mergeArr(l.sessions,c.sessions,200);
   const cp=c.plan||{};
   mergeU(l.plan.tasks,cp.tasks);
@@ -5828,9 +5899,9 @@ function refreshNav(){
 let view='auth',viewArg=null;
 const PARENT={profile:null,lessons:null,lessonSubj:'lessons',notes:'home',notesSubj:'notes',quests:'home',ach:'home',stats:null,examHub:null,examResult:'examHub',
   bank:'home',bankAdd:'bank',wrongs:'home',weak:'home',plan:'home',focus:'home',boss:'home',bossIntro:'boss',kingdom:'home',league:'home',
-  tests:'lessons',testSubj:'tests',testIntro:'testSubj',testResult:'testIntro'};
+  tests:'lessons',testSubj:'tests',testIntro:'testSubj',testResult:'testIntro',season:'home',frameshop:'season',intel:'home',review:'intel'};
 const TAB_OF={home:'home',quests:'home',ach:'home',kingdom:'home',league:'home',focus:'home',plan:'home',boss:'home',bossIntro:'home',bank:'home',bankAdd:'home',wrongs:'home',weak:'home',
-  lessons:'lessons',lessonSubj:'lessons',notes:'lessons',notesSubj:'lessons',examHub:'examHub',examResult:'examHub',stats:'stats',profile:'profile',tests:'lessons',testSubj:'lessons',testIntro:'lessons',testResult:'lessons'};
+  lessons:'lessons',lessonSubj:'lessons',notes:'lessons',notesSubj:'lessons',examHub:'examHub',examResult:'examHub',stats:'stats',profile:'profile',tests:'lessons',testSubj:'lessons',testIntro:'lessons',testResult:'lessons',season:'home',frameshop:'home',intel:'home',review:'home'};
 function titleFor(v,arg){
   if(v==='lessonSubj'||v==='notesSubj'){const s=SUBJ_BY_ID[arg];return s.icon+' '+s.name;}
   if(v==='bossIntro'){const b=BOSS_BY[arg];return b.emoji+' '+b.name;}
@@ -5838,7 +5909,7 @@ function titleFor(v,arg){
   if(v==='testIntro'){const l=lessonOfTest(arg);return '📄 '+l.topic;}
   return({home:'🐉 HiskonLGS',profile:'👤 Profil',lessons:'📚 Çalış',quests:'🎯 Görevler',ach:'🏆 Başarımlar',notes:'📝 Konu Anlatımları',stats:'📊 İstatistik Merkezi',
     examHub:'📝 Deneme Sınavı',examResult:'📋 Sonuç Raporu',bank:'📖 Soru Bankası',bankAdd:'➕ Kendi Sorun',wrongs:'📓 Yanlış Defterim',weak:'🧠 Zayıf Konularım',
-    tests:'📄 Konu Testleri',testResult:'📋 Test Sonucu',plan:'📅 Çalışma Takvimi',focus:'⏱️ Focus Mode',boss:'⚔️ Boss Battle',kingdom:'🏰 Dragon Kingdom',league:'🏅 Lig Sistemi'})[v];
+    tests:'📄 Konu Testleri',season:'🏴‍☠️ Sezon 1',frameshop:'🛒 Frame Shop',intel:'🐉 Dragon Intelligence',review:'🧠 Akıllı Tekrar',testResult:'📋 Test Sonucu',plan:'📅 Çalışma Takvimi',focus:'⏱️ Focus Mode',boss:'⚔️ Boss Battle',kingdom:'🏰 Dragon Kingdom',league:'🏅 Lig Sistemi'})[v];
 }
 let examTick=null;
 function go(v,arg){
@@ -5857,7 +5928,7 @@ function go(v,arg){
   const map={auth:viewAuth,home:viewHome,profile:viewProfile,lessons:viewLessons,lessonSubj:viewLessonSubj,quests:viewQuests,ach:viewAch,notes:viewNotes,notesSubj:viewNotesSubj,
     stats:viewStats,examHub:viewExamHub,examResult:viewExamResult,bank:viewBank,bankAdd:viewBankAdd,wrongs:viewWrongs,weak:viewWeak,plan:viewPlan,focus:viewFocus,
     boss:viewBoss,bossIntro:viewBossIntro,kingdom:viewKingdom,league:viewLeague,
-    tests:viewTests,testSubj:viewTestSubj,testIntro:viewTestIntro,testResult:viewTestResult};
+    season:viewSeason,frameshop:viewFrameShop,intel:viewIntel,review:viewReview,tests:viewTests,testSubj:viewTestSubj,testIntro:viewTestIntro,testResult:viewTestResult};
   map[v](arg);
 }
 navBack.addEventListener('click',()=>{
@@ -5961,6 +6032,14 @@ function viewHome(){
   const weakN=weakTopics().filter(x=>x.s.pct<50).length;
   const todayTasks=Object.keys(U.plan.tasks).map(k=>U.plan.tasks[k]).filter(x=>!x.del&&x.date===todayStr());
   const reg=REGIONS.filter(r=>U.xp>=r.xp).pop();
+  applyBg(w);
+  w.appendChild(seasonHomeCard());
+  const ig=el('div','feat-grid'),dueN=dueReviews().length;
+  [{v:'intel',i:'🐉',n:'Dragon Intelligence',s:'Kişisel öneri ve analiz',c:'#b970ff'},{v:'review',i:'🧠',n:'Akıllı Tekrar',s:dueN?dueN+' konu bekliyor':'Bugün tekrar yok',c:'#2dd4bf',b:dueN}].forEach(f=>{
+    const b=el('button','feat','<span class="fi">'+f.i+'</span><b>'+f.n+'</b><small>'+f.s+'</small>'+(f.b?'<span class="badge">'+f.b+'</span>':''));
+    b.style.setProperty('--c',f.c);b.addEventListener('click',()=>go(f.v));ig.appendChild(b);
+  });
+  w.appendChild(ig);
   w.appendChild(el('div','sec-h','Savaş ve Gelişim'));
   const feats=[
     {v:'boss',i:'⚔️',n:'Boss Battle',s:bossWins(U)+'/'+BOSSES.length+' boss yenildi',c:'#ff5a3c'},
@@ -6034,6 +6113,7 @@ function viewProfile(){
       '<div class="kpi"><b>'+bossWins(U)+'</b><span>Yenilen boss</span></div><div class="kpi"><b>'+(U.stats.exams||0)+'</b><span>Deneme sınavı</span></div>'+
       '<div class="kpi"><b>'+focusMin+' dk</b><span>Toplam odak</span></div><div class="kpi"><b>'+solvedWrongs(U)+'</b><span>Çözülen yanlış</span></div>'+
     '</div>';
+  ensureSeason();applyBg(w);
   const badges=el('div','card','<h3>🎖️ Boss Rozetleri <small>'+bossWins(U)+'/'+BOSSES.length+'</small></h3>');
   const bl=el('div','badges');
   BOSSES.forEach(b=>{bl.appendChild(el('div','badge-i'+(((U.bosses[b.id]||{}).wins||0)>0?'':' off'),b.emoji));});
@@ -6060,6 +6140,7 @@ function viewProfile(){
     fp.appendChild(b);
   });
   fc.appendChild(fp);w.appendChild(fc);
+  w.appendChild(seasonCosmeticsCard());
 
   const ed=el('div','card','<h3>✏️ Profili Düzenle</h3>'+
     '<div class="sec-title" style="margin-top:0">Kullanıcı adı</div>'+
@@ -6073,7 +6154,7 @@ function viewProfile(){
   function opt(html,sel,fn,cls){const b=el('button','ava-opt'+(sel?' sel':'')+(cls?' '+cls:''),html);b.type='button';b.addEventListener('click',fn);grid.appendChild(b);}
   if(U.photoURL)opt('<img alt="" referrerpolicy="no-referrer" src="'+esc(U.photoURL)+'">',cur.t==='google',()=>{U.avatar={t:'google'};saveProfile();go('profile');});
   if(cur.t==='custom'&&cur.v)opt('<img alt="" src="'+esc(cur.v)+'">',true,()=>{});
-  EMOJIS.forEach(em=>opt(em,cur.t==='emoji'&&cur.v===em,()=>{U.avatar={t:'emoji',v:em};saveProfile();go('profile');}));
+  EMOJIS.concat(Object.keys(U.cos.avatars||{})).forEach(em=>opt(em,cur.t==='emoji'&&cur.v===em,()=>{U.avatar={t:'emoji',v:em};saveProfile();go('profile');}));
   const fileIn=ed.querySelector('#pfFile');
   opt('📷',false,()=>fileIn.click(),'up');
   fileIn.addEventListener('change',()=>{
@@ -6612,6 +6693,7 @@ function finishExam(auto){
   Object.keys(U.examRev).sort().slice(0,-3).forEach(k=>{delete U.examRev[k];});
   dayRec(todayStr(),true).sec+=elapsed;
   U.stats.exams=(U.stats.exams||0)+1;
+  seasonEvent('exam');
   bumpStreak();
   addXp(D*3+20);
   U.examState=null;
@@ -7132,6 +7214,7 @@ function finishTest(){
   U.stats.tests=(U.stats.tests||0)+1;
   const perfect=(d===t.qs.length);
   if(perfect)U.stats.tperfect=(U.stats.tperfect||0)+1;
+  seasonEvent('test',R.id.split(':')[1]);
   ensureQuest();U.quest.correct+=d;
   dayRec(todayStr(),true).sec+=Math.min(dur,3600);
   bumpStreak();
@@ -7272,6 +7355,442 @@ function fitPaper(){
 }
 window.addEventListener('resize',()=>{if(!printRoot.classList.contains('hidden'))fitPaper();});
 window.addEventListener('afterprint',()=>{});
+/* ================= SEZON 1, DRAGON INTELLIGENCE, AKILLI TEKRAR ================= */
+const SEASON={id:1,name:'DEVILS OF THE CARIBBEAN',start:'2026-11-03',days:30,tierXp:100,maxTier:50};
+const SPARTS=[['🪵','THE SHIPWRECK','Gemi Enkazı',1,10],['🦜','THE PIRATE’S COVE','Korsan Koyu',11,20],['⚓','THE BLACK FLEET','Kara Filo',21,30],['🌋','THE CURSED ISLAND','Lanetli Ada',31,40],['👑','THE DEVILS OF THE CARIBBEAN','Karayiplerin Şeytanları',41,50]];
+const FRAMEDEFS={
+ wood:{name:'Wooden Frame',cls:'fr-wood',price:50,icon:'🪵'},anchor:{name:'Silver Anchor',cls:'fr-anchor',price:100,icon:'⚓'},gcompass:{name:'Golden Compass',cls:'fr-gcompass',price:150,icon:'🧭'},
+ pskull:{name:'Pirate Skull',cls:'fr-pskull',price:200,icon:'☠️'},pearl:{name:'Black Pearl',cls:'fr-pearl',price:300,icon:'⚫'},cursed:{name:'Cursed Gold',cls:'fr-cursed',price:400,icon:'🌋'},
+ kraken:{name:'Kraken’s Wrath',cls:'fr-kraken',price:550,icon:'🐙',seasonOnly:true},captain:{name:'Legendary Captain',cls:'fr-captain',price:750,icon:'👑'},
+ compass:{name:'Old Compass Frame',cls:'fr-compass',price:0,icon:'🧭'},skullgold:{name:'Golden Skull Frame',cls:'fr-skullgold',price:0,icon:'💀'},devil:{name:'Devil of the Caribbean',cls:'fr-devil',price:0,icon:'😈'}};
+const BGDEFS={ocean:['Ocean Background','🌊'],flag:['Pirate Flag Background','🏴‍☠️'],storm:['Stormy Caribbean','🌩️'],cursed:['Cursed Island Background','🌋'],midnight:['Midnight Caribbean','🌌']};
+const BADGEDEFS={s1_init:['🏴‍☠️','Pirate Initiate'],s1_log:['📜','Captain’s Log'],s1_fleet:['🏴‍☠️','Black Fleet Emblem'],s1_trident:['🔱','Trident Emblem'],s1_devils:['🏴‍☠️','Devils of the Caribbean'],s1_kraken:['🐙','Kraken Slayer'],s1_streak:['🔥','Pirate Streak']};
+const TITLES_S=[['s1_t10','Shipwreck Survivor','☠️'],['s1_t20','Pirate Captain','🏴‍☠️'],['s1_t30','Admiral of the Black Fleet','☠️'],['s1_t40','Lord of the Cursed Island','👑'],['s1_t50','DEVIL OF THE CARIBBEAN','👑']];
+TITLES_S.forEach(t=>TITLES.push({id:t[0],name:t[1],icon:t[2],how:'Sezon 1 ödülü',cond:u=>!!(u.cos&&u.cos.titles&&u.cos.titles[t[0]])}));
+/* tür|arg|ikon|ad|açıklama */
+const TIERS=[null,
+ ['badge','s1_init','🏴‍☠️','Pirate Initiate','Sezon özel rozeti'],['pp',20,'💰','20 PP','Power Points'],['avatar','⚓','⚓','Sailor Avatar','Denizci profil simgesi'],['pp',25,'💰','25 PP','Power Points'],['frame','compass','🖼️','Old Compass Frame','Pusula profil çerçevesi'],
+ ['pp',30,'💰','30 PP','Power Points'],['bg','ocean','🌊','Ocean Background','Okyanus profil arka planı'],['pp',35,'💰','35 PP','Power Points'],['boost','xp:0.25:30','⚔️','Pirate XP Boost','30 dk +%25 XP'],['title','s1_t10','☠️','Shipwreck Survivor','Özel unvan'],
+ ['pp',40,'💰','40 PP','Power Points'],['avatar','🦜','🦜','Parrot Avatar','Papağan profil simgesi'],['pp',45,'💰','45 PP','Power Points'],['frame','skullgold','🖼️','Golden Skull Frame','Altın kafatası çerçevesi'],['bg','flag','🏴‍☠️','Pirate Flag Background','Korsan bayrağı arka planı'],
+ ['pp',50,'💰','50 PP','Power Points'],['boost','lg:0.25:30','⚔️','League Boost','30 dk +%25 lig puanı'],['pp',55,'💰','55 PP','Power Points'],['badge','s1_log','📜','Captain’s Log','Sezon profil rozeti'],['title','s1_t20','🏴‍☠️','Pirate Captain','Özel unvan'],
+ ['pp',60,'💰','60 PP','Power Points'],['frame','pearl','🖼️','Black Pearl Frame','Siyah inci çerçevesi'],['pp',65,'💰','65 PP','Power Points'],['bg','storm','🌩️','Stormy Caribbean','Fırtınalı deniz arka planı'],['avatar','💀','💀','Skeleton Crew Avatar','İskelet korsan simgesi'],
+ ['pp',70,'💰','70 PP','Power Points'],['boost','xp:1:30','⚔️','Double XP Boost','30 dk 2x XP'],['pp',75,'💰','75 PP','Power Points'],['badge','s1_fleet','🏴‍☠️','Black Fleet Emblem','Kara Filo rozeti'],['title','s1_t30','☠️','Admiral of the Black Fleet','Özel unvan'],
+ ['pp',80,'💰','80 PP','Power Points'],['frame','cursed','🖼️','Cursed Gold Frame','Lanetli altın çerçeve'],['pp',85,'💰','85 PP','Power Points'],['bg','cursed','🌋','Cursed Island Background','Lanetli ada arka planı'],['avatar','💰','💰','Treasure Hunter Avatar','Hazine avcısı simgesi'],
+ ['pp',90,'💰','90 PP','Power Points'],['tq',1,'⚔️','Triple Quest Reward','Bir sezon görev ödülüne +%50 XP'],['pp',95,'💰','95 PP','Power Points'],['badge','s1_trident','🔱','Trident Emblem','Üç dişli mızrak rozeti'],['title','s1_t40','👑','Lord of the Cursed Island','Özel unvan'],
+ ['pp',100,'💰','100 PP','Power Points'],['frame','kraken','🖼️','Kraken Frame','Kraken temalı çerçeve'],['pp',110,'💰','110 PP','Power Points'],['bg','midnight','🌌','Midnight Caribbean','Gece Karayipleri arka planı'],['avatar','🐙','🐙','Kraken Avatar','Kraken profil simgesi'],
+ ['pp',120,'💰','120 PP','Power Points'],['boost','xp:0.5:60','⚔️','Legendary XP Boost','60 dk +%50 XP'],['pp',130,'💰','130 PP','Power Points'],['badge','s1_devils','🏴‍☠️','Devils of the Caribbean','Efsanevi sezon rozeti'],['title','s1_t50','👑','DEVIL OF THE CARIBBEAN','Efsanevi unvan + animasyonlu çerçeve']];
+const LBOOSTS=[['Sailor’s Luck',0.05,15],['Captain’s Order',0.10,30],['Black Fleet Power',0.15,45],['Kraken’s Blessing',0.20,60]];
+/* ---------- durum ---------- */
+function seasonIdx(){return Math.round((pdate(todayStr())-pdate(SEASON.start))/86400000);}
+function seasonActive(){const i=seasonIdx();return i>=0&&i<SEASON.days;}
+function seasonLeft(){return Math.max(0,SEASON.days-seasonIdx());}
+function finalVoyage(){const i=seasonIdx();return i>=SEASON.days-3&&i<SEASON.days;}
+function ensureSeason(){
+  if(!U.cos)U.cos={};['frames','avatars','bgs','titles','badges'].forEach(k=>{U.cos[k]=U.cos[k]||{};});
+  if(typeof U.pp!=='number')U.pp=0;
+  if(!U.season||U.season.id!==SEASON.id)U.season={id:SEASON.id,sxp:0,claimed:{},tq:0,boost:null,lboost:null,c:{q:0,exams:0,tt:{}},kr:{},lc:{}};
+  const S2=U.season,t=todayStr(),wk=weekStart(t);
+  S2.c=S2.c||{q:0,exams:0,tt:{}};S2.kr=S2.kr||{};S2.lc=S2.lc||{};
+  if(!S2.d||S2.d.date!==t)S2.d={date:t,q:0,rev:0,mini:0,pq:0,cl:{}};
+  if(!S2.w||S2.w.key!==wk)S2.w={key:wk,q:0,topics:{},ex:0,cl:{}};
+  return S2;
+}
+function xpMult(){
+  const S2=U.season,now=Date.now();let m=1;
+  if(S2&&S2.boost&&S2.boost.until>now)m+=S2.boost.m;
+  if(S2&&S2.lboost&&S2.lboost.until>now)m+=S2.lboost.m;
+  return m;
+}
+function ppAdd(n){U.pp=Math.max(0,(U.pp||0)+n);U.ppu=Date.now();}
+function grantReward(r){
+  const k=r[0],a=r[1];
+  if(k==='pp')ppAdd(a);
+  else if(k==='badge')U.cos.badges[a]=Date.now();
+  else if(k==='avatar')U.cos.avatars[a]=Date.now();
+  else if(k==='frame')U.cos.frames[a]=Date.now();
+  else if(k==='bg')U.cos.bgs[a]=Date.now();
+  else if(k==='title')U.cos.titles[a]=Date.now();
+  else if(k==='tq')U.season.tq=(U.season.tq||0)+1;
+  else if(k==='boost'){const p=a.split(':'),o={m:+p[1],until:Date.now()+(+p[2])*60000};if(p[0]==='xp')U.season.boost=o;else U.season.lboost=o;}
+}
+function tierOf(){return Math.min(SEASON.maxTier,Math.floor(((U.season||{}).sxp||0)/SEASON.tierXp));}
+function addSxp(n){
+  if(!seasonActive()||!n)return;
+  const S2=ensureSeason(),before=tierOf();
+  S2.sxp+=n;
+  const now=tierOf();
+  for(let t=before+1;t<=now;t++){
+    if(S2.claimed[t])continue;
+    S2.claimed[t]=Date.now();
+    const r=TIERS[t];grantReward(r);
+    if(t===50){grantReward(['frame','devil']);celebrate('😈','SEZON 1 TAMAMLANDI','DEVIL OF THE CARIBBEAN','50. kademe ödülü: efsanevi unvan ve animasyonlu çerçeve!');}
+    else if(t%10===0)celebrate(r[2],'Bölüm tamamlandı! Kademe '+t,r[3],r[4]);
+    else toast(r[2],'Kademe '+t+' ödülü',r[3]);
+  }
+}
+/* ---------- olaylar ---------- */
+function seasonEvent(type,arg){
+  if(!U)return;
+  const S2=ensureSeason();
+  if(type==='q'){
+    S2.d.q++;S2.w.q++;S2.c.q++;
+    if(arg&&S2.d.pq<60){S2.d.pq++;addSxp(1);}
+  }else if(type==='topic'){S2.w.topics[arg]=1;}
+  else if(type==='test'){S2.d.mini++;S2.w.ex++;S2.c.tt[arg]=1;S2.w.topics[arg]=1;}
+  else if(type==='exam'){S2.d.mini++;S2.w.ex++;S2.c.exams++;}
+  else if(type==='review'){S2.d.rev++;S2.d.mini+=(arg&&arg.stage===1)?1:0;S2.w.topics[arg.lid]=1;}
+}
+const DAILYC=[['dq','20 soru çöz',s=>s.d.q,20,25,0],['dr','Bir konu tekrarı yap',s=>s.d.rev,1,20,0],['dm','Bir mini testi tamamla',s=>s.d.mini,1,25,0]];
+const WEEKLYC=[['wq','150 soru çöz',s=>s.w.q,150,100,30],['wt','5 farklı konu çalış',s=>Object.keys(s.w.topics).length,5,100,40],['we','3 deneme veya mini deneme tamamla',s=>s.w.ex,3,125,50],['ws','5 günlük çalışma serisi yap',s=>streakOf(U),5,100,0,'s1_streak']];
+const LEGC=[['l1','500 soru çöz',s=>s.c.q,500,150,60],['l2','10 farklı konuda test tamamla',s=>Object.keys(s.c.tt).length,10,150,60],['l3','5 deneme tamamla',s=>s.c.exams,5,150,60],['l4','7 günlük çalışma serisini tamamla',s=>streakOf(U),7,150,60,'s1_streak']];
+function claimContract(grp,c){
+  const S2=ensureSeason(),box=grp==='d'?S2.d.cl:grp==='w'?S2.w.cl:S2.lc;
+  if(box[c[0]]||c[2](S2)<c[3]||!seasonActive())return;
+  box[c[0]]=1;
+  let sx=c[4];
+  if(grp==='d'&&S2.tq>0){S2.tq--;sx=Math.round(sx*1.5);toast('⚔️','Triple Quest','Görev ödülü +%50 XP!');}
+  addSxp(sx);if(c[5])ppAdd(c[5]);if(c[6])U.cos.badges[c[6]]=Date.now();
+  saveDB();toast('✅','Görev tamamlandı','+'+sx+' Season XP'+(c[5]?' · +'+c[5]+' PP':''));
+  go('season');
+}
+/* ---------- sezon soruları ---------- */
+const PIRATE_RAW=[
+ ['Bir korsan haritasında hazine, A noktasından 3 adım doğuya, sonra 4 adım kuzeye gidilince bulunuyor. A noktasına hazinenin uzaklığı kaç adımdır? (düz çizgi)','5',['7','12','4'],'Dik üçgenin hipotenüsü: 3² + 4² = 25, √25 = 5.','mat'],
+ ['Kaptanın gemisinde 48 fıçı var. Fıçıların 3/8’i rom doludur. Rom dolu kaç fıçı vardır?','18',['16','24','12'],'48 · 3/8 = 18.','mat'],
+ ['Bir korsan gemisi saatte 12 deniz mili hızla gidiyor. 5 saatte kaç deniz mili yol alır?','60',['17','48','72'],'Yol = hız × zaman = 12 · 5 = 60.','mat'],
+ ['Hazine sandığında 3 altın, 5 gümüş, 2 bakır para var. Gözü kapalı çekilen bir paranın altın olma olasılığı nedir?','3/10',['3/5','1/3','1/2'],'Toplam 10 para; altın 3 tane → 3/10.','mat'],
+ ['Bir sandık 2⁵ altın içeriyor. Kaç altın vardır?','32',['10','25','16'],'2⁵ = 2·2·2·2·2 = 32.','mat'],
+ ['Gemi direğinin gölgesi 6 m, 2 m’lik bir çubuğun gölgesi 1,5 m ise direk kaç m’dir?','8',['4,5','9','7'],'Benzerlik: 2/1,5 = x/6 → x = 8.','mat'],
+ ['Rüzgârla yelkenin şişmesi hangi enerji dönüşümüdür?','Rüzgârın kinetik enerjisi → yelkenin hareket enerjisi',['Işık enerjisi → ısı','Kimyasal enerji → elektrik','Elektrik → ses'],'Rüzgâr hareket eden hava olduğu için kinetik enerjiye sahiptir.','fen'],
+ ['Demir çapanın deniz suyunda paslanması hangi tür değişimdir?','Kimyasal değişim',['Fiziksel değişim','Hâl değişimi','Çözünme'],'Paslanmada demir yeni bir madde oluşturur.','fen'],
+ ['Korsanlar deniz suyundan tuz elde etmek için suyu buharlaştırıyor. Bu yöntem neyi ayırır?','Çözünmüş tuzu sudan',['Suyu oksijenden','Tuzu demirden','Suyu yağdan'],'Buharlaşmada su gazlaşır, tuz kalır.','fen'],
+ ['Fener ışığının uzaktan görülmesi için hangi özellik önemlidir?','Işığın doğrusal yayılması',['Işığın bükülmesi','Işığın kaybolması','Işığın ses olması'],'Işık doğrusal yayılır.','fen'],
+ ['“Kaptanın sesi fırtınadan güçlüydü.” cümlesinde hangi söz sanatı vardır?','Abartma',['Kişileştirme','Konuşturma','Benzetme'],'Sesin fırtınadan güçlü olması abartıdır.','tr'],
+ ['“Dalgalar gemiye öfkeyle saldırdı.” cümlesinde hangi söz sanatı vardır?','Kişileştirme',['Abartma','Benzetme','Karşıtlık'],'Dalgalara insana özgü “öfke” verilmiş.','tr'],
+ ['“Korsanlar haritayı dikkatle inceledi.” cümlesinde yüklem hangisidir?','inceledi',['Korsanlar','haritayı','dikkatle'],'Yargı bildiren söz yüklemdir.','tr'],
+ ['“Fırtına çıktığı için sefer ertelendi.” cümlesindeki anlam ilişkisi nedir?','Sebep-sonuç',['Amaç-sonuç','Koşul-sonuç','Öznel yargı'],'“-dığı için” sebep bildirir.','tr'],
+ ['Kurtuluş Savaşı’nda Başkomutan Meydan Muharebesi hangi yıl kazanılmıştır?','1922',['1920','1921','1923'],'30 Ağustos 1922.','ink'],
+ ['Lozan Barış Antlaşması kaç yılında imzalanmıştır?','1923',['1920','1921','1924'],'24 Temmuz 1923.','ink'],
+ ['Aşağıdakilerden hangisi “Pirate” sözcüğünün Türkçe karşılığıdır?','korsan',['denizci','kaptan','hazine'],'pirate = korsan.','ing'],
+ ['Complete the sentence: The pirates ______ the treasure yesterday.','found',['find','finds','finding'],'“Yesterday” geçmiş zaman: find → found.','ing'],
+ ['Which word means “hazine”?','treasure',['anchor','sail','captain'],'treasure = hazine.','ing'],
+ ['Zekât ve sadaka ile ilgili hangisi doğrudur?','Sadaka gönüllü, zekât farzdır.',['İkisi de farzdır.','Zekât gönüllüdür.','Sadaka yalnız paradır.'],'Zekât farz, sadaka gönüllü bir yardımdır.','din']];
+const PIRATE_QS=PIRATE_RAW.map((r,i)=>{
+  const s=SUBJ_BY_ID[r[4]],q=mc(r[0],r[1],r[2],r[3]);
+  q.id='S1#'+i;q.lid='season';q.subjId=s.id;q.subject=s.name;q.icon=s.icon;q.color=s.color;q.topic='Pirate Challenge';q.emoji='🏴‍☠️';q.diff='medium';
+  QMAP[q.id]=q;return q;
+});
+function hardPool(){return shuffle(QALL.filter(q=>q.diff==='hard'));}
+function startPirate(){
+  const qs=shuffle(PIRATE_QS).slice(0,10);
+  startQuiz({id:'practice',subj:null,subject:'Pirate Challenge',icon:'🏴‍☠️',color:'#1cb0f6',topic:'Pirate Challenges',questions:qs,hook:'pirate'},'practice');
+}
+function startCursed(){
+  const qs=hardPool().slice(0,10);
+  startQuiz({id:'practice',subj:null,subject:'Cursed Questions',icon:'💀',color:'#b970ff',topic:'Cursed Questions',questions:qs,hook:'cursed'},'practice');
+}
+function startKraken(){
+  const per={};let qs=[];
+  CORE.forEach(s=>{const h=shuffle(QALL.filter(q=>q.subjId===s.id&&q.diff==='hard'));qs=qs.concat(h.slice(0,2));});
+  qs=qs.concat(shuffle(PIRATE_QS).slice(0,Math.max(0,10-qs.length)));
+  qs=shuffle(qs).slice(0,10);
+  startQuiz({id:'kraken',subj:null,subject:'Kraken',icon:'🐙',color:'#b970ff',topic:'Kraken Boss Challenge',questions:qs,boss:{id:'kraken',name:'Kraken',emoji:'🐙',kraken:true}},'boss');
+}
+function krakenDone(){
+  const S2=ensureSeason(),wk=S2.w.key,first=!S2.kr[wk],perfect=S.wrong===0;
+  let sx=0,xp=60+S.total*5+(perfect?40:0);
+  if(first&&seasonActive()){S2.kr[wk]=1;sx=100+(finalVoyage()?50:0);addSxp(sx);ppAdd(40);}
+  if(!U.cos.badges.s1_kraken){U.cos.badges.s1_kraken=Date.now();celebrate('🐙','Kraken yenildi!','Kraken Slayer','İlk Kraken zaferin için özel rozet kazandın!');}
+  bumpStreak();addXp(xp);saveDB();pulseStreak();
+  finishScreen(resultHTML('Kraken yenildi!','',(first?'Haftalık ödül: +'+sx+' Season XP · +40 PP':'Bu haftanın ödülünü zaten aldın.')+'<br>Doğru: '+S.correct+'/'+S.total,xp,'🐙'),'Sezona Dön');
+}
+function postPractice(){
+  const L=S.lesson,ok=S.correct;
+  if(L.hook==='pirate'){addSxp(10+ok*3);toast('🏴‍☠️','Pirate Challenge','+'+(10+ok*3)+' Season XP');}
+  if(L.hook==='cursed'){addSxp(15+ok*5);toast('💀','Cursed Questions','+'+(15+ok*5)+' Season XP');}
+  if(L.review)reviewDone(L.review,S.total?S.correct/S.total:0);
+  if(L.itask){const t=U.itask;if(t&&t.date===todayStr()){t.done[L.itask]=1;}}
+  saveDB();
+}
+/* ---------- Akıllı Tekrar ---------- */
+const RINT=[1,3,7,14],RNAME=['Kısa tekrar','Mini test','Karma tekrar','Son kontrol'];
+function ensureRev(){
+  U.rev=U.rev||{};
+  ALL.forEach(l=>{if(U.done[l.id]&&!U.rev[l.id])U.rev[l.id]={t0:todayStr(),stage:0,u:Date.now()};});
+}
+function scheduleReview(lid){U.rev=U.rev||{};if(!U.rev[lid])U.rev[lid]={t0:todayStr(),stage:0,u:Date.now()};}
+function revDue(lid){
+  const r=U.rev[lid];if(!r||r.stage>=4)return null;
+  const due=addDays(r.t0,RINT[r.stage]),eff=r.snooze&&r.snooze>due?r.snooze:due,t=todayStr();
+  return {r:r,due:eff,over:Math.round((pdate(t)-pdate(eff))/86400000),ready:t>=eff};
+}
+function dueReviews(){
+  ensureRev();
+  return ALL.filter(l=>U.done[l.id]).map(l=>({l,d:revDue(l.id)})).filter(x=>x.d&&x.d.ready).sort((a,b)=>b.d.over-a.d.over);
+}
+function topicTestQs(lid){
+  const sp=TSPEC[lid];if(!sp)return [];let o=[];
+  for(let n=1;n<=sp.n;n++){const t=getTest(lid,n);if(t)t.qs.forEach(q=>o.push(getQ(q.id)));}
+  return o.filter(Boolean);
+}
+function reviewSet(l,stage){
+  const own=lessonQs(l),tq=shuffle(topicTestQs(l.id));
+  const wr=ids=>shuffle(ids).sort((a,b)=>(U.wrongs[b.id]?1:0)-(U.wrongs[a.id]?1:0));
+  if(stage===0)return shuffle(shuffle(own).slice(0,4).concat(tq.slice(0,2)));
+  if(stage===1)return shuffle(shuffle(own).slice(0,3).concat(tq.slice(0,6))).slice(0,8);
+  if(stage===2){
+    const others=shuffle(ALL.filter(x=>x.subj===l.subj&&x.id!==l.id&&U.done[x.id]).reduce((a,x)=>a.concat(lessonQs(x)),[])).slice(0,4);
+    return shuffle(shuffle(own).slice(0,3).concat(tq.slice(0,3)).concat(others)).slice(0,10);
+  }
+  const hard=tq.filter(q=>q.diff==='hard').concat(own.filter(q=>q.diff==='hard'),tq,own);
+  const seen={},out=[];hard.forEach(q=>{if(!seen[q.id]&&out.length<10){seen[q.id]=1;out.push(q);}});
+  return shuffle(out);
+}
+function startReview(l){
+  const d=revDue(l.id);if(!d)return;
+  const st=d.r.stage,qs=reviewSet(l,st);
+  if(!qs.length){toast('ℹ️','Tekrar','Bu konu için soru bulunamadı.');return;}
+  startQuiz({id:'practice',subj:l.subj,subject:l.subject,icon:l.icon,color:l.color,topic:RNAME[st]+': '+l.topic,questions:qs,review:{lid:l.id,stage:st}},'practice');
+}
+function reviewDone(rv,ratio){
+  const r=U.rev[rv.lid];if(!r)return;
+  if(ratio>=0.6){r.stage=Math.min(4,rv.stage+1);r.snooze='';toast('🧠','Tekrar başarılı','Bir sonraki adım: '+(r.stage<4?RNAME[r.stage]:'Konu pekişti!'));}
+  else{r.snooze=addDays(todayStr(),1);toast('🔁','Tekrar','Yarın bu konuyu yeniden deneyelim.');}
+  r.u=Date.now();
+  seasonEvent('review',rv);
+}
+function viewReview(){
+  ensureRev();
+  const w=el('section','page'),due=dueReviews();
+  w.innerHTML='<div class="hero"><div style="font-size:46px">🧠</div><h2 style="margin:4px 0">Akıllı Tekrar</h2><div class="muted" style="font-size:14px;line-height:1.55">Tamamladığın her konu 1 gün, 3 gün, 7 gün ve 14 gün sonra tekrar karşına çıkar. Böylece öğrendiklerin unutulmaz.</div>'+
+    '<div class="hero-stats"><div><b>'+due.length+'</b><span>Bugün tekrar</span></div><div><b>'+ALL.filter(l=>U.rev[l.id]&&U.rev[l.id].stage>=4).length+'</b><span>Pekişen konu</span></div><div><b>'+ALL.filter(l=>U.done[l.id]).length+'</b><span>Takipteki konu</span></div></div></div>';
+  w.appendChild(el('div','sec-h','Bugün tekrar edilecekler'));
+  if(!due.length)w.appendChild(el('div','empty','Bugün tekrar edilecek konu yok. 🎉 Yeni konu tamamladıkça burada görünür.'));
+  due.forEach(x=>{
+    const b=el('button','lcard');b.style.setProperty('--c',x.l.color);
+    b.innerHTML='<div class="licon">'+x.l.icon+'</div><div class="lbody"><h3>'+x.l.topic+'</h3><p>'+RNAME[x.d.r.stage]+' · '+(x.d.over>0?x.d.over+' gün gecikti':'bugün')+'</p></div><span class="pill">Başla</span>';
+    b.addEventListener('click',()=>startReview(x.l));w.appendChild(b);
+  });
+  const up=ALL.filter(l=>U.done[l.id]).map(l=>({l,d:revDue(l.id)})).filter(x=>x.d&&!x.d.ready).sort((a,b)=>a.d.due<b.d.due?-1:1).slice(0,8);
+  if(up.length){
+    w.appendChild(el('div','sec-h','Yaklaşan tekrarlar'));
+    const c=el('div','card');
+    up.forEach(x=>c.appendChild(el('div','topic-row','<span style="font-size:22px">'+x.l.icon+'</span><div class="grow"><b>'+x.l.topic+'</b><div class="muted" style="font-size:12.5px">'+RNAME[x.d.r.stage]+' · '+dmy(x.d.due)+'</div></div>')));
+    w.appendChild(c);
+  }
+  stage.appendChild(w);
+}
+/* ---------- Dragon Intelligence ---------- */
+function perfScore(){
+  const ov=overallStat(),cov=topicsDone(U)/ALL.length,days=lastDays(14).filter(d=>U.daily[d]&&U.daily[d].q>0).length/14;
+  return Math.round((ov.pct/100*0.5+cov*0.25+days*0.25)*500);
+}
+function periodStat(days,off){
+  const ds=lastDays(days+off).slice(0,days);let q=0,c=0;ds.forEach(d=>{const r=U.daily[d];if(r){q+=r.q;c+=r.c;}});
+  return {q,c,pct:q?Math.round(c/q*100):null};
+}
+function weakPractice(l,tag){
+  const own=lessonQs(l).concat(topicTestQs(l.id));
+  const qs=shuffle(own).sort((a,b)=>(U.wrongs[b.id]&&!U.wrongs[b.id].solved?1:0)-(U.wrongs[a.id]&&!U.wrongs[a.id].solved?1:0)).slice(0,10);
+  startQuiz({id:'practice',subj:l.subj,subject:l.subject,icon:l.icon,color:l.color,topic:'Güçlendirme: '+l.topic,questions:shuffle(qs),itask:tag||''},'practice');
+}
+function intelTasks(){
+  const t=todayStr();
+  if(!U.itask||U.itask.date!==t){
+    const wk=weakTopics(),due=dueReviews(),open=Object.keys(U.wrongs).filter(k=>!U.wrongs[k].solved&&getQ(k));
+    const list=[];
+    if(wk.length)list.push({id:'a',icon:'🎯',text:wk[0].l.topic+' konusunda 10 soru çöz',kind:'weak',lid:wk[0].l.id});
+    else{const nl=nextLesson();if(nl)list.push({id:'a',icon:'📚',text:'Yeni konu: '+nl.topic,kind:'lesson',lid:nl.id});}
+    if(due.length)list.push({id:'b',icon:'🧠',text:due[0].l.topic+' konusunu tekrar et ('+RNAME[due[0].d.r.stage]+')',kind:'review',lid:due[0].l.id});
+    if(open.length)list.push({id:'c',icon:'📓',text:'Yanlış defterinden '+Math.min(5,open.length)+' soru çöz',kind:'wrongs'});
+    if(!list.length)list.push({id:'d',icon:'🏆',text:'Karma denemeyle kendini sına',kind:'karma'});
+    U.itask={date:t,list:list,done:{}};saveDB(true);
+  }
+  return U.itask;
+}
+function runTask(tk){
+  if(tk.kind==='weak')weakPractice(BY_ID[tk.lid],tk.id);
+  else if(tk.kind==='lesson')startLesson(BY_ID[tk.lid]);
+  else if(tk.kind==='review')startReview(BY_ID[tk.lid]);
+  else if(tk.kind==='karma')startLesson(buildKarma());
+  else if(tk.kind==='wrongs'){
+    const qs=shuffle(Object.keys(U.wrongs).filter(k=>!U.wrongs[k].solved).map(getQ).filter(Boolean)).slice(0,5);
+    startQuiz({id:'practice',subj:null,subject:'Yanlış Defteri',icon:'📓',color:'#ff4b4b',topic:'Yanlış tekrarı',questions:qs,itask:tk.id},'wrongs');
+  }
+}
+function viewIntel(){
+  const w=el('section','page'),ov=overallStat(),sc=perfScore(),wk=weakTopics();
+  w.innerHTML='<div class="hero" style="text-align:center"><div style="font-size:48px">🐉</div><h2 style="margin:4px 0">Dragon Intelligence</h2>'+
+    '<div class="muted" style="font-size:13px">Performansını analiz edip sana özel öneriler hazırlar.</div>'+
+    '<div style="font-size:46px;font-weight:900;color:#ffc800;line-height:1.2;margin-top:8px">'+sc+'<small style="font-size:16px;color:var(--muted)"> / 500</small></div><div class="muted" style="font-size:12.5px">LGS Performans Puanı<br><i>Gerçek sınav sonucunu tahmin etmez; yalnızca uygulama içindeki gelişimini gösterir.</i></div></div>';
+  /* öneri */
+  const subs=CORE.map(s=>({s,st:subjStat(s)})).filter(x=>x.st.a>=5).sort((a,b)=>a.st.pct-b.st.pct);
+  let advice;
+  if(subs.length){
+    const ws=subs[0],wt=wk.filter(x=>x.l.subj===ws.s.id)[0];
+    advice='🐉 <b>'+ws.s.name+'</b> dersinde başarı oranın %'+ws.st.pct+'. '+(wt?'Özellikle <b>'+wt.l.topic+'</b> konusunda gelişime açıksın (%'+wt.s.pct+'). Bu konuyu tekrar etmeni öneriyorum.':'Bu dersten daha fazla soru çözmen faydalı olur.');
+    if(subs.length>1&&subs[subs.length-1].st.pct>=80)advice+='<br>💪 <b>'+subs[subs.length-1].s.name+'</b> dersinde harika gidiyorsun (%'+subs[subs.length-1].st.pct+').';
+  }else advice='🐉 Seni tanıyabilmem için birkaç ders ve test çözmen gerekiyor. Her dersten en az 5 soru çözdüğünde kişisel önerilerim başlar!';
+  const ac=el('div','card','<h3>💡 Dragon’un Önerisi</h3><div style="line-height:1.6;font-size:14.5px">'+advice+'</div>');
+  if(subs.length){const wt=wk.filter(x=>x.l.subj===subs[0].s.id)[0]||wk[0];if(wt){const b=el('button','btn blue');b.style.marginTop='12px';b.textContent='🎯 '+wt.l.topic+' için çalış';b.addEventListener('click',()=>weakPractice(wt.l));ac.appendChild(b);}}
+  w.appendChild(ac);
+  /* günlük görevler */
+  const T=intelTasks(),tc=el('div','card','<h3>🎯 Bugünkü Kişisel Görevlerin <small>'+Object.keys(T.done).length+'/'+T.list.length+'</small></h3>');
+  T.list.forEach(tk=>{
+    const done=!!T.done[tk.id],r=el('button','intel-task'+(done?' done':''),'<span>'+(done?'✅':tk.icon)+'</span><b>'+esc(tk.text)+'</b><i>›</i>');
+    r.addEventListener('click',()=>runTask(tk));tc.appendChild(r);
+  });
+  w.appendChild(tc);
+  /* ders analizi */
+  const sc2=el('div','card','<h3>📊 Ders Bazlı Başarı</h3>');
+  CORE.forEach(s=>{const st=subjStat(s);sc2.appendChild(el('div','hbar','<div class="t"><span>'+s.icon+' '+s.name+'</span><span>'+(st.pct===null?'veri yok':'%'+st.pct+' · '+st.a+' soru')+'</span></div><div class="mini"><i style="width:'+(st.pct||0)+'%;background:'+s.color+'"></i></div>'));});
+  w.appendChild(sc2);
+  /* karşılaştırma */
+  const cur=periodStat(7,0),prev=periodStat(7,7);
+  let cmp='Henüz karşılaştırma için yeterli veri yok.';
+  if(cur.q||prev.q){
+    const dq=cur.q-prev.q,dp=(cur.pct!==null&&prev.pct!==null)?cur.pct-prev.pct:null;
+    cmp='Bu hafta <b>'+cur.q+'</b> soru çözdün (önceki hafta '+prev.q+', '+(dq>=0?'+':'')+dq+').'+(dp!==null?'<br>Doğruluk: <b>%'+cur.pct+'</b> (önceki hafta %'+prev.pct+', '+(dp>=0?'+':'')+dp+' puan).':'');
+  }
+  w.appendChild(el('div','card','<h3>📈 Önceki Performansla Karşılaştırma</h3><div style="line-height:1.7;font-size:14.5px">'+cmp+'</div>'));
+  /* 14 günlük grafik */
+  const ds=lastDays(14),mx=Math.max(10,Math.max.apply(null,ds.map(d=>(U.daily[d]||{q:0}).q)));
+  const ch=el('div','card','<h3>🗓️ Son 14 Gün <small>çözülen soru</small></h3>');
+  ch.appendChild(el('div','bars14',ds.map(d=>{const r=U.daily[d]||{q:0,c:0},h=Math.round(r.q/mx*100);return '<div class="b14"><i style="height:'+h+'%" title="'+dmy(d)+': '+r.q+' soru"></i><small>'+pdate(d).getDate()+'</small></div>';}).join('')));
+  w.appendChild(ch);
+  /* unutma riski */
+  const due=dueReviews().slice(0,5),rc=el('div','card','<h3>🧠 Unutulmaya Yakın Konular <small>'+dueReviews().length+'</small></h3>');
+  if(!due.length)rc.appendChild(el('div','empty','Şu an tekrar bekleyen konu yok.'));
+  due.forEach(x=>{const b=el('button','topic-row',' <span style="font-size:22px">'+x.l.icon+'</span><div class="grow" style="text-align:left"><b>'+x.l.topic+'</b><div class="muted" style="font-size:12.5px">'+RNAME[x.d.r.stage]+(x.d.over>0?' · '+x.d.over+' gün gecikti':'')+'</div></div><span class="pill">Tekrar</span>');b.style.cssText='width:100%;background:none;border:0;color:inherit;cursor:pointer;font-family:inherit';b.addEventListener('click',()=>startReview(x.l));rc.appendChild(b);});
+  const rb=el('button','mini-btn','Tüm tekrar takvimi →');rb.style.marginTop='10px';rb.addEventListener('click',()=>go('review'));rc.appendChild(rb);
+  w.appendChild(rc);
+  /* konu analizi */
+  const strong=ALL.map(l=>({l,s:topicStat(l)})).filter(x=>x.s.a>=3&&x.s.pct>=80).sort((a,b)=>b.s.pct-a.s.pct).slice(0,5);
+  const ta=el('div','card','<h3>🔬 Konu Analizi</h3>');
+  ta.appendChild(el('div','sec-title','Gelişime açık'));
+  if(!wk.length)ta.appendChild(el('div','muted','Henüz zayıf konu tespit edilmedi.'));
+  wk.slice(0,5).forEach(x=>ta.appendChild(el('div','topic-row','<span class="dot r"></span><div class="grow"><b>'+x.l.topic+'</b><div class="muted" style="font-size:12px">'+x.l.subject+'</div></div><b>%'+x.s.pct+'</b>')));
+  ta.appendChild(el('div','sec-title','Güçlü konular'));
+  if(!strong.length)ta.appendChild(el('div','muted','Henüz yeterli veri yok.'));
+  strong.forEach(x=>ta.appendChild(el('div','topic-row','<span class="dot g"></span><div class="grow"><b>'+x.l.topic+'</b><div class="muted" style="font-size:12px">'+x.l.subject+'</div></div><b>%'+x.s.pct+'</b>')));
+  w.appendChild(ta);
+  stage.appendChild(w);
+}
+/* ---------- Sezon ekranı ---------- */
+function tierRewardHTML(t){const r=TIERS[t];return r?'<span class="ti-i">'+r[2]+'</span>':'';}
+function viewSeason(){
+  const S2=ensureSeason(),w=el('section','page'),tier=tierOf(),idx=seasonIdx(),left=seasonLeft();
+  const nextT=tier<50?TIERS[tier+1]:null,into=S2.sxp-tier*SEASON.tierXp,pct=tier>=50?100:Math.min(100,into/SEASON.tierXp*100);
+  const status=idx<0?'Sezon '+(-idx)+' gün sonra başlıyor':idx>=SEASON.days?'Sezon sona erdi':'Gün '+(idx+1)+'/'+SEASON.days+' · '+left+' gün kaldı';
+  w.innerHTML='<div class="season-cover"><div class="sc-ship">🏴‍☠️⛵🌊</div><small>SEASON '+SEASON.id+'</small><h2>'+SEASON.name+'</h2><div class="sc-st">'+status+'</div></div>'+
+   (finalVoyage()?'<div class="card final-v">⚓ <b>FINAL VOYAGE</b> aktif! Son günlerde Kraken ödülü +50 Season XP.</div>':'')+
+   '<div class="card"><div class="lbl2"><b>Kademe '+tier+'/50</b><span>'+S2.sxp+' Season XP</span></div><div class="xpbar2"><i style="width:'+pct+'%"></i></div>'+
+   '<div class="muted" style="font-size:13px;margin-top:8px">'+(nextT?'Sonraki ödül (Kademe '+(tier+1)+'): '+nextT[2]+' <b style="color:#e9efff">'+nextT[3]+'</b> · '+(SEASON.tierXp-into)+' XP kaldı':'Tüm kademeler tamamlandı! 👑')+'</div>'+
+   '<div class="season-stats"><div><b>💰 '+(U.pp||0)+'</b><span>Power Points</span></div><div><b>'+Object.keys(U.cos.frames).length+'</b><span>Çerçeve</span></div><div><b>'+Object.keys(U.cos.badges).length+'</b><span>Rozet</span></div></div>'+
+   (xpMult()>1?'<div class="boost-on">⚡ Aktif XP çarpanı: x'+xpMult().toFixed(2)+'</div>':'')+'</div>';
+  const row=el('div','btn-row');row.style.marginBottom='14px';
+  const fs=el('button','btn blue','🛒 Frame Shop');fs.addEventListener('click',()=>go('frameshop'));row.appendChild(fs);
+  w.appendChild(row);
+  /* harita */
+  w.appendChild(el('div','sec-h','🗺️ Sezon Haritası'));
+  SPARTS.forEach((p,pi)=>{
+    const c=el('div','card isl');
+    c.innerHTML='<h3>'+p[0]+' '+p[1]+' <small>'+p[2]+' · '+p[3]+'–'+p[4]+'</small></h3>';
+    const g=el('div','tgrid');
+    for(let t=p[3];t<=p[4];t++){
+      const r=TIERS[t],done=tier>=t,cur=tier+1===t;
+      const b=el('button','tier'+(done?' done':'')+(cur?' cur':'')+(t%10===0?' big':''),'<small>'+t+'</small><span>'+r[2]+'</span>');
+      b.addEventListener('click',()=>toast(r[2],'Kademe '+t+(done?' · kazanıldı':''),r[3]+' — '+r[4]));
+      g.appendChild(b);
+    }
+    c.appendChild(g);w.appendChild(c);
+  });
+  /* görevler */
+  w.appendChild(el('div','sec-h','📜 Daily Pirate Contracts'));
+  const dc=el('div','card');
+  DAILYC.forEach(c=>dc.appendChild(contractRow('d',c,S2.d.cl[c[0]],c[2](S2))));
+  w.appendChild(dc);
+  w.appendChild(el('div','sec-h','⚔️ Weekly Pirate Missions'));
+  const wc=el('div','card');
+  WEEKLYC.forEach(c=>wc.appendChild(contractRow('w',c,S2.w.cl[c[0]],c[2](S2))));
+  w.appendChild(wc);
+  w.appendChild(el('div','sec-h','🌟 Legendary Contracts'));
+  const lc=el('div','card');
+  LEGC.forEach(c=>lc.appendChild(contractRow('l',c,S2.lc[c[0]],c[2](S2))));
+  w.appendChild(lc);
+  /* sezon soruları */
+  w.appendChild(el('div','sec-h','🏴‍☠️ Sezona Özel Sorular'));
+  const evs=[['🏴‍☠️','Pirate Challenges','Korsan temalı 10 karma soru · +Season XP',startPirate,'#1cb0f6'],['💀','Cursed Questions','10 zor soru · daha fazla Season XP',startCursed,'#b970ff'],
+    ['🐙','Kraken Boss Challenge',(S2.kr[S2.w.key]?'Bu haftaki ödül alındı (tekrar oynanabilir)':'Haftalık boss · +100 Season XP, +40 PP, ilk zafer rozeti'),startKraken,'#ff5a3c']];
+  evs.forEach(e=>{const b=el('button','lcard');b.style.setProperty('--c',e[4]);b.innerHTML='<div class="licon">'+e[0]+'</div><div class="lbody"><h3>'+e[1]+'</h3><p>'+e[2]+'</p></div><span class="pill">Başla</span>';b.addEventListener('click',e[3]);w.appendChild(b);});
+  stage.appendChild(w);
+}
+function contractRow(grp,c,claimed,val){
+  const ok=val>=c[3],v=Math.min(val,c[3]);
+  const rw=c[4]+' Season XP'+(c[5]?' + '+c[5]+' PP':'')+(c[6]?' + rozet':'');
+  const r=el('div','contract'+(claimed?' done':''),'<div class="grow"><b>'+c[1]+'</b><div class="muted" style="font-size:12px">Ödül: '+rw+'</div><div class="mini" style="height:8px;margin-top:6px"><i style="width:'+Math.round(v/c[3]*100)+'%"></i></div></div><span class="cnum">'+v+'/'+c[3]+'</span>');
+  const b=el('button','pill',claimed?'✓':'Al');b.disabled=!!claimed||!ok||!seasonActive();
+  b.addEventListener('click',()=>claimContract(grp,c));
+  r.appendChild(b);return r;
+}
+/* ---------- Frame Shop ---------- */
+function frameBox(id){return '<div class="ava fshop-ava '+FRAMEDEFS[id].cls+'">'+avatarHTML(U)+'</div>';}
+function viewFrameShop(){
+  const w=el('section','page'),act=seasonActive();
+  w.innerHTML='<div class="hero" style="text-align:center"><div style="font-size:44px">🛒</div><h2 style="margin:4px 0">Frame Shop</h2><div style="font-size:30px;font-weight:900;color:#ffc800">💰 '+(U.pp||0)+' PP</div><div class="muted" style="font-size:13px">Power Points sezon sonunda silinmez. Satın alınan çerçeveler kalıcıdır.</div></div>';
+  const g=el('div','fgrid');
+  ['wood','anchor','gcompass','pskull','pearl','cursed','kraken','captain'].forEach(id=>{
+    const d=FRAMEDEFS[id],own=!!U.cos.frames[id],can=!own&&(U.pp||0)>=d.price&&(!d.seasonOnly||act);
+    const c=el('div','fcard'+(own?' own':''),frameBox(id)+'<b>'+d.name+'</b><small>'+(d.seasonOnly?'⏳ Yalnızca sezon boyunca':'')+'</small>');
+    const b=el('button','pill',own?(U.frame===id?'Takılı':'Tak'):d.price+' PP');
+    b.disabled=!own&&!can;
+    b.addEventListener('click',()=>{
+      if(own){U.frame=id;saveProfile();go('frameshop');return;}
+      ppAdd(-d.price);U.cos.frames[id]=Date.now();U.frame=id;saveDB();toast(d.icon,'Satın alındı',d.name);go('frameshop');
+    });
+    c.appendChild(b);g.appendChild(c);
+  });
+  w.appendChild(g);
+  w.appendChild(el('div','sec-h','⚡ Lig Boostları'));
+  const bc=el('div','card');
+  const lb=U.season&&U.season.lboost&&U.season.lboost.until>Date.now()?U.season.lboost:null;
+  if(lb)bc.appendChild(el('div','boost-on','Aktif lig boostu: +%'+Math.round(lb.m*100)+' · '+Math.ceil((lb.until-Date.now())/60000)+' dk kaldı'));
+  LBOOSTS.forEach((b,i)=>{
+    const price=(i+1)*15,r=el('div','contract','<div class="grow"><b>'+b[0]+'</b><div class="muted" style="font-size:12px">+%'+Math.round(b[1]*100)+' lig puanı · '+b[2]+' dk</div></div>');
+    const bt=el('button','pill',price+' PP');bt.disabled=(U.pp||0)<price||!act;
+    bt.addEventListener('click',()=>{ppAdd(-price);U.season.lboost={m:b[1],until:Date.now()+b[2]*60000};saveDB();toast('⚡',b[0],'Aktif!');go('frameshop');});
+    r.appendChild(bt);bc.appendChild(r);
+  });
+  bc.appendChild(el('div','muted','Boostlar yalnızca kazandığın XP/lig puanını artırır; seni doğrudan lig atlatmaz.'));
+  w.appendChild(bc);
+  stage.appendChild(w);
+}
+/* ---------- Profil kozmetikleri ---------- */
+function seasonCosmeticsCard(){
+  const c=el('div','card','<h3>🏴‍☠️ Sezon Kozmetikleri</h3>');
+  c.appendChild(el('div','sec-title','Çerçeveler'));
+  const fp=el('div','title-pick');
+  const fr=Object.keys(U.cos.frames);
+  if(!fr.length)fp.appendChild(el('div','muted','Sezon kademeleri ve Frame Shop ile çerçeve kazan.'));
+  fr.forEach(id=>{if(!FRAMEDEFS[id])return;const b=el('button','mini-btn'+(U.frame===id?' on':''),FRAMEDEFS[id].icon+' '+FRAMEDEFS[id].name);b.addEventListener('click',()=>{U.frame=id;saveProfile();go('profile');});fp.appendChild(b);});
+  c.appendChild(fp);
+  c.appendChild(el('div','sec-title','Arka planlar'));
+  const bp=el('div','title-pick');
+  const b0=el('button','mini-btn'+(!U.bg?' on':''),'Varsayılan');b0.addEventListener('click',()=>{U.bg='';saveProfile();go('profile');});bp.appendChild(b0);
+  Object.keys(U.cos.bgs).forEach(id=>{if(!BGDEFS[id])return;const b=el('button','mini-btn'+(U.bg===id?' on':''),BGDEFS[id][1]+' '+BGDEFS[id][0]);b.addEventListener('click',()=>{U.bg=id;saveProfile();go('profile');});bp.appendChild(b);});
+  c.appendChild(bp);
+  c.appendChild(el('div','sec-title','Rozetler'));
+  const bd=el('div','badges');
+  Object.keys(BADGEDEFS).forEach(id=>{const on=!!U.cos.badges[id];bd.appendChild(el('div','badge-i'+(on?'':' off'),'<span title="'+BADGEDEFS[id][1]+'">'+BADGEDEFS[id][0]+'</span>'));});
+  c.appendChild(bd);
+  return c;
+}
+function applyBg(root){const h=root.querySelector('.hero');if(h&&U.bg&&BGDEFS[U.bg])h.classList.add('bg-'+U.bg);}
+function seasonHomeCard(){
+  ensureSeason();
+  const tier=tierOf(),b=el('button','season-home','<div class="sh-i">🏴‍☠️</div><div class="grow"><small>SEASON 1</small><b>DEVILS OF THE CARIBBEAN</b><div class="muted" style="font-size:12.5px">Kademe '+tier+'/50 · '+(seasonActive()?seasonLeft()+' gün kaldı':'sezon bitti')+' · 💰 '+(U.pp||0)+' PP</div></div><span class="arrow">›</span>');
+  b.addEventListener('click',()=>go('season'));return b;
+}
 /* ================= QUIZ MOTORU ================= */
 let S={lesson:null,mode:'lesson',queue:[],current:null,hearts:MAX_HEARTS,energy:100,correct:0,wrong:0,total:1,locked:false,origin:null,qStart:0};
 
@@ -7556,6 +8075,7 @@ function completeLesson(){
   U.done[L.id]=Math.max(U.done[L.id]||0,stars);
   bumpStreak();
   completeTasksFor(L.id);
+  scheduleReview(L.id);seasonEvent('topic',L.id);
   addXp(xp);
   checkAch();saveDB();
   pulseStreak();
@@ -7563,11 +8083,12 @@ function completeLesson(){
 }
 function completePractice(){
   const xp=S.total*3+(S.wrong===0?10:0);
-  bumpStreak();addXp(xp);checkAch();saveDB();pulseStreak();
+  bumpStreak();addXp(xp);postPractice();checkAch();saveDB();pulseStreak();
   finishScreen(resultHTML('Tekrar Tamamlandı!','',S.lesson.topic+'<br>Eksiklerini kapatmaya devam et!',xp,'🎯'),'Geri Dön');
 }
 function completeBoss(){
   const b=S.lesson.boss,perfect=S.wrong===0;
+  if(b.kraken){krakenDone();return;}
   const xp=60+S.total*5+(perfect?40:0);
   const rec=U.bosses[b.id]||{wins:0,best:0};
   rec.wins=(rec.wins||0)+1;rec.best=Math.max(rec.best||0,S.energy);U.bosses[b.id]=rec;
