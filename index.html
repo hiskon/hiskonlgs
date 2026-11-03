@@ -3096,7 +3096,7 @@ const TSPEC={};
 ['tr','mat','fen'].forEach(k=>TLIDS[k].forEach(id=>{TSPEC[id]={n:3,per:20};}));
 ['ink','din','ing'].forEach(k=>TLIDS[k].forEach(id=>{TSPEC[id]={n:2,per:10};}));
 const KBR={},GR={},CB={};
-const GREPS=16;
+const GREPS=40;
 
 /* ---- bilgi bankası tabanlı soru kalıpları ---- */
 const ROMAN=['I','II','III'];
@@ -3139,7 +3139,7 @@ function stmtCands(kb,r){
   for(let k=0;k<16;k++){
     if(fa.length>=3&&tr.length>=1){
       const t=r.pick(tr),w=r.some(fa,3);
-      out.push(C(r.pick(sT),t[0],w.map(x=>x[0]),'Doğru bilgi: '+t[0]+w.map(x=>' “'+shortTxt(x[0])+'” yanlıştır.'+corr(x)).join(''),kb.d||'medium','s1t','t:'+T.indexOf(t)));
+      out.push(C(r.pick(sT),t[0],w.map(x=>x[0]),'Doğru bilgi: '+t[0]+w.filter(x=>x[2]).slice(0,2).map(x=>' Yanlış seçenek: “'+shortTxt(x[0])+'” — '+x[2]).join(''),kb.d||'medium','s1t','t:'+T.indexOf(t)));
     }
     if(tr.length>=3&&fa.length>=1){
       const f=r.pick(fa),w=r.some(tr,3);
@@ -3226,7 +3226,7 @@ function poolFor(lid){
   const seen={},uniq=[];
   cands.forEach(c=>{if(!cleanCand(c))return;const key=c.s+'|'+c.c;if(seen[key])return;seen[key]=1;uniq.push(c);});
   const groups={};uniq.forEach(c=>{(groups[c.f]=groups[c.f]||[]).push(c);});
-  const names=r.shuf(Object.keys(groups));names.forEach(n=>{groups[n]=r.shuf(groups[n]);});
+  const names=[];r.shuf(Object.keys(groups)).forEach(n=>{names.push(n);if(/^yn/.test(n)){for(let w=0;w<9;w++)names.push(n);}});Object.keys(groups).forEach(n=>{groups[n]=r.shuf(groups[n]);});
   const picked=[],srcCount={};
   let guard=0;
   while(picked.length<need&&guard++<400){
@@ -3251,7 +3251,7 @@ function assembleTests(lid){
   const fcount=(g,f)=>g.filter(x=>x.f===f).length;
   sorted.forEach((c,i)=>{
     let t=-1;
-    for(let s=0;s<spec.n&&t<0;s++){const tt=(i+s)%spec.n;if(groups[tt].length<spec.per&&!(c.src&&groups[tt].some(x=>x.src===c.src))&&fcount(groups[tt],c.f)<2)t=tt;}
+    for(let s=0;s<spec.n&&t<0;s++){const tt=(i+s)%spec.n;if(groups[tt].length<spec.per&&!(c.src&&groups[tt].some(x=>x.src===c.src))&&fcount(groups[tt],c.f)<(/^yn/.test(c.f)?3:2))t=tt;}
     if(t<0)for(let s=0;s<spec.n&&t<0;s++){const tt=(i+s)%spec.n;if(groups[tt].length<spec.per&&!(c.src&&groups[tt].some(x=>x.src===c.src)))t=tt;}
     if(t<0)t=groups.findIndex(g=>g.length<spec.per);
     if(t>=0)groups[t].push(c);
@@ -3295,7 +3295,7 @@ function fmtStem(s){
 function plainStem(s){return s.replace(/\[\[(.+?)\]\]/g,'«$1»');}
 
 /* ================= MATEMATİK ÜRETİCİLERİ ================= */
-function W(c,list){return numW(c,list.concat([c+1,c-1,c+2,c-2,c*2,c+10,c-10,c+5]));}
+function W(c,list){const o=numW(c,list.concat([c+1,c-1,c+2,c-2,c*2,c+10,c-10,c+5]));return (typeof c==='number'&&c>=0)?o.filter(x=>String(x).indexOf('−')!==0):o;}
 function supe(s){const m={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻','−':'⁻','x':'ˣ','(':'⁽',')':'⁾'};return String(s).split('').map(ch=>m[ch]||ch).join('');}
 function lin(a,b,v){v=v||'x';let t=(a===1?'':a===-1?'−':String(a))+v;if(b>0)t+=' + '+b;else if(b<0)t+=' − '+(-b);return t;}
 function quad(a,b,c,v){
@@ -4966,9 +4966,9 @@ KBR['ink-ilke']=[
 {cats:{
  'cumhuriyetçilik':['Cumhuriyetin ilan edilmesi','Saltanatın kaldırılması','Cumhurbaşkanının TBMM’ce seçilmesi','Hâkimiyetin kayıtsız şartsız millete ait olması'],
  'milliyetçilik':['Türk Tarih Kurumu’nun kurulması','Türk Dil Kurumu’nun kurulması','Kapitülasyonların kaldırılması','Lozan Antlaşması ile tam bağımsızlığın sağlanması'],
- 'halkçılık':['Kadınlara seçme ve seçilme hakkının verilmesi','Soyadı Kanunu’nun kabulü','Aşar vergisinin kaldırılması','Millet Mekteplerinin açılması'],
+ 'halkçılık':['Kadınlara seçme ve seçilme hakkının verilmesi','Lakap ve unvanların kaldırılması','Aşar vergisinin kaldırılması','Hukuk önünde eşitlik ilkesinin benimsenmesi'],
  'devletçilik':['Sümerbank’ın kurulması','Birinci Beş Yıllık Sanayi Planı’nın uygulanması','Etibank’ın kurulması','Demiryollarının devlet eliyle yapılması'],
- 'laiklik':['Halifeliğin kaldırılması','Tevhid-i Tedrisat Kanunu’nun kabulü','Tekke ve zaviyelerin kapatılması','Medeni Kanun’un kabulü'],
+ 'laiklik':['Halifeliğin kaldırılması','Tevhid-i Tedrisat Kanunu’nun kabulü','Tekke ve zaviyelerin kapatılması','Laikliğin 1937’de Anayasa’ya girmesi'],
  'inkılapçılık':['Şapka Kanunu’nun kabulü','Harf İnkılabı’nın yapılması','Uluslararası takvimin kabulü','Ölçü birimi olarak metrik sistemin benimsenmesi']},
  pos:['Aşağıdakilerden hangisi {c} ilkesiyle ilgilidir?'],neg:['Aşağıdakilerden hangisi {c} ilkesiyle ilgili değildir?'],cls:['“{i}” hangi Atatürk ilkesiyle ilgilidir?'],d:'medium'},
 {tp:'Atatürk ilkeleriyle ilgili',T:[
@@ -5402,6 +5402,821 @@ mkEng('ing-forces',
  ['Many people ______ homeless after the tornado.','became',['become','becomes','becoming'],'Geçmişte olmuş olay: become → became.'],
  ['A: What should we do in an earthquake?\nB: ______ under a table.','Hide',['Hides','Hiding','Hid'],'Emir kipinde yalın fiil kullanılır.']]);
 
+/* ================= SEÇMELİ DERSLER: KMY, BESYO, BYT ================= */
+TLIDS.kmy=['kmy-kultur','kmy-yesevi','kmy-mevlana','kmy-yunus','kmy-harezmi','kmy-sina','kmy-yakin','kmy-mimar','kmy-edebiyat','kmy-halk'];
+TLIDS.bes=['bes-takim','bes-bireysel','bes-nabiz','bes-uygunluk','bes-olimpiyat','bes-fair'];
+TLIDS.byt=['byt-bilgisayar','byt-yeni','byt-etik','byt-guvenlik','byt-ag','byt-arama','byt-algoritma','byt-prog'];
+['kmy','bes','byt'].forEach(k=>TLIDS[k].forEach(id=>{TSPEC[id]={n:2,per:10};}));
+
+/* ---- KÜLTÜR VE MEDENİYET ---- */
+KBR['kmy-kultur']={tp:'Kültür ve medeniyetle ilgili',T:[
+ ['Kültür, bir toplumun maddi ve manevi değerlerinin bütünüdür.',1],
+ ['Dil, kültürün en önemli taşıyıcılarından biridir.',1],
+ ['Medeniyet, tek bir millete özgüdür ve milletler arasında paylaşılamaz.',0,'Medeniyet birçok toplumun ortak değerlerinden oluşur; milletler üstüdür.'],
+ ['Kültür kuşaktan kuşağa aktarılır.',1],
+ ['Gelenek ve görenekler manevi kültür unsurlarındandır.',1],
+ ['Giysi, ev ve aletler maddi kültür unsurlarıdır.',1],
+ ['Kültür yalnızca bir toplumun sanat eserlerinden oluşur.',0,'Kültür; dil, din, ahlak, gelenek ve sanat gibi birçok unsuru kapsar.'],
+ ['Bir medeniyet birden fazla kültürün ortak birikimini içerebilir.',1],
+ ['Kültürler arası etkileşim, kültürün zenginleşmesine katkı sağlar.',1],
+ ['Mezopotamya, Mısır, Çin ve Hint, erken medeniyet havzaları arasındadır.',1],
+ ['Kendi değerlerimizi korumak için başka kültürlerle hiç etkileşime girmemeliyiz.',0,'Etkileşim yararlıdır; önemli olan kendi değerlerimizi koruyarak etkileşimde bulunmaktır.'],
+ ['Müzeler, kültürel mirasın korunmasında önemli rol oynar.',1]],
+ D:[['Kültür','Bir toplumun maddi ve manevi değerlerinin bütünü'],['Medeniyet','Birçok toplumun ortak değerlerinden oluşan, milletler üstü birikim'],['Gelenek','Kuşaktan kuşağa aktarılan davranış ve inanış biçimi'],['Kültürel miras','Geçmişten günümüze ulaşan maddi ve manevi değerler'],['Maddi kültür','Giysi, ev, alet gibi elle tutulur kültür unsurları'],['Manevi kültür','Dil, din, ahlak, gelenek gibi soyut kültür unsurları']]};
+KBR['kmy-yesevi']={tp:'Ahmet Yesevi ve Ahi Evran ile ilgili',T:[
+ ['Ahmet Yesevi’nin eseri Divan-ı Hikmet’tir.',1],
+ ['Ahmet Yesevi’ye “Pîr-i Türkistan” denilmiştir.',1],
+ ['Divan-ı Hikmet Arapça yazılmıştır.',0,'Divan-ı Hikmet sade Türkçe ile yazılmıştır.'],
+ ['Ahilik, esnaf ve sanatkârları örgütleyen bir teşkilattır.',1],
+ ['Ahi Evran Kırşehir’de yaşamıştır.',1],
+ ['Ahilik ilkeleri arasında “eli açık, kapısı açık, sofrası açık” olmak vardır.',1],
+ ['Ahilikte meslek basamakları çırak, kalfa ve ustadır.',1],
+ ['Ahi Evran 20. yüzyılda yaşamış bir şairdir.',0,'Ahi Evran 13. yüzyılda yaşamış, Ahiliğin önde gelen ismidir.'],
+ ['Yesevilik, Türk-İslam kültürünün Anadolu’ya yayılmasında etkili olmuştur.',1],
+ ['Ahilik, ürün kalitesine ve dürüst ticarete önem verir.',1],
+ ['Ahilik yalnızca zenginlerin girebildiği bir topluluktur.',0,'Ahilik; esnaf ve sanatkârların ahlak ve dayanışma esasına dayanan teşkilatıdır.'],
+ ['Ahmet Yesevi’nin eserleri halka hitap eden bir dille yazılmıştır.',1]],
+ D:[['Ahilik','Esnaf ve sanatkârları ahlak ve dayanışma esasıyla örgütleyen Anadolu teşkilatı'],['Divan-ı Hikmet','Ahmet Yesevi’nin sade Türkçe ile yazdığı hikmetler toplamı'],['Pîr-i Türkistan','Ahmet Yesevi’ye verilen unvan'],['Fütüvvet','Mertlik, cömertlik ve yardımseverlik anlayışı'],['Kalfa','Çıraklıktan sonra gelen, ustalığa hazırlanan meslek basamağı']]};
+KBR['kmy-mevlana']={tp:'Mevlânâ ve Hacı Bektaş-ı Velî ile ilgili',T:[
+ ['Mevlânâ’nın vefat yıldönümü “Şeb-i Arus” olarak anılır.',1],
+ ['Mevlânâ’nın en bilinen eseri Mesnevi’dir.',1],
+ ['Mesnevi Farsça yazılmıştır.',1],
+ ['Mevlânâ Konya’da yaşamış ve orada vefat etmiştir.',1],
+ ['Mevlevilik, Hacı Bektaş-ı Velî tarafından kurulmuştur.',0,'Mevlevilik, Mevlânâ’nın düşüncelerine dayanır; tarikat hâline getirilmesinde oğlu Sultan Veled etkilidir.'],
+ ['Hacı Bektaş-ı Velî’nin türbesi Nevşehir’in Hacıbektaş ilçesindedir.',1],
+ ['“Eline, beline, diline sahip ol.” sözü Hacı Bektaş-ı Velî ile anılır.',1],
+ ['Hacı Bektaş-ı Velî’nin eserlerinden biri Makâlât’tır.',1],
+ ['Mevlânâ ve Hacı Bektaş-ı Velî sevgi, hoşgörü ve insan sevgisini vurgulamıştır.',1],
+ ['“Ya olduğun gibi görün ya göründüğün gibi ol.” sözü iki yüzlülüğü eleştirir.',1],
+ ['Hacı Bektaş-ı Velî 15. yüzyılda İstanbul’da yaşamıştır.',0,'Hacı Bektaş-ı Velî 13. yüzyılda yaşamış, Anadolu’da Hacıbektaş’ta bulunmuştur.'],
+ ['Sema, Mevlevilerin gerçekleştirdiği dönme ayinidir.',1]],
+ D:[['Mesnevi','Mevlânâ’nın Farsça yazdığı büyük manzum eseri'],['Sema','Mevlevilerin dönerek yaptığı ayin'],['Şeb-i Arus','Mevlânâ’nın vefat gününü anlatan “düğün gecesi” anlamındaki söz'],['Makâlât','Hacı Bektaş-ı Velî’ye atfedilen eser'],['Kâmil insan','Olgunlaşmış, sevgi ve hoşgörü sahibi insan']]};
+KBR['kmy-yunus']={tp:'Yunus Emre ve Şeyh Edebali ile ilgili',T:[
+ ['Yunus Emre şiirlerini sade Türkçe ile yazmıştır.',1],
+ ['Yunus Emre’nin eserlerinden biri Risâletü’n-Nushiyye’dir.',1],
+ ['“Yaratılanı hoş gör, Yaratandan ötürü.” sözü hoşgörüyü anlatır.',1],
+ ['Yunus Emre şiirlerini yalnızca Arapça yazmıştır.',0,'Yunus Emre halkın anlayacağı sade Türkçe ile yazmıştır.'],
+ ['Şeyh Edebali, Osman Gazi’nin manevi danışmanıdır.',1],
+ ['Şeyh Edebali, Osman Gazi’nin kayınpederidir.',1],
+ ['Şeyh Edebali’nin öğütlerinde adalet ve halkı gözetmek öne çıkar.',1],
+ ['Şeyh Edebali Selçuklu Devleti’nin sultanıdır.',0,'Şeyh Edebali, Osmanlı’nın kuruluşunda etkili bir bilge ve danışmandır.'],
+ ['Yunus Emre 13.–14. yüzyıllarda Anadolu’da yaşamıştır.',1],
+ ['Yunus Emre’nin dizelerinde sevgi ve insan sevgisi öne çıkar.',1],
+ ['Osman Gazi’nin gördüğü rüyayı Şeyh Edebali yorumlamıştır.',1],
+ ['Yunus Emre’nin şiirleri halk arasında yaşamaya devam etmektedir.',1]],
+ D:[['Hoşgörü','Başkalarının düşünce ve davranışlarına saygı gösterme'],['Tasavvuf','İnsanın manevi olgunluğa ulaşmasını amaçlayan anlayış'],['Risâletü’n-Nushiyye','Yunus Emre’nin öğüt veren manzum eseri'],['Devlet ahlakı','Yöneticilerin adalet ve halkı gözetme ilkeleri']]};
+KBR['kmy-harezmi']={tp:'Harezmî, Farabî ve Bîrûnî ile ilgili',T:[
+ ['“Algoritma” sözcüğü Harezmî’nin adından türemiştir.',1],
+ ['Harezmî, cebir biliminin kurucusu kabul edilir.',1],
+ ['Farabî’ye “Muallim-i Sânî” (ikinci öğretmen) denir.',1],
+ ['Farabî’nin eserlerinden biri el-Medînetü’l-Fâzıla’dır.',1],
+ ['Bîrûnî Dünya’nın yarıçapını hesaplamıştır.',1],
+ ['Bîrûnî astronomi ve coğrafya alanlarında çalışmıştır.',1],
+ ['Harezmî tıp alanında el-Kânûn fi’t-Tıb adlı eseri yazmıştır.',0,'el-Kânûn fi’t-Tıb İbn-i Sina’nın eseridir; Harezmî matematikçidir.'],
+ ['Farabî’ye “Muallim-i Evvel” denir.',0,'Muallim-i Evvel Aristo’dur; Farabî “Muallim-i Sânî” olarak bilinir.'],
+ ['Harezmî, Hint rakamlarının yayılmasında etkili olmuştur.',1],
+ ['Bîrûnî’nin eserlerinden biri el-Âsârü’l-Bâkiye’dir.',1],
+ ['Farabî yalnızca şiir yazmış, bilimle ilgilenmemiştir.',0,'Farabî felsefe, mantık, müzik ve siyaset gibi alanlarda eser vermiştir.'],
+ ['Bu bilginler İslam medeniyetinin bilimdeki gelişmişliğini gösterir.',1]],
+ D:[['Cebir','Harezmî’nin kurduğu kabul edilen matematik dalı'],['Algoritma','Harezmî’nin adından türeyen, adım adım çözüm yöntemi'],['Muallim-i Sânî','Farabî’ye verilen “ikinci öğretmen” unvanı'],['Astronomi','Gök cisimlerini inceleyen bilim dalı']]};
+KBR['kmy-sina']={tp:'İbn-i Sina, Cezerî ve Kâtip Çelebi ile ilgili',T:[
+ ['İbn-i Sina’nın tıp alanındaki eseri el-Kânûn fi’t-Tıb’dır.',1],
+ ['İbn-i Sina’nın eseri uzun yıllar Avrupa üniversitelerinde okutulmuştur.',1],
+ ['Cezerî mühendislik alanında önemli çalışmalar yapmıştır.',1],
+ ['Fil Saati, Cezerî’nin ünlü icatlarındandır.',1],
+ ['Cezerî’nin otomatik makineleri, robot teknolojisine ilham olarak kabul edilir.',1],
+ ['Kâtip Çelebi’nin Cihannümâ adlı eseri coğrafya alanındadır.',1],
+ ['Keşfü’z-Zünûn, Kâtip Çelebi’nin bibliyografya niteliğindeki eseridir.',1],
+ ['Kâtip Çelebi 10. yüzyılda yaşamıştır.',0,'Kâtip Çelebi 17. yüzyılda yaşamış Osmanlı bilginidir.'],
+ ['“Kitâbü’l-Hind” İbn-i Sina’nın eseridir.',0,'“Kitâbü’l-Hind” Bîrûnî’nin eseridir; İbn-i Sina’nın ünlü eserleri el-Kânûn ve eş-Şifâ’dır.'],
+ ['Cezerî 20. yüzyılda yaşamış bir mühendistir.',0,'Cezerî 12.–13. yüzyıllarda yaşamıştır.'],
+ ['Avrupa’da İbn-i Sina “Avicenna” adıyla tanınır.',1],
+ ['Cezerî, Artuklu sarayında mühendislik yapmıştır.',1]],
+ D:[['el-Kânûn fi’t-Tıb','İbn-i Sina’nın uzun yıllar okutulan tıp kitabı'],['Fil Saati','Cezerî’nin yaptığı ünlü mekanik saat'],['Cihannümâ','Kâtip Çelebi’nin coğrafya eseri'],['Keşfü’z-Zünûn','Kâtip Çelebi’nin bibliyografya ansiklopedisi'],['Bibliyografya','Kaynakça; kitap ve yazıların sistemli listesi']]};
+KBR['kmy-yakin']={tp:'Yakın dönem bilim insanlarıyla ilgili',T:[
+ ['Cahit Arf matematik alanında çalışmıştır.',1],
+ ['“Arf değişmezi” Cahit Arf’ın adıyla anılır.',1],
+ ['Halil İnalcık, Osmanlı tarihi alanında tanınmış bir tarihçidir.',1],
+ ['Oktay Sinanoğlu kimya alanında dünyaca tanınan bir bilim insanıdır.',1],
+ ['Fuat Sezgin İslam bilim tarihi alanında çalışmıştır.',1],
+ ['Fuat Sezgin, Frankfurt’ta İslam Bilim ve Teknoloji Tarihi Enstitüsü’nü kurmuştur.',1],
+ ['Cahit Arf kimya alanında Nobel Ödülü kazanmıştır.',0,'Cahit Arf matematikçidir; kimya Oktay Sinanoğlu’nun alanıdır.'],
+ ['Halil İnalcık astronomi çalışmalarıyla tanınır.',0,'Halil İnalcık, Osmanlı tarihi çalışmalarıyla tanınır.'],
+ ['Cahit Arf, TÜBİTAK’ın kuruluş çalışmalarında yer almıştır.',1],
+ ['“Geschichte des Arabischen Schrifttums” Fuat Sezgin’in eseridir.',1],
+ ['Oktay Sinanoğlu, moleküller üzerine kuramsal çalışmalar yapmıştır.',1],
+ ['Bu bilim insanları Türk bilimine uluslararası katkı sağlamıştır.',1]],
+ D:[['Arf değişmezi','Cahit Arf’ın adıyla anılan matematik kavramı'],['İslam bilim tarihi','Fuat Sezgin’in çalıştığı alan'],['Osmanlı tarihçiliği','Halil İnalcık’ın uzmanlık alanı'],['TÜBİTAK','Türkiye’de bilimsel ve teknolojik araştırmaları destekleyen kurum']]};
+KBR['kmy-mimar']={tp:'Mimar Sinan, Turgut Cansever ve Osman Hamdi Bey ile ilgili',T:[
+ ['Mimar Sinan’ın çıraklık eseri Şehzade Camii’dir.',1],
+ ['Mimar Sinan’ın kalfalık eseri Süleymaniye Camii’dir.',1],
+ ['Mimar Sinan’ın ustalık eseri Selimiye Camii’dir.',1],
+ ['Selimiye Camii Bursa’dadır.',0,'Selimiye Camii Edirne’dedir.'],
+ ['Süleymaniye Camii Ankara’dadır.',0,'Süleymaniye Camii İstanbul’dadır.'],
+ ['Osman Hamdi Bey “Kaplumbağa Terbiyecisi” tablosunun ressamıdır.',1],
+ ['Osman Hamdi Bey, Sanayi-i Nefise Mektebi’ni kurmuştur.',1],
+ ['Osman Hamdi Bey, müzecilik alanında önemli çalışmalar yapmıştır.',1],
+ ['Mimar Sinan 19. yüzyılda yaşamış bir ressamdır.',0,'Mimar Sinan 16. yüzyılda yaşamış Osmanlı mimarbaşısıdır.'],
+ ['Mimar Sinan, Osmanlı’da mimarbaşılık görevinde bulunmuştur.',1],
+ ['Turgut Cansever, çağdaş Türk mimarisinde Türk-İslam anlayışını yorumlamış bir mimardır.',1],
+ ['Sanayi-i Nefise Mektebi, güzel sanatlar eğitimi veren bir okuldur.',1]],
+ D:[['Mimarbaşı','Osmanlı’da saray yapılarından sorumlu baş mimar'],['Selimiye','Mimar Sinan’ın “ustalık eserim” dediği Edirne’deki cami'],['Sanayi-i Nefise','Osman Hamdi Bey’in kurduğu güzel sanatlar okulu'],['Müzecilik','Eserlerin toplanıp korunması ve sergilenmesi işi']]};
+KBR['kmy-edebiyat']={tp:'Edebiyat önderleriyle ilgili',T:[
+ ['İstiklal Marşı’nın şairi Mehmet Âkif Ersoy’dur.',1],
+ ['Mehmet Âkif’in ünlü eseri Safahat’tır.',1],
+ ['Namık Kemal “Vatan şairi” olarak bilinir.',1],
+ ['Namık Kemal’in tiyatro eseri Vatan Yahut Silistre’dir.',1],
+ ['Ahmet Hamdi Tanpınar’ın romanlarından biri Huzur’dur.',1],
+ ['Ömer Seyfettin, Türk hikâyeciliğinin önemli isimlerindendir.',1],
+ ['Ömer Seyfettin, “Yeni Lisan” hareketinin öncülerindendir.',1],
+ ['İstiklal Marşı Namık Kemal tarafından yazılmıştır.',0,'İstiklal Marşı’nın şairi Mehmet Âkif Ersoy’dur.'],
+ ['“Kaşağı” hikâyesi Tanpınar’ındır.',0,'“Kaşağı”, Ömer Seyfettin’in hikâyesidir.'],
+ ['Safahat, Ömer Seyfettin’in hikâye kitabıdır.',0,'Safahat, Mehmet Âkif’in şiir kitabıdır.'],
+ ['İstiklal Marşı 12 Mart 1921’de kabul edilmiştir.',1],
+ ['Namık Kemal’in eserlerinde vatan, hürriyet ve millet kavramları öne çıkar.',1]],
+ D:[['İstiklal Marşı','Mehmet Âkif’in yazdığı, TBMM’nin 1921’de kabul ettiği millî marş'],['Safahat','Mehmet Âkif’in şiir kitabı'],['Yeni Lisan','Ömer Seyfettin’in öncülük ettiği sade Türkçe akımı'],['Vatan şairi','Namık Kemal’e verilen unvan']]};
+KBR['kmy-halk']={tp:'Halk kültürü ve müzik önderleriyle ilgili',T:[
+ ['Âşık Veysel, sazıyla söyleyen bir halk ozanıdır.',1],
+ ['Âşık Veysel Sivas’ın Şarkışla ilçesinde doğmuştur.',1],
+ ['“Uzun İnce Bir Yoldayım” Âşık Veysel’in bilinen türkülerindendir.',1],
+ ['Karacaoğlan 17. yüzyılda yaşamış bir halk şairidir.',1],
+ ['Karacaoğlan’ın şiirlerinde aşk ve doğa sevgisi öne çıkar.',1],
+ ['Barış Manço “7’den 77’ye” adlı televizyon programıyla tanınır.',1],
+ ['Barış Manço, Anadolu rock müziğinin önemli temsilcilerindendir.',1],
+ ['Sadettin Kaynak Türk müziği bestecisidir.',1],
+ ['Âşık Veysel Fransa’da doğmuş bir opera sanatçısıdır.',0,'Âşık Veysel, Sivas’ta doğmuş bir halk ozanıdır.'],
+ ['Karacaoğlan 20. yüzyılda yaşamıştır.',0,'Karacaoğlan 17. yüzyılda yaşamıştır.'],
+ ['Barış Manço klasik Batı müziği bestecisidir.',0,'Barış Manço Anadolu rock ve pop müziğiyle tanınan bir sanatçıdır.'],
+ ['Bu isimler halk kültürünün kuşaktan kuşağa aktarılmasına katkı sağlamıştır.',1]],
+ D:[['Âşık','Sazıyla şiir söyleyen halk ozanı'],['Halk şairi','Halkın diliyle şiirler söyleyen sanatçı'],['Anadolu rock','Anadolu ezgileriyle rock müziğin birleşimi'],['Türkü','Halk müziğinin anonim ya da âşıklara ait ezgili şiiri']]};
+
+/* ---- BEDEN EĞİTİMİ VE SPOR ---- */
+KBR['bes-takim']={tp:'Takım sporlarıyla ilgili',T:[
+ ['Futbolda bir takım sahada 11 oyuncuyla oynar.',1],
+ ['Basketbolda pota yerden 3,05 metre yüksekliktedir.',1],
+ ['Voleybolda bir takım sahada 6 oyuncuyla oynar.',1],
+ ['Hentbolda bir takım sahada kaleciyle birlikte 7 oyuncuyla oynar.',1],
+ ['Voleybolda top bir takım tarafından en fazla üç vuruşta karşıya geçirilmelidir.',1],
+ ['Futbolda kaleci dışındaki oyuncular topu elle oynayabilir.',0,'Futbolda kaleci dışındaki oyuncular topu elle oynayamaz.'],
+ ['Basketbolda top ayakla sürülür.',0,'Basketbolda top elle sürülür (dribling).'],
+ ['Voleybolda alttan karşılama tekniğine manşet denir.',1],
+ ['Hentbolda top ayakla oynanır.',0,'Hentbolda top elle oynanır.'],
+ ['Takım sporlarında iş birliği ve iletişim önemlidir.',1],
+ ['Basketbolda topla fazla adım atmak adım (yürüme) hatasıdır.',1],
+ ['Voleybolda filenin üzerinden topa sert vurmaya smaç denir.',1]],
+ D:[['Dribling','Basketbolda topu yere vurarak sürme'],['Manşet','Voleybolda topu ön kolların birleşimiyle alttan karşılama'],['Smaç','Voleybolda filenin üzerinden topa sert vuruş'],['Ofsayt','Futbolda hücum oyuncusunun kural dışı konumda bulunması'],['Pas','Topu takım arkadaşına gönderme']]};
+KBR['bes-bireysel']={tp:'Bireysel sporlar ve koordinasyonla ilgili',T:[
+ ['Atletizm; koşu, atlama ve atma branşlarından oluşur.',1],
+ ['Badminton raketle ve tüylü topla oynanır.',1],
+ ['Masa tenisinde top, file üzerinden raketle karşı masaya gönderilir.',1],
+ ['Uzun atlama, atletizmin atma branşlarındandır.',0,'Uzun atlama bir atlama branşıdır.'],
+ ['Gülle atma, atletizmin atma branşlarındandır.',1],
+ ['Masa tenisi, 6 kişilik takımlarla oynanır.',0,'Masa tenisi tek ya da çift olarak oynanan bir raket sporudur.'],
+ ['100 metre koşusu bir sürat koşusudur.',1],
+ ['Koordinasyon, hareketlerin uyumlu ve dengeli yapılabilmesidir.',1],
+ ['Denge, koordinasyonun önemli bileşenlerinden biridir.',1],
+ ['Badminton’da raket yerine eller kullanılır.',0,'Badminton raketle oynanır.'],
+ ['Bireysel sporlarda sporcu kendi performansından sorumludur.',1],
+ ['Maraton uzun mesafe koşusudur.',1]],
+ D:[['Koordinasyon','Hareketlerin uyumlu ve dengeli yapılabilmesi'],['Sürat','Kısa sürede hızlı hareket edebilme yeteneği'],['Dayanıklılık','Uzun süre yorulmadan çalışabilme yeteneği'],['Çeviklik','Yönü hızla değiştirebilme yeteneği']]};
+KBR['bes-nabiz']={tp:'Nabız, ısınma ve soğumayla ilgili',T:[
+ ['Nabız, kalbin dakikadaki atış sayısıdır.',1],
+ ['Nabız bilekteki atardamardan ölçülebilir.',1],
+ ['Nabız 15 saniye sayılıp 4 ile çarpılarak dakikalık nabız bulunabilir.',1],
+ ['Isınma hareketleri sakatlanma riskini azaltır.',1],
+ ['Soğuma hareketleri, egzersiz sonrası vücudu dinlenmeye hazırlar.',1],
+ ['Egzersiz sırasında nabız düşer.',0,'Egzersiz sırasında kalp daha çok kan pompaladığı için nabız artar.'],
+ ['Isınma yapmadan egzersize başlamak güvenlidir.',0,'Isınma yapılmazsa kas yaralanması riski artar.'],
+ ['Düzenli sporla dinlenik nabız genellikle düşer.',1],
+ ['Egzersiz bittikten sonra soğuma hareketleri yapılmamalıdır.',0,'Egzersiz sonrası soğuma hareketleri yapılmalıdır.'],
+ ['Esneme hareketleri kasları gevşetmeye yardımcı olur.',1],
+ ['Nabız boyundaki atardamardan da ölçülebilir.',1],
+ ['Ağır egzersizde nabız dinlenik nabızdan yüksektir.',1]],
+ D:[['Nabız','Kalbin dakikadaki atış sayısı'],['Isınma','Egzersizden önce vücudu hazırlayan hareketler'],['Soğuma','Egzersiz sonunda vücudu sakinleştiren hareketler'],['Esneme','Kasların ve eklemlerin hareket genişliğini artıran hareketler']]};
+KBR['bes-uygunluk']={tp:'Vücut kompozisyonu ve fiziksel uygunlukla ilgili',T:[
+ ['Vücut kitle indeksi, kilonun boyun karesine bölünmesiyle bulunur.',1],
+ ['Esneklik, eklemlerin hareket genişliğidir.',1],
+ ['Kas kuvveti, kasın uygulayabildiği kuvvetle ilgilidir.',1],
+ ['Kardiyorespiratuvar dayanıklılık, kalp ve akciğerlerin uzun süre çalışabilme kapasitesidir.',1],
+ ['Fiziksel uygunluk yalnızca kas büyüklüğüyle ilgilidir.',0,'Fiziksel uygunluk; dayanıklılık, kuvvet, esneklik ve vücut kompozisyonu gibi bileşenleri kapsar.'],
+ ['Düzenli uyku ve dengeli beslenme fiziksel uygunluğu destekler.',1],
+ ['Vücut kompozisyonu; yağ, kas ve kemik gibi dokuların oranını ifade eder.',1],
+ ['Hareketsiz yaşam sağlığa yararlıdır.',0,'Hareketsiz yaşam sağlık risklerini artırır.'],
+ ['Boy ve kilo dengesi sağlıklı yaşam için önemlidir.',1],
+ ['Esneklik çalışmaları sakatlanmaları azaltmaya yardımcı olur.',1],
+ ['Düzenli egzersiz kalp ve akciğer sağlığını korur.',1],
+ ['Kuvvet çalışmaları kemik sağlığını her zaman olumsuz etkiler.',0,'Uygun kuvvet çalışmaları kemik ve kas sağlığını destekler.']],
+ D:[['BKİ','Vücut kitle indeksi; kilonun boyun karesine bölümü'],['Esneklik','Eklemlerin hareket genişliği'],['Kuvvet','Kasın direnç karşısında uygulayabildiği güç'],['Vücut kompozisyonu','Vücuttaki yağ, kas ve kemik oranı']]};
+KBR['bes-olimpiyat']={tp:'Olimpiyat Oyunları ile ilgili',T:[
+ ['Antik Olimpiyat Oyunları Olympia’da yapılmıştır.',1],
+ ['Modern Olimpiyat Oyunları ilk kez 1896’da Atina’da yapılmıştır.',1],
+ ['Modern olimpiyatların kurucusu Pierre de Coubertin’dir.',1],
+ ['Olimpiyat bayrağındaki beş halka beş kıtayı simgeler.',1],
+ ['Yaz Olimpiyatları iki yılda bir yapılır.',0,'Yaz Olimpiyatları dört yılda bir yapılır.'],
+ ['Olimpiyat meşalesi Olympia’da yakılır.',1],
+ ['Antik Olimpiyatlar Zeus onuruna düzenlenmiştir.',1],
+ ['Olimpiyat felsefesinde barış ve dostluk önemlidir.',1],
+ ['İlk modern Olimpiyat Oyunları Roma’da yapılmıştır.',0,'İlk modern Olimpiyat Oyunları Atina’da yapılmıştır.'],
+ ['Olimpiyat halkaları beş farklı sporu simgeler.',0,'Beş halka beş kıtayı simgeler.'],
+ ['Paralimpik oyunlar engelli sporcular için düzenlenir.',1],
+ ['Olimpiyat sloganı “Daha hızlı, daha yüksek, daha güçlü”dür.',1]],
+ D:[['Olimpiyat','Dünya sporcularının dört yılda bir yarıştığı büyük spor organizasyonu'],['Meşale','Olimpiyat ateşini taşıyan ışık'],['Paralimpik','Engelli sporcuların katıldığı olimpiyat türü'],['Antik Olimpiyat','Eski Yunan’da Olympia’da yapılan spor oyunları']]};
+KBR['bes-fair']={tp:'Fair play ve spor ahlakıyla ilgili',T:[
+ ['Fair play, kurallara uyarak dürüst ve saygılı oynamaktır.',1],
+ ['Fair play yalnızca kazanan takım için geçerlidir.',0,'Fair play kazanan ve kaybeden herkes için geçerlidir.'],
+ ['Rakibe ve hakeme saygı göstermek fair play davranışıdır.',1],
+ ['Sporda şiddet ve ayrımcılık fair play’e aykırıdır.',1],
+ ['Rakip sporcu yaralanınca ona yardım etmek fair play örneğidir.',1],
+ ['Hakem kararına küfür ederek itiraz etmek sporculuğa uygundur.',0,'Hakem kararlarına saygı göstermek gerekir.'],
+ ['Spor, toplumsal barışa ve dostluğa katkı sağlar.',1],
+ ['Kazanmak için her yol mubahtır.',0,'Fair play, kazanmak için hileye başvurulmamasını gerektirir.'],
+ ['Doping, fair play ilkesine aykırıdır.',1],
+ ['Kaybettiğinde rakibi tebrik etmek sportmenliktir.',1],
+ ['Seyircilerin de fair play kurallarına uygun davranması beklenir.',1],
+ ['Sporda centilmenlik yalnızca profesyonel sporcular için geçerlidir.',0,'Sporda centilmenlik herkes için geçerlidir.']],
+ D:[['Fair play','Sporda adil, dürüst ve saygılı oynama anlayışı'],['Doping','Performansı yapay yolla artıran yasaklı madde veya yöntem kullanımı'],['Sportmenlik','Kazanmayı ve kaybetmeyi olgunlukla karşılama'],['Centilmenlik','Rakibe karşı nazik ve onurlu davranma']]};
+
+/* ---- BİLİŞİM TEKNOLOJİLERİ VE YAZILIM ---- */
+KBR['byt-bilgisayar']=[
+{cats:{'donanım':['Klavye','Fare','Monitör','Yazıcı','İşlemci (CPU)','RAM','Sabit disk','Ekran kartı'],'yazılım':['Windows','Linux','Microsoft Word','Google Chrome','Photoshop','Android','Excel','Antivirüs programı']},
+ pos:['Aşağıdakilerden hangisi {c} örneğidir?'],neg:['Aşağıdakilerden hangisi {c} örneği değildir?'],cls:['“{i}” aşağıdakilerden hangisine örnektir?'],decoys:['İnternet servisi'],d:'easy'},
+{cats:{'resim dosyası':['.jpg','.png','.gif','.bmp'],'ses dosyası':['.mp3','.wav','.ogg'],'video dosyası':['.mp4','.avi','.mkv'],'belge dosyası':['.docx','.pdf','.txt','.odt']},
+ pos:['Aşağıdaki uzantılardan hangisi bir {c}na aittir?'.replace('dosyası','dosyası')],noNeg:false,neg:['Aşağıdaki uzantılardan hangisi bir {c} uzantısı değildir?'],cls:['“{i}” uzantısı hangi dosya türüne aittir?'],lc:{'resim dosyası':'resim dosyası','ses dosyası':'ses dosyası','video dosyası':'video dosyası','belge dosyası':'belge dosyası'},d:'easy'},
+{tp:'Bilgisayar sistemleri ve dosya yönetimiyle ilgili',T:[
+ ['Donanım, bilgisayarın elle tutulabilen fiziksel parçalarıdır.',1],
+ ['Yazılım, bilgisayara yaptırılacak işleri belirleyen programlardır.',1],
+ ['RAM, bilgisayarda kalıcı depolama sağlar.',0,'RAM geçici çalışma belleğidir; kalıcı depolama sabit disk veya SSD ile yapılır.'],
+ ['İşlemci (CPU) bilgisayarın beyni olarak görev yapar.',1],
+ ['İşletim sistemi, donanım ile kullanıcı arasında arayüz sağlar.',1],
+ ['Windows bir işletim sistemi değil, uygulama yazılımıdır.',0,'Windows bir işletim sistemidir.'],
+ ['Dosya uzantısı, dosyanın türünü belirtir.',1],
+ ['1 byte 8 bittir.',1],
+ ['Klasörler dosyaları düzenli tutmaya yarar.',1],
+ ['Fare bir çıkış (çıktı) birimidir.',0,'Fare bir giriş birimidir.'],
+ ['Monitör bir çıkış birimidir.',1],
+ ['Çöp kutusuna taşınan dosyalar, boşaltılana kadar geri yüklenebilir.',1]],
+ D:[['Donanım','Bilgisayarın fiziksel parçaları'],['Yazılım','Bilgisayarın çalışmasını sağlayan programlar'],['İşletim sistemi','Donanım ile kullanıcı arasında köprü kuran temel yazılım'],['RAM','Çalışan programların geçici olarak tutulduğu bellek'],['Dosya uzantısı','Dosya adının sonunda yer alan, tür belirten ek'],['Byte','8 bitlik veri birimi']]}];
+KBR['byt-yeni']={tp:'Bulut bilişim ve yapay zekâ ile ilgili',T:[
+ ['Bulut bilişimde veriler internet üzerindeki sunucularda saklanır.',1],
+ ['Bulutta saklanan dosyalara internet bağlantısı olan farklı cihazlardan ulaşılabilir.',1],
+ ['Yapay zekâ, makinelerin insan zekâsına benzer işler yapabilmesini hedefler.',1],
+ ['Sesli asistanlar yapay zekâ uygulamalarına örnektir.',1],
+ ['Nesnelerin İnterneti (IoT), günlük nesnelerin internete bağlanmasıdır.',1],
+ ['Bulut bilişim için verilerin yalnızca kişisel bilgisayarın diskinde tutulması gerekir.',0,'Bulut bilişimde veriler uzak sunucularda tutulur.'],
+ ['Yapay zekâ sistemleri her zaman hatasız çalışır.',0,'Yapay zekâ hata yapabilir; sonuçlar kontrol edilmelidir.'],
+ ['Makine öğrenmesi, verilerden öğrenen sistemlerin geliştirilmesidir.',1],
+ ['Büyük veri, çok büyük ve hızla artan veri yığınlarını ifade eder.',1],
+ ['Yüz tanıma sistemleri yapay zekâ kullanabilir.',1],
+ ['Bulut hesaplarında parola güvenliği önemli değildir.',0,'Bulut hesapları güçlü parola ve iki adımlı doğrulama ile korunmalıdır.'],
+ ['Sanal gerçeklik, bilgisayar üretimi bir ortamı yaşatır.',1]],
+ D:[['Bulut bilişim','Verilerin ve uygulamaların internet üzerindeki sunucularda tutulması'],['Yapay zekâ','Makinelerin öğrenme ve karar verme gibi zekâ gerektiren işleri yapması'],['Nesnelerin İnterneti','Günlük nesnelerin internete bağlanarak veri alışverişi yapması'],['Büyük veri','Çok büyük ve hızlı artan veri yığını'],['Makine öğrenmesi','Bilgisayarın verilerden öğrenmesini sağlayan yapay zekâ dalı']]};
+KBR['byt-etik']={tp:'Bilişim etiği ve dijital vatandaşlıkla ilgili',T:[
+ ['İntihal, başkasının çalışmasını kaynak göstermeden kendi çalışması gibi sunmaktır.',1],
+ ['Telif hakkı, eser sahibinin eseri üzerindeki haklarını korur.',1],
+ ['Korsan yazılım kullanmak yasaldır.',0,'Korsan yazılım kullanmak yasaya ve etik kurallara aykırıdır.'],
+ ['İnternetten bulunan her görsel izin almadan kullanılabilir.',0,'Görsellerin telif hakkı olabilir; kullanım koşullarına dikkat edilmelidir.'],
+ ['Kaynak göstermek bilişim etiğinin gereğidir.',1],
+ ['e-Devlet, kamu hizmetlerine internet üzerinden ulaşım sağlar.',1],
+ ['e-Devlet şifresi başkalarıyla paylaşılabilir.',0,'e-Devlet şifresi kişiseldir, paylaşılmamalıdır.'],
+ ['Dijital vatandaş, internette başkalarının haklarına saygı gösterir.',1],
+ ['Açık kaynak yazılımların kodları herkese açıktır.',1],
+ ['Başkasının hesabına izinsiz girmek etik ve hukuki bir suçtur.',1],
+ ['Doğruluğunu bilmediğimiz bilgiyi paylaşmak sorumsuzluktur.',1],
+ ['Lisanslı yazılım, yasal yoldan edinilmiş yazılımdır.',1]],
+ D:[['İntihal','Başkasının eserini kaynak göstermeden kendi eseri gibi sunma'],['Telif hakkı','Eser sahibinin eseri üzerindeki yasal hakları'],['e-Devlet','Kamu hizmetlerine internetten ulaşılan portal'],['Dijital vatandaşlık','İnternette sorumlu ve saygılı davranma'],['Açık kaynak','Kaynak kodu herkese açık yazılım']]};
+KBR['byt-guvenlik']={tp:'Siber zorbalık, gizlilik ve parola ile ilgili',T:[
+ ['Güçlü parola büyük-küçük harf, rakam ve sembol içerir.',1],
+ ['Parola olarak doğum tarihi kullanmak güvenlidir.',0,'Doğum tarihi gibi tahmin edilebilir bilgiler zayıf parola oluşturur.'],
+ ['Aynı parolayı tüm hesaplarda kullanmak güvenlidir.',0,'Her hesap için farklı parola kullanılmalıdır.'],
+ ['Dijital ayak izi, internette bıraktığımız izlerin tümüdür.',1],
+ ['Oltalama (phishing), sahte mesaj ve sitelerle bilgi çalmaya çalışmaktır.',1],
+ ['Siber zorbalığa uğrayan kişi durumu güvendiği bir yetişkine bildirmelidir.',1],
+ ['Kişisel verileri tanımadığımız kişilerle paylaşmak güvenlidir.',0,'Kişisel veriler yabancılarla paylaşılmamalıdır.'],
+ ['İki adımlı doğrulama hesap güvenliğini artırır.',1],
+ ['Antivirüs yazılımı zararlı yazılımlara karşı korur.',1],
+ ['Siber zorbalık yalnızca yüz yüze gerçekleşir.',0,'Siber zorbalık internet ve dijital ortamlarda gerçekleşir.'],
+ ['Şüpheli bağlantılara tıklamamak gerekir.',1],
+ ['Paylaşılan içerikler internette uzun süre kalabilir.',1]],
+ D:[['Dijital ayak izi','İnternette bıraktığımız tüm izler'],['Siber zorbalık','Dijital ortamlarda bir kişiyi rahatsız etme, aşağılama veya tehdit etme'],['Oltalama','Sahte mesaj veya sitelerle bilgi çalma girişimi'],['Güçlü parola','Tahmin edilmesi zor, uzun ve karışık karakterli parola'],['İki adımlı doğrulama','Parolaya ek ikinci bir doğrulama adımı']]};
+KBR['byt-ag']={tp:'Bilgisayar ağlarıyla ilgili',T:[
+ ['LAN, ev ya da okul gibi küçük bir alanı kapsayan yerel ağdır.',1],
+ ['WAN, geniş bir coğrafi alanı kapsayan ağdır.',1],
+ ['İnternet, dünya çapındaki ağların birbirine bağlanmasıyla oluşur.',1],
+ ['Modem, internet servis sağlayıcısına bağlantıyı sağlar.',1],
+ ['Yönlendirici (router), ağdaki cihazlar arasında veri yönlendirir.',1],
+ ['IP adresi, ağa bağlı cihazların kimlik adresidir.',1],
+ ['LAN, tüm dünyayı kapsayan ağdır.',0,'LAN küçük bir alanı kapsar; dünyayı kapsayan ağ internettir.'],
+ ['Wi-Fi kablosuz ağ bağlantısı sağlar.',1],
+ ['HTTPS bağlantısı, verilerin şifrelenerek iletilmesine yardımcı olur.',1],
+ ['İnternet ile WWW (web) tamamen aynı şeydir.',0,'İnternet ağ altyapısıdır; web, internet üzerinde çalışan bir hizmettir.'],
+ ['Tarayıcı, web sayfalarını görüntülemeye yarar.',1],
+ ['Herkese açık Wi-Fi ağlarında güvenlik riski yoktur.',0,'Herkese açık ağlarda veriler izlenebilir; dikkatli olunmalıdır.']],
+ D:[['LAN','Küçük bir alandaki cihazları birbirine bağlayan yerel ağ'],['WAN','Geniş coğrafi alana yayılan ağ'],['İnternet','Dünya çapında birbirine bağlı ağlar bütünü'],['IP adresi','Ağdaki cihazın kimlik adresi'],['Modem','Hat ile bilgisayar ağı arasında bağlantı kuran cihaz'],['Yönlendirici','Ağdaki veri trafiğini yönlendiren cihaz']]};
+KBR['byt-arama']={tp:'Arama stratejileri ve bulut iş birliğiyle ilgili',T:[
+ ['Anahtar sözcükler kullanmak arama sonuçlarını daraltır.',1],
+ ['Tırnak içine alınan ifade, aynen eşleşen sonuçları arar.',1],
+ ['Arama sonuçlarındaki ilk sayfa her zaman en doğru bilgidir.',0,'Kaynağın güvenilirliği kontrol edilmelidir; ilk sonuç her zaman doğru olmayabilir.'],
+ ['Bir bilgiyi birden fazla güvenilir kaynaktan doğrulamak iyi bir araştırma yöntemidir.',1],
+ ['Bulut tabanlı belgelerde birden fazla kişi aynı belge üzerinde çalışabilir.',1],
+ ['Ortak belgede “görüntüleyici” izni olan kişi belgeyi düzenleyebilir.',0,'Görüntüleyici yalnızca görebilir; düzenleme için “düzenleyici” izni gerekir.'],
+ ['Belgeyi paylaşırken erişim izinlerine dikkat edilmelidir.',1],
+ ['“.gov.tr” uzantısı Türkiye’deki kamu kurumlarına ait sitelerde görülür.',1],
+ ['E-postanın konu satırı, mesajın içeriğini kısaca belirtmelidir.',1],
+ ['Tanımadığımız kişilerden gelen e-posta eklerini hemen açmalıyız.',0,'Şüpheli e-posta ekleri açılmamalıdır.'],
+ ['Video konferans uygulamaları uzaktaki kişilerle görüntülü görüşmeye imkân tanır.',1],
+ ['Bir bilgiyi paylaşmadan önce doğruluğunu araştırmak gerekir.',1]],
+ D:[['Anahtar sözcük','Aranan konuyu en iyi anlatan temel sözcük'],['Ortak çalışma','Birden fazla kişinin aynı belge üzerinde birlikte çalışması'],['Güvenilir kaynak','Doğru ve denetlenebilir bilgi sunan kaynak'],['Video konferans','İnternet üzerinden görüntülü toplantı']]};
+KBR['byt-algoritma']={tp:'Algoritma ve akış şemalarıyla ilgili',T:[
+ ['Algoritma, bir problemi çözmek için izlenen adım adım yöntemdir.',1],
+ ['Akış şemasında başlangıç ve bitiş oval ile gösterilir.',1],
+ ['Akış şemasında karar (evet/hayır) sembolü eşkenar dörtgendir.',1],
+ ['Akış şemasında işlem adımı dikdörtgenle gösterilir.',1],
+ ['Akış şemasında giriş/çıkış paralelkenarla gösterilir.',1],
+ ['Karar sembolünden yalnızca tek bir çıkış yönü olur.',0,'Karar sembolünden evet/hayır gibi en az iki çıkış yönü vardır.'],
+ ['Algoritmadaki adımların sırası önemli değildir.',0,'Algoritmada adımların sırası sonucu etkiler.'],
+ ['Ayrıştırma, büyük problemi küçük parçalara bölmektir.',1],
+ ['Örüntü tanıma, benzerlikleri fark etmektir.',1],
+ ['Soyutlama, gereksiz ayrıntıları ayıklayıp önemli olana odaklanmaktır.',1],
+ ['İyi bir algoritma net ve sonlu adımlardan oluşur.',1],
+ ['Akış şemaları yalnızca matematik problemlerinde kullanılır.',0,'Akış şeması günlük hayattaki süreçleri de gösterebilir.']],
+ D:[['Algoritma','Bir problemi çözmek için sıralı ve net adımlar bütünü'],['Akış şeması','Algoritmanın şekillerle gösterimi'],['Ayrıştırma','Büyük problemi küçük parçalara bölme'],['Soyutlama','Gereksiz ayrıntıları atıp önemli olana odaklanma'],['Örüntü tanıma','Benzerlikleri ve düzenleri fark etme']]};
+KBR['byt-prog']={tp:'Programlama temelleriyle ilgili',T:[
+ ['Değişken, veri saklamak için kullanılan isimli bellek alanıdır.',1],
+ ['Döngüler, bir işlemi tekrarlamak için kullanılır.',1],
+ ['if-else bir karar yapısıdır.',1],
+ ['Fonksiyon, belirli bir işi yapan ve tekrar kullanılabilen kod bloğudur.',1],
+ ['Metin (string) veri türü sayı içeremez.',0,'Metin harf ve sayı içerebilir; sayısal işlem için sayı türü gerekir.'],
+ ['Mantıksal (boolean) değişken yalnızca doğru ya da yanlış değer alır.',1],
+ ['Programlamada “=” işareti çoğunlukla atama anlamında kullanılır.',1],
+ ['Hata ayıklama, programdaki hataları bulup düzeltmektir.',1],
+ ['Programcılar yazdıkları programda hiç hata yapmaz.',0,'Hata yapmak doğaldır; hata ayıklama programlamanın parçasıdır.'],
+ ['Aynı kodu tekrar tekrar yazmak, döngü kullanmaktan daha verimlidir.',0,'Döngü, tekrarlı işleri kısa ve verimli yazmayı sağlar.'],
+ ['Python bir programlama dilidir.',1],
+ ['Scratch, blok tabanlı görsel bir programlama ortamıdır.',1]],
+ D:[['Değişken','Veri saklayan isimli bellek alanı'],['Döngü','İşlemleri belli koşulda tekrarlayan yapı'],['Fonksiyon','Belirli bir işi yapan, tekrar çağrılabilen kod bloğu'],['Hata ayıklama','Programdaki hataları bulup düzeltme'],['Karar yapısı','Koşula göre farklı işlem yapılmasını sağlayan yapı']]};
+/* ---- sayısal/izleme soruları ---- */
+GR['byt-algoritma']=[
+ r=>{const a=r.int(2,9),b=r.int(2,9),c=r.int(2,5),res=(a+b)*c;
+  return C('Bir algoritmanın adımları:\n1. x değerine '+a+' ver.\n2. x’e '+b+' ekle.\n3. x’i '+c+' ile çarp.\n4. x’i yazdır.\n\nBu algoritma sonunda ekrana hangi değer yazılır?',res,W(res,[a+b+c,a+b*c,a*b*c,res+c]),'x = '+a+' → '+(a+b)+' → '+res+'.','medium','tr1');},
+ r=>{const n=r.int(3,9),res=n*(n+1)/2;
+  return C('Bir algoritmada toplam = 0 yapılır; sonra i, 1’den '+n+'’e kadar birer birer artarken her adımda toplam = toplam + i işlemi yapılır. Sonunda toplam kaç olur?',res,W(res,[n*n,res-n,res+n,n+1]),'1 + 2 + … + '+n+' = '+res+'.','hard','tr2');},
+ r=>{const k=r.int(10,50),x=r.int(5,60),ans=x>k?'Büyük':'Küçük veya eşit';
+  return C('Bir algoritma şöyle çalışıyor: “Eğer sayı '+k+'’dan büyükse ‘Büyük’ yaz, değilse ‘Küçük veya eşit’ yaz.” Sayı '+x+' girilirse ne yazılır?',ans,['Büyük','Küçük veya eşit','Hiçbir şey yazılmaz','Hata verir'].filter(v=>v!==ans).slice(0,3),x+(x>k?' > ':' ≤ ')+k+' olduğu için “'+ans+'” yazılır.','easy','tr3');},
+ r=>{const n=r.int(3,8),m=r.int(2,5);
+  return C('Bir döngü, her turda sayacı '+m+' artırıyor ve sayaç başlangıçta 0. Döngü '+n+' kez çalışırsa sayacın son değeri kaç olur?',n*m,W(n*m,[n+m,n*m+m,n,m]),n+' · '+m+' = '+(n*m)+'.','medium','tr4');}
+];
+GR['byt-prog']=[
+ r=>{const a=r.int(3,15),b=r.int(2,9),c=r.int(2,6);
+  return C('Bir programda:\nsayi = '+a+'\nsayi = sayi + '+b+'\nsayi = sayi - '+c+'\nyaz(sayi)\n\nEkrana ne yazılır?',a+b-c,W(a+b-c,[a-b+c,a+b+c,a+b,a-c]),a+' → '+(a+b)+' → '+(a+b-c)+'.','easy','p1');},
+ r=>{const n=r.int(3,7),v=r.int(2,5);
+  return C('for i in range('+n+'):\n    yaz("A")\n\nBu döngü kaç kez “A” yazar?',n,W(n,[n+1,n-1,n*2]),'range('+n+') '+n+' tur döner (0’dan '+(n-1)+'’e).','medium','p2');},
+ r=>{const a=r.int(2,9),k=r.pick(['tek','çift']),x=r.int(1,30),ans=x%2===0?'çift':'tek';
+  return C('Bir program, girilen sayının 2’ye bölümünden kalana bakıyor: kalan 0 ise “çift”, değilse “tek” yazıyor. Sayı '+x+' girilirse ne yazar?',ans,['tek','çift','sıfır','hata'].filter(v=>v!==ans).slice(0,3),x+' % 2 = '+(x%2)+' olduğu için “'+ans+'” yazılır.','easy','p3');},
+ r=>{const t=r.pick([['isim = "Ali"','metin (string)'],['yas = 13','tam sayı (integer)'],['boy = 1.62','ondalıklı sayı (float)'],['uyku = True','mantıksal (boolean)'],['not1 = 85','tam sayı (integer)']]);
+  const all=['metin (string)','tam sayı (integer)','ondalıklı sayı (float)','mantıksal (boolean)'];
+  return C('“'+t[0]+'” satırında değişkenin veri türü aşağıdakilerden hangisidir?',t[1],all.filter(x=>x!==t[1]),'Atanan değere bakılır: '+t[0]+' → '+t[1]+'.','medium','p4');},
+ r=>{const a=r.int(2,6),b=r.int(2,6),f=r.pick(['topla','carp']),res=f==='topla'?a+b:a*b;
+  return C('def '+f+'(x, y):\n    return x '+(f==='topla'?'+':'*')+' y\n\n'+f+'('+a+', '+b+') çağrısı hangi değeri döndürür?',res,W(res,[a+b+1,a*b+1,Math.abs(a-b),a+b+a*b]).filter(v=>v!==String(res)),'Fonksiyon x ve y değerlerini '+(f==='topla'?'toplar':'çarpar')+': '+res+'.','hard','p5');}
+];
+/* ================= YENİ NESİL MATEMATİK ve UZUN TÜRKÇE SORULARI ================= */
+function G(lid,f){(GR[lid]=GR[lid]||[]).push(f);}
+function hhmm(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+function uniqStr(arr,c){const o=[];arr.forEach(x=>{x=String(x);if(x!==String(c)&&o.indexOf(x)<0)o.push(x);});return o;}
+
+/* ---------- ÇARPANLAR VE KATLAR ---------- */
+G('mat-carp',r=>{
+  const g=r.pick([4,6,8,9,12,15]),x=r.int(2,9),y=r.int(2,9);if(x===y||gcd(x,y)!==1)return null;
+  const a=g*x,b=g*y,ans=x+y;
+  const c=r.pick([
+   ['Bir okul kütüphanesinde '+a+' roman ve '+b+' hikâye kitabı bulunmaktadır. Kütüphane görevlisi, bütün kitapları raflara yerleştirirken her rafta aynı sayıda kitap bulunmasını ve bir rafta yalnızca tek tür kitap olmasını istiyor. Rafları mümkün olduğunca az kullanmak istediğine göre kaç raf gerekir?','raf'],
+   ['Bir spor salonunda '+a+' basketbol topu ile '+b+' voleybol topu vardır. Görevli, topları her sepette eşit sayıda ve aynı türden top olacak biçimde sepetlere dizecektir. Sepet sayısını en az tutmak istiyorsa kaç sepet kullanması gerekir?','sepet'],
+   ['Bir manavda '+a+' kg elma ile '+b+' kg portakal vardır. Manav, bunları her kasada eşit kütlede ve yalnızca tek tür meyve olacak şekilde kasalara koyacaktır. En az kaç kasa gerekir?','kasa']]);
+  return C(c[0],ans,W(ans,[x*y,g,a+b,ans+g]),'EBOB('+a+', '+b+') = '+g+'. Eşit gruplar '+g+' birimlik olur; '+a+'/'+g+' + '+b+'/'+g+' = '+x+' + '+y+' = '+ans+' '+c[1]+'.','hard','ynC1');});
+G('mat-carp',r=>{
+  const a=r.pick([8,10,12,15,18,20,24,30]),b=r.pick([9,10,12,14,15,16,20,25]);if(a===b)return null;
+  const l=lcm(a,b);if(l>420||l===a||l===b)return null;
+  const h=r.pick([6,7,8,9]),m0=h*60,t=m0+l;
+  const opts=uniqStr([hhmm(m0+gcd(a,b)),hhmm(m0+a+b),hhmm(m0+l/2),hhmm(m0+l+a),hhmm(m0+Math.abs(a-b))],hhmm(t));
+  if(opts.length<3)return null;
+  return C('Bir şehirde iki otobüs hattı vardır. A hattının otobüsleri terminalden her '+a+' dakikada bir, B hattının otobüsleri her '+b+' dakikada bir hareket etmektedir. Sabah saat '+hhmm(m0)+'’da her iki hattın otobüsü terminalden aynı anda kalkıyor.\n\nBuna göre iki otobüs, bu andan sonra ilk kez saat kaçta yeniden aynı anda hareket eder?',hhmm(t),opts.slice(0,3),'EKOK('+a+', '+b+') = '+l+' dakika. '+hhmm(m0)+' + '+l+' dk = '+hhmm(t)+'.','hard','ynC2');});
+G('mat-carp',r=>{
+  const n=r.pick([120,180,240,300,360,420]),m=r.pick([60,90,150,200,210,270]),g=gcd(n,m),cnt=(n/g)*(m/g);
+  if(cnt<6||cnt>200)return null;
+  return C('Boyu '+n+' cm ve eni '+m+' cm olan dikdörtgen biçimli bir zemin, kenar uzunluğu tam sayı (cm) olan eş kare seramiklerle, hiç kırmadan ve boşluk bırakmadan döşenecektir. Usta, seramik sayısını mümkün olduğunca az tutmak istemektedir.\n\nBuna göre usta kaç seramik kullanır?',cnt,W(cnt,[n*m/(g*g)/2,(n+m)/g,g,cnt+n/g]),'En büyük kare kenarı EBOB('+n+', '+m+') = '+g+' cm. Seramik sayısı ('+n+'/'+g+')·('+m+'/'+g+') = '+(n/g)+'·'+(m/g)+' = '+cnt+'.','hard','ynC3');});
+G('mat-carp',r=>{
+  const x=r.int(1,4),y=r.int(1,3),z=r.int(0,2),ans=(x+1)*(y+1)*(z+1);
+  const form='2'+supe(x)+' · 3'+supe(y)+(z?' · 5'+supe(z):'');
+  return C('Bir matematik yarışmasında yarışmacılara şu bilgi verilmiştir: “Bir A doğal sayısının asal çarpanlarına ayrılmış biçimi '+form+' şeklindedir.”\n\nYarışmacılardan A sayısının kaç farklı pozitif tam böleni olduğunu bulmaları isteniyor. Doğru cevap hangisidir?',ans,W(ans,[x+y+z+3,x*y*z,(x+1)*(y+1)+z,ans*2]),'Bölen sayısı, üslerin 1 fazlalarının çarpımıdır: ('+(x+1)+')('+(y+1)+')'+(z?'('+(z+1)+')':'')+' = '+ans+'.','hard','ynC4');});
+
+/* ---------- ÜSLÜ İFADELER ---------- */
+G('mat-uslu',r=>{
+  const d=r.pick([1.5,3,4.5,6,9]),t=d*1000/3;
+  return C('Işık, boşlukta saniyede yaklaşık 3·10⁵ km yol alır. Bir uzay aracından gönderilen radyo sinyali de ışık hızıyla ilerlemektedir. Aracın Dünya’dan uzaklığı '+nf(d)+'·10⁸ km olduğuna göre sinyal Dünya’ya kaç saniyede ulaşır?',nf(t),numW(nf(t),[t*10,t/10,d*100,d*10000,t*2]),'Süre = yol/hız = ('+nf(d)+'·10⁸)/(3·10⁵) = '+nf(t)+' saniye.','hard','ynU1');});
+G('mat-uslu',r=>{
+  const k=r.pick([3,5,6,7,10]),h=r.int(3,8),v=k*Math.pow(2,h),q=r.int(0,1);
+  if(q===0)return C('Bir laboratuvarda yetiştirilen bakteri kolonisi her saat sonunda sayısını iki katına çıkarmaktadır. Deneyin başında kolonide '+k+' bakteri vardır.\n\nBuna göre '+h+' saat sonunda kolonide kaç bakteri bulunur?',v,W(v,[k*h,k*h*2,k*Math.pow(2,h-1),k+Math.pow(2,h)]),k+' · 2'+supe(h)+' = '+v+'.','medium','ynU2');
+  return C('Bir laboratuvarda yetiştirilen bakteri kolonisi her saat sonunda sayısını iki katına çıkarmaktadır. Deneyin başında kolonide '+k+' bakteri vardır ve bir ara kolonideki bakteri sayısı '+v+' olarak sayılmıştır.\n\nBu sayım deneyin kaçıncı saatinde yapılmıştır?',h,W(h,[v/k,h+1,h-1,v-k]),v+'/'+k+' = '+(v/k)+' = 2'+supe(h)+' olduğundan '+h+'. saatte.','hard','ynU2');});
+G('mat-uslu',r=>{
+  const n=r.int(4,10),t=Math.pow(2,n)/10;
+  return C('Kalınlığı 0,1 mm olan ince bir kâğıt, her seferinde ortadan ikiye katlanarak '+n+' kez katlanıyor.\n\nKatlama işlemi bittiğinde kâğıt tomarının kalınlığı kaç mm olur?',nf(t),numW(nf(t),[n/10,n,0.1*n*2,t*2,t/2,Math.pow(2,n-1)]),'Her katlamada kalınlık 2 katına çıkar: 0,1 · 2'+supe(n)+' = '+nf(t)+' mm.','medium','ynU3');});
+G('mat-uslu',r=>{
+  const a=r.int(1,5),b=r.int(1,3),c=r.int(0,2),e=a+2*b-3*c;if(e<1||e>10)return null;
+  return C('Bir bilgi yarışmasında şu soru sorulmuştur:\n\n“A = 2'+supe(a)+' · 4'+supe(b)+' ÷ 8'+supe(c)+' olduğuna göre A kaçtır?”\n\nYarışmacının doğru cevabı aşağıdakilerden hangisidir?',Math.pow(2,e),W(Math.pow(2,e),[Math.pow(2,a+b-c),Math.pow(2,e+1),Math.pow(2,e-1),Math.pow(2,a*b)]),'4 = 2², 8 = 2³ olduğundan A = 2'+supe(a)+' · 2'+supe(2*b)+' ÷ 2'+supe(3*c)+' = 2'+supe(e)+' = '+Math.pow(2,e)+'.','hard','ynU4');});
+
+/* ---------- KAREKÖKLÜ İFADELER ---------- */
+G('mat-kok',r=>{
+  const m=r.pick([2,3,5,6,7]),k=r.int(2,6),A=m*k*k;
+  const ok=radStr(4*k,m);
+  return C('Alanı '+A+' m² olan kare biçimindeki bir bahçenin etrafı, bir tur tel örgüyle çevrilecektir. Tel örgü metre olarak satıldığına göre bahçenin çevresi kaç metredir?',ok+' m',uniqStr([radStr(2*k,m)+' m',radStr(8*k,m)+' m',radStr(4,m*k)+' m',radStr(k,m)+' m'],ok+' m').slice(0,3),'Kenar = √'+A+' = '+radStr(k,m)+' m. Çevre = 4 · '+radStr(k,m)+' = '+ok+' m.','hard','ynK1');});
+G('mat-kok',r=>{
+  const s=r.int(3,12),A=2*s*s;
+  return C('Alanı '+A+' cm² olan kare biçimindeki bir kartonun karşılıklı köşeleri arasına bir ip gerilecektir. (Köşegen)\n\nİpin boyu kaç cm olmalıdır?',2*s,W(2*s,[s,s*2+1,A/2,s*3]),'Kare alanı = köşegen²/2 → köşegen² = 2·'+A+' = '+(2*A)+' → köşegen = '+(2*s)+' cm.','hard','ynK2');});
+G('mat-kok',r=>{
+  const n=r.pick([5,7,10,11,13,19,23,29,31,40,50,60,70]),a=Math.floor(Math.sqrt(n));
+  const opts=[(a-1)+' ile '+a,(a+1)+' ile '+(a+2),(a+2)+' ile '+(a+3)];
+  return C('Kenar uzunluğu √'+n+' metre olan kare biçimli bir halı, uzunluğu tam sayı metre olan iki duvar arasına tam oturtulmak isteniyor.\n\nHalının kenar uzunluğu aşağıdaki hangi iki ardışık tam sayı arasındadır?',a+' ile '+(a+1),opts,a+'² = '+a*a+' < '+n+' < '+(a+1)*(a+1)+' = '+(a+1)+'² olduğundan √'+n+' sayısı '+a+' ile '+(a+1)+' arasındadır.','medium','ynK3');});
+G('mat-kok',r=>{
+  const m=r.pick([2,3,5,6]),p=r.int(2,6),q=r.int(2,6);if(p===q||gcd(p,q)!==1)return null;
+  return C('Alanı '+(m*p*p)+' cm² olan bir kare ile alanı '+(m*q*q)+' cm² olan başka bir kare bir panoya asılacaktır. Birinci karenin bir kenarı, ikinci karenin bir kenarının kaç katıdır?',fr(p,q),fW(fr(p,q),[[q,p],[p*p,q*q],[p+1,q],[p,q+1]]).slice(0,3),'Kenarlar √'+(m*p*p)+' = '+radStr(p,m)+' ve √'+(m*q*q)+' = '+radStr(q,m)+'. Oran = '+p+'/'+q+'.','hard','ynK4');});
+
+/* ---------- VERİ ANALİZİ ---------- */
+G('mat-veri',r=>{
+  const N=r.pick([36,40,45,60,72]),cats=r.pick(VCATS).slice(0,4),cnt=[];
+  let left=N;for(let i=0;i<3;i++){const c=r.int(2,Math.floor(left/2)-1>2?Math.floor(left/2)-1:2);cnt.push(c);left-=c;}
+  if(left<2)return null;cnt.push(left);
+  const ang=cnt.map(c=>c*360/N);if(ang.some(a=>!Number.isInteger(a)))return null;
+  const k=r.int(0,3),others=[0,1,2,3].filter(i=>i!==k);
+  return C('Bir okulda '+N+' öğrenciye “En çok hangisini seviyorsun?” sorusu yöneltilmiş ve verilen cevaplar daire grafiğiyle gösterilmiştir. Grafikte '+others.map(i=>cats[i]+' dilimi '+ang[i]+'°').join(', ')+' olarak çizilmiştir. Geriye kalan dilim '+cats[k]+' cevabına aittir.\n\nBuna göre '+cats[k]+' cevabını veren öğrenci sayısı kaçtır?',cnt[k],W(cnt[k],[ang[k]/10,N-cnt[k],Math.round(ang[k]/N),cnt[k]+3]),cats[k]+' dilimi: 360° − ('+others.map(i=>ang[i]).join(' + ')+') = '+ang[k]+'°. Öğrenci sayısı = '+N+' · '+ang[k]+'/360 = '+cnt[k]+'.','hard','ynV1');});
+G('mat-veri',r=>{
+  const sc=[];for(let i=0;i<5;i++)sc.push(r.int(5,10)*10);
+  const S=sc.reduce((a,b)=>a+b,0),T=r.int(6,9)*10,last=6*T-S;if(last<30||last>100)return null;
+  return C('Elif’in ilk beş Matematik sınavından aldığı notlar sırasıyla '+sc.join(', ')+'’tur. Elif, altı sınavın not ortalamasının '+T+' olmasını istiyor.\n\nBuna göre altıncı sınavdan kaç almalıdır?',last,W(last,[T,6*T-S+10,(S+T)/6,Math.round(S/5)]),'Toplam = 6 · '+T+' = '+6*T+'. İlk beş not toplamı '+S+'. Altıncı not = '+6*T+' − '+S+' = '+last+'.','medium','ynV2');});
+G('mat-veri',r=>{
+  const base=[];while(base.length<9)base.push(r.int(2,15));
+  const m=r.int(2,15);base[0]=m;base[3]=m;base[7]=m;
+  const cnt={};base.forEach(x=>{cnt[x]=(cnt[x]||0)+1;});
+  const mxc=Math.max.apply(null,Object.keys(cnt).map(k=>cnt[k])),modes=Object.keys(cnt).filter(k=>cnt[k]===mxc);
+  if(modes.length!==1)return null;
+  const s=base.slice().sort((a,b)=>a-b),sum=s.reduce((a,b)=>a+b,0),mean=Math.round(sum/9*100)/100,med=s[4],mode=+modes[0],rng=s[8]-s[0];
+  const names=['Aritmetik ortalama','Ortanca (medyan)','Tepe değer (mod)','Açıklık'],vals=[mean,med,mode,rng];
+  const t=r.int(0,3),pert=[1,2,3,-1,-2,4,-3];
+  const opts=names.map((nm,i)=>nm+' = '+nf(i===t?vals[i]:vals[i]+pert[(i*3+t+base[0])%pert.length]));
+  if(new Set(opts).size<4)return null;
+  const correct=opts[t],wrongs=opts.filter((x,i)=>i!==t);
+  return C('Bir doğa kulübünün 9 üyesinin bir ayda diktiği fidan sayıları şöyledir:\n'+base.join(', ')+'\n\nBu veri grubu için aşağıdaki ifadelerden hangisi doğrudur?',correct,wrongs,'Sıralı veri: '+s.join(', ')+'. Ortalama = '+sum+'/9 ≈ '+nf(mean)+'; ortanca = '+med+'; mod = '+mode+'; açıklık = '+s[8]+' − '+s[0]+' = '+rng+'.','hard','ynV3');});
+G('mat-veri',r=>{
+  const v=[];for(let i=0;i<6;i++)v.push(r.int(8,40));
+  const S=v.reduce((a,b)=>a+b,0);if(S%6!==0)return null;const mean=S/6;
+  const days=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],cnt=v.filter(x=>x>mean).length;
+  return C('Bir fotoğraf stüdyosunun bir haftada her gün çektiği fotoğraf sayısı şöyledir: '+days.map((d,i)=>d+' '+v[i]).join(', ')+'.\n\nBu verilerin aritmetik ortalamasından daha fazla fotoğraf çekilen kaç gün vardır?',cnt,W(cnt,[mean,6-cnt,cnt+1,3]).filter(x=>+x>=0&&+x<=6),'Ortalama = '+S+'/6 = '+mean+'. Ortalamadan büyük değerlerin sayısı: '+cnt+'.','medium','ynV4');});
+
+/* ---------- OLASILIK ---------- */
+G('mat-olasilik',r=>{
+  const q=r.pick([[1,2],[2,3],[3,4]]),m=r.int(2,6),x=r.int(2,8),R=q[0]*m,Tn=q[1]*m,r0=R-x,T0=Tn-x;
+  if(r0<1||T0<=r0+1)return null;
+  return C('Bir torbada '+r0+' kırmızı ve '+(T0-r0)+' mavi bilye vardır. Torbaya bir miktar kırmızı bilye ekleniyor. Bu işlemden sonra torbadan rastgele çekilen bir bilyenin kırmızı olma olasılığı '+q[0]+'/'+q[1]+' olmuştur.\n\nBuna göre torbaya kaç kırmızı bilye eklenmiştir?',x,W(x,[T0-r0,r0,R-T0+x,x+2]),'Eklenen kırmızı sayısı x olsun: ('+r0+' + x)/('+T0+' + x) = '+q[0]+'/'+q[1]+' → x = '+x+'.','hard','ynO1');});
+G('mat-olasilik',r=>{
+  const kinds=[['iki zarın toplamı '+0,s=>0]];
+  const k=r.int(0,4);let desc,pred;
+  if(k===0){const t=r.int(4,10);desc='gelen sayıların toplamı '+t;pred=(a,b)=>a+b===t;}
+  else if(k===1){desc='iki zarın aynı sayıyı göstermesi';pred=(a,b)=>a===b;}
+  else if(k===2){desc='gelen sayıların çarpımının tek olması';pred=(a,b)=>(a*b)%2===1;}
+  else if(k===3){const t=r.pick([3,4,5]);desc='gelen sayılardan en az birinin '+t+'’ten büyük olması';pred=(a,b)=>a>t||b>t;}
+  else{desc='gelen sayıların toplamının asal sayı olması';pred=(a,b)=>isPrime(a+b);}
+  let c=0;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(pred(a,b))c++;if(c===0)return null;
+  const ans=fr(c,36);
+  return C('Ayşe ile Kerem, birbirinden bağımsız iki hilesiz zarı birlikte atıyor. Oyunun kuralına göre, '+desc+' hâlinde Ayşe puan kazanacaktır.\n\nBuna göre Ayşe’nin puan kazanma olasılığı kaçtır?',ans,fW(ans,[[c+1,36],[c-1,36],[c,18],[c,6],[c+2,36]]).slice(0,3),'36 eş olasılıklı durumdan '+c+' tanesi istenen durumdur. Olasılık = '+(ans===c+'/36'?ans:c+'/36 = '+ans)+'.','hard','ynO2');});
+G('mat-olasilik',r=>{
+  const n=r.pick([8,10,12,15,20]),k=r.int(0,4);let desc,pred;
+  if(k===0){desc='asal sayı';pred=isPrime;}else if(k===1){const t=r.pick([2,3,4]);desc=t+'’ün katı olan sayı';pred=x=>x%t===0;}
+  else if(k===2){desc='tam kare sayı';pred=x=>Math.sqrt(x)===Math.floor(Math.sqrt(x));}
+  else if(k===3){const t=r.pick([12,18,20]);desc=t+' sayısının böleni olan bir sayı';pred=x=>t%x===0;}
+  else{desc='çift ve 4’ten büyük bir sayı';pred=x=>x%2===0&&x>4;}
+  let c=0;for(let i=1;i<=n;i++)if(pred(i))c++;if(c===0||c===n)return null;const ans=fr(c,n);
+  return C('Bir oyun çarkı, 1’den '+n+'’e kadar numaralanmış '+n+' eş daire diliminden oluşmaktadır. Çark döndürüldüğünde ok, dilimlerden birinin üzerinde rastgele durmaktadır.\n\nOkun '+desc+' üzerinde durma olasılığı kaçtır?',ans,fW(ans,[[c+1,n],[c-1,n],[c,n+1],[n-c,n],[c,n-1]]).slice(0,3),'1’den '+n+'’e kadar '+c+' sayı koşulu sağlar. Olasılık = '+(ans===c+'/'+n?ans:c+'/'+n+' = '+ans)+'.','medium','ynO3');});
+G('mat-olasilik',r=>{
+  const t1=r.int(6,14),r1=r.int(2,t1-2),t2=r.int(6,14),r2=r.int(2,t2-2);if(r1*t2===r2*t1)return null;
+  const A=r1*t2>r2*t1;
+  return C('Aynı büyüklükteki bilyelerden oluşan iki torbadan birincisinde '+r1+' kırmızı, '+(t1-r1)+' sarı; ikincisinde '+r2+' kırmızı, '+(t2-r2)+' sarı bilye vardır. Zeynep, kırmızı bilye çekme şansını artırmak için bir torba seçecektir.\n\nZeynep’in kırmızı bilye çekme olasılığı hangi torbada daha büyüktür?',A?'Birinci torbada':'İkinci torbada',[A?'İkinci torbada':'Birinci torbada','İki torbada da eşittir','Karşılaştırma yapılamaz'],'Birinci torba '+r1+'/'+t1+' ≈ '+nf(Math.round(r1/t1*100)/100)+', ikinci torba '+r2+'/'+t2+' ≈ '+nf(Math.round(r2/t2*100)/100)+'. Büyük olasılık '+(A?'birinci':'ikinci')+' torbadadır.','hard','ynO4');});
+
+/* ---------- CEBİRSEL İFADELER VE ÖZDEŞLİKLER ---------- */
+G('mat-cebir',r=>{
+  const a=r.int(2,7),b=r.int(1,8),neg=r.int(0,1),nb=neg?-b:b;
+  const e=quad(1,a+nb,a*nb);
+  return C('Dikdörtgen biçimindeki bir arsanın kısa kenarı (x + '+a+') metre, uzun kenarı ise (x '+(neg?'− ':'+ ')+b+') metredir.\n\nBu arsanın alanını gösteren cebirsel ifade aşağıdakilerden hangisidir?',e+' m²',uniqStr([quad(1,a+nb,a+nb),quad(1,a*nb,a+nb),quad(1,a-nb,-a*nb),quad(1,a+nb,-a*nb)],e).slice(0,3).map(x=>x+' m²'),'(x + '+a+')(x '+(neg?'− ':'+ ')+b+') = x² + '+(a+nb)+'x + ('+(a*nb)+') = '+e+'.','hard','ynB1');});
+G('mat-cebir',r=>{
+  const a=r.int(2,9),b=r.int(1,a-1),s=a+b,p=a*b,ans=a*a+b*b;if(a===b)return null;
+  return C('Bir dikdörtgen biçimindeki bahçenin yarı çevresi '+s+' metre, alanı ise '+p+' m²’dir. Bahçenin bir köşesinden karşı köşesine tel gerilecektir.\n\nGerilecek telin uzunluğunun karesi kaç m²’dir?',ans,W(ans,[s*s,s*s-p,2*p,s*s-4*p,a*a+b*b+2*p]),'Kenarlar a ve b olsun: a + b = '+s+', a·b = '+p+'. Köşegen² = a² + b² = (a + b)² − 2ab = '+s*s+' − '+2*p+' = '+ans+'.','hard','ynB2');});
+G('mat-cebir',r=>{
+  const B=r.int(20,70),A=B+2,ans=A*A-B*B;
+  return C('Kenar uzunlukları '+A+' m ve '+B+' m olan iki kare biçimli arsa vardır. Belediye, büyük arsanın alanı ile küçük arsanın alanı arasındaki farkı hesaplamak istiyor.\n\nBu fark kaç m²’dir?',ans,W(ans,[A*A+B*B,(A-B)*(A-B),A*B,ans+4,2*(A+B)]),A+'² − '+B+'² = ('+A+' − '+B+')('+A+' + '+B+') = 2 · '+(A+B)+' = '+ans+'.','medium','ynB3');});
+G('mat-cebir',r=>{
+  const a=r.int(2,8),n=r.int(a+2,30),ans=n+a;
+  return C('Bir mağazada fiyatı “(x² − '+a*a+') ÷ (x − '+a+')” TL işlemiyle belirlenen bir üründe x değeri '+n+' alınmıştır.\n\nBuna göre ürünün fiyatı kaç TL olur?',ans,W(ans,[n-a,n*n-a*a,n,a*a]),'x² − '+a*a+' = (x − '+a+')(x + '+a+') olduğundan ifade x + '+a+' = '+n+' + '+a+' = '+ans+' olur.','medium','ynB4');});
+G('mat-cebir',r=>{
+  const x=r.int(2,9),y=r.int(1,8);if(x===y)return null;const s=x+y,p=x*y,ans=s*s-2*p;
+  return C('Ali, bir matematik öğretmeninin tahtaya yazdığı şu bilgiyi defterine geçirmiştir:\n\n“x + y = '+s+' ve x · y = '+p+'”\n\nÖğretmen, bu bilgiden yararlanarak x² + y² ifadesinin değerini sormaktadır. Doğru cevap hangisidir?',ans,W(ans,[s*s,s*s+2*p,s*s-p,2*p]),'x² + y² = (x + y)² − 2xy = '+s*s+' − '+2*p+' = '+ans+'.','hard','ynB5');});
+
+/* ---------- DOĞRUSAL DENKLEMLER ---------- */
+G('mat-dogrusal',r=>{
+  const a=r.pick([15,20,25,30]),k=r.pick([8,10,12,15]),x0=r.int(4,20),v=a+k*x0,q=r.int(0,1);
+  if(q===0)return C('Bir taksi, yolcuyu aldığında '+a+' TL açılış ücreti yazıyor ve her kilometre için ayrıca '+k+' TL ücret ekliyor. Yolculuk ücretine y, kilometreye x dersek bir yolcu '+x0+' km yol gidiyor.\n\nBu yolcunun ödeyeceği ücret kaç TL’dir?',v,W(v,[k*x0,a*x0,(a+k)*x0,v+a]),'y = '+k+'x + '+a+' → x = '+x0+' için y = '+k*x0+' + '+a+' = '+v+'.','medium','ynD1');
+  return C('Bir taksi, yolcuyu aldığında '+a+' TL açılış ücreti yazıyor ve her kilometre için ayrıca '+k+' TL ücret ekliyor. Bir yolcu yolculuk sonunda toplam '+v+' TL ödemiştir.\n\nBu yolcu kaç kilometre yol gitmiştir?',x0,W(x0,[v/k,(v-a)/a,v-a-k,x0+2]),'y = '+k+'x + '+a+' = '+v+' → '+k+'x = '+(v-a)+' → x = '+x0+'.','hard','ynD1');});
+G('mat-dogrusal',r=>{
+  const a=r.pick([20,30,40]),b=r.pick([0,10,60,70]),p=r.pick([6,8,9,10]),q=r.pick([2,3,4,5]),x=r.int(4,20);
+  const a2=b===0?(a+(p-q)*x):b;
+  const A=a,B=a+(p-q)*x;if(B===A)return null;
+  return C('İki internet paketi sunulmaktadır. Birinci paket, sabit '+A+' TL aylık ücrete ek olarak her GB için '+p+' TL; ikinci paket ise sabit '+B+' TL aylık ücrete ek olarak her GB için '+q+' TL almaktadır.\n\nİki paketin aylık ücretlerinin eşit olması için kullanılan veri miktarı kaç GB olmalıdır?',x,W(x,[x+3,x-2,(B-A),(B+A)/(p+q)]),A+' + '+p+'x = '+B+' + '+q+'x → '+(p-q)+'x = '+(B-A)+' → x = '+x+' GB.','hard','ynD2');});
+G('mat-dogrusal',r=>{
+  const h=r.pick([120,150,180,240,300]),d=r.pick([6,10,12,15,20]);if(h%d!==0)return null;const t=h/d;
+  return C('Bir su deposunda başlangıçta '+h+' litre su vardır. Depodaki bir musluk açıldığında dakikada '+d+' litre su akıtmaktadır. Depodaki su miktarını y, geçen süreyi (dakika) x ile gösteriyoruz.\n\nBu depo kaç dakika sonra tamamen boşalır?',t,W(t,[h-d,h+d,h/2/d,t+d]),'y = '+h+' − '+d+'x. y = 0 → x = '+h+'/'+d+' = '+t+' dakika.','medium','ynD3');});
+G('mat-dogrusal',r=>{
+  const x1=r.int(0,3),dx=r.int(2,5),m=r.pick([2,3,4,5,-2,-3]),y1=r.int(2,12),x2=x1+dx,y2=y1+m*dx;
+  return C('Bir bisikletlinin başlangıç noktasına olan uzaklığı, zamanla doğrusal olarak değişmektedir. '+x1+'. dakikada başlangıç noktasına '+y1+' km, '+x2+'. dakikada ise '+y2+' km uzaklıktadır.\n\nBu hareketin grafiğini gösteren doğrunun eğimi kaçtır?',m,W(m,[-m,dx,y2-y1,m+2,1/m]).filter(v=>true),'Eğim = ('+y2+' − '+y1+')/('+x2+' − '+x1+') = '+(y2-y1)+'/'+dx+' = '+m+'.','hard','ynD4');});
+G('mat-dogrusal',r=>{
+  const a=r.pick([20,30,40,50]),k=r.pick([5,10,15]);
+  const c=eqL(k,a),wr=uniqStr([eqL(a,k),eqL(k+a,0),eqL(k,-a),eqL(a,0)],c);
+  return C('Bir oyun parkında çocuk başına bilet fiyatı yoktur; ancak park girişinde '+a+' TL giriş ücreti alınmakta, içeride oynanan her oyun için ayrıca '+k+' TL ödenmektedir. Toplam ücreti y, oynanan oyun sayısını x ile gösterelim.\n\nBu durumu gösteren denklem aşağıdakilerden hangisidir?',c,wr.slice(0,3),'Sabit '+a+' TL + oyun başına '+k+' TL → y = '+k+'x + '+a+'.','medium','ynD5');});
+
+/* ---------- EŞİTSİZLİKLER ---------- */
+G('mat-esitsizlik',r=>{
+  const W0=r.pick([400,450,500,600,700]),w=r.pick([180,200,220,240]),c=r.pick([15,20,25,30]),ans=Math.floor((W0-w)/c);if(ans<2)return null;
+  return C('Bir yük asansörünün üzerinde “En fazla '+W0+' kg taşıyabilir.” yazmaktadır. Asansörde kütlesi '+w+' kg olan bir görevli bulunmaktadır ve asansöre her biri '+c+' kg olan koliler yüklenecektir.\n\nAsansöre en fazla kaç koli yüklenebilir?',ans,W(ans,[ans+1,Math.ceil((W0-w)/c),W0/c,(W0-w)/(c*2)]),w+' + '+c+'x ≤ '+W0+' → x ≤ '+nf((W0-w)/c)+' → en fazla '+ans+' koli.','hard','ynE1');});
+G('mat-esitsizlik',r=>{
+  const M=r.pick([100,120,150,200]),p=r.pick([12,15,18,20]),k=r.int(2,4),c=r.pick([3,4,5,6]),left=M-p*k,ans=Math.floor(left/c);if(left<c*2)return null;
+  return C('Zeynep’in '+M+' TL’si vardır. Kırtasiyeden tanesi '+p+' TL olan '+k+' defter aldıktan sonra kalan parasıyla tanesi '+c+' TL olan kalemlerden alacaktır.\n\nZeynep en fazla kaç kalem alabilir?',ans,W(ans,[Math.ceil(left/c),ans-1,M/c,left/c+1]),'Kalan para '+M+' − '+p*k+' = '+left+' TL. '+c+'x ≤ '+left+' → x ≤ '+nf(left/c)+' → en fazla '+ans+' kalem.','medium','ynE2');});
+G('mat-esitsizlik',r=>{
+  const T=r.pick([30,40,50,55,60,70]),n=20,d=Math.ceil((T+n)/5);
+  return C('Bir bilgi yarışmasında '+n+' soru sorulmaktadır. Her doğru cevap için 4 puan verilmekte, her yanlış ya da boş cevap için 1 puan düşülmektedir. Bir yarışmacının finale kalabilmesi için toplam puanının en az '+T+' olması gerekmektedir.\n\nBuna göre bir yarışmacı finale kalmak için en az kaç soruyu doğru cevaplamalıdır?',d,W(d,[T/4,Math.floor((T+n)/5),d-1,d+2]),'Doğru sayısı d: 4d − ('+n+' − d) ≥ '+T+' → 5d ≥ '+(T+n)+' → d ≥ '+nf((T+n)/5)+' → en az '+d+'.','hard','ynE3');});
+G('mat-esitsizlik',r=>{
+  const L=r.int(1,6),a=r.int(2,4),b=r.int(1,6),up=r.int(18,40);
+  let cnt=0,list=[];for(let x=L;x<=60;x++)if(a*x+b<up){cnt++;list.push(x);}if(cnt<3||cnt>12)return null;
+  return C('Bir spor salonunda üyelik yaşı x ile gösteriliyor. Salonun kuralı: “x en az '+L+' olmalı ve '+a+'x + '+b+' < '+up+' eşitsizliğini sağlamalıdır.”\n\nBu kurala uyan kaç farklı doğal sayı değeri vardır?',cnt,W(cnt,[cnt+1,cnt-1,Math.floor((up-b)/a),Math.ceil((up-b)/a)]),a+'x + '+b+' < '+up+' → x < '+nf((up-b)/a)+'. '+L+' ≤ x < '+nf((up-b)/a)+' olduğundan '+cnt+' doğal sayı vardır.','hard','ynE4');});
+
+/* ---------- ÜÇGENLER ---------- */
+G('mat-ucgen',r=>{
+  const a=r.int(4,12),b=r.int(2,9);if(a===b)return null;const lo=Math.abs(a-b)+1,hi=a+b-1;let sum=0;for(let i=lo;i<=hi;i++)sum+=i;
+  const q=r.int(0,1);
+  if(q===0)return C('Bir bahçıvan, kenar uzunlukları '+a+' m, '+b+' m ve x m olan üçgen biçimli bir çiçek tarhı yapacaktır. x’in uzunluğu tam sayı metre olarak seçilecektir.\n\nBuna göre x’in alabileceği kaç farklı değer vardır?',hi-lo+1,W(hi-lo+1,[a+b,Math.abs(a-b),hi-lo+2,hi-lo]),'|'+a+' − '+b+'| < x < '+a+' + '+b+' → '+Math.abs(a-b)+' < x < '+(a+b)+' → x = '+lo+', …, '+hi+' ('+(hi-lo+1)+' değer).','hard','ynT1');
+  return C('Bir bahçıvan, kenar uzunlukları '+a+' m, '+b+' m ve x m olan üçgen biçimli bir çiçek tarhı yapacaktır. x’in uzunluğu tam sayı metre olarak seçilecektir.\n\nx’in alabileceği tam sayı değerlerinin toplamı kaçtır?',sum,W(sum,[sum+hi,sum-lo,(lo+hi),sum+lo]),'Üçgen eşitsizliği: '+Math.abs(a-b)+' < x < '+(a+b)+'. x = '+lo+' + … + '+hi+' = '+sum+'.','hard','ynT1');});
+G('mat-ucgen',r=>{
+  const t=r.pick(PTRI),k=r.pick([1,1,2]),A=t[0]*k,B=t[1]*k,Cc=t[2]*k,q=r.int(0,1);
+  if(A<4)return null;
+  if(q===0)return C('Boyu '+Cc+' m olan bir merdiven, yere dik olan bir duvara dayanmıştır. Merdivenin duvara değdiği nokta yerden '+B+' m yüksektedir.\n\nBuna göre merdivenin alt ucu duvardan kaç m uzaktadır?',A,W(A,[Cc-B,B-A,Cc+B,Math.round(Cc/2)]),'Pisagor: '+A+'² + '+B+'² = '+Cc+'². Alt uç duvardan '+A+' m uzaktadır.','medium','ynT2');
+  return C('Bir elektrik direğinin tepe noktasına, direğin tabanından '+A+' m uzaktaki yer noktasından gergin bir tel bağlanmıştır. Direğin boyu '+B+' m’dir ve direk yere diktir.\n\nBu telin uzunluğu kaç m’dir?',Cc,W(Cc,[A+B,B-A,Cc+1,A*B/2]),'Tel, dik üçgenin hipotenüsüdür: √('+A+'² + '+B+'²) = √'+(A*A+B*B)+' = '+Cc+' m.','medium','ynT2');});
+G('mat-ucgen',r=>{
+  const o=r.pick([[1,2,3],[2,3,4],[3,4,5],[2,3,5],[1,1,2]]),s=o[0]+o[1]+o[2],t=180/s,ang=o.map(x=>x*t),q=r.int(0,1);
+  if(!Number.isInteger(t))return null;
+  const big=Math.max.apply(null,ang),sm=Math.min.apply(null,ang);
+  return C('Bir mimar, iç açılarının ölçüleri sırasıyla '+o.join(' : ')+' oranında olan üçgen biçimli bir çatı çizmektedir.\n\nBu çatının '+(q?'en küçük':'en büyük')+' açısının ölçüsü kaç derecedir?',q?sm:big,W(q?sm:big,[t,180-big,sm+big,big-sm]),'Açılar '+o.map(x=>x+'k').join(', ')+' ve toplam 180°: '+s+'k = 180 → k = '+t+'. Açılar: '+ang.join('°, ')+'°.','medium','ynT3');});
+G('mat-ucgen',r=>{
+  const B=r.int(30,80),Cc=r.int(30,80),ext=B+Cc;if(B+Cc>=160)return null;
+  return C('ABC üçgeninde B açısının ölçüsü '+B+'°, C açısının ölçüsü '+Cc+'°’dir. Bir öğrenci, A köşesindeki dış açının ölçüsünü hesaplamak istiyor.\n\nBu dış açının ölçüsü kaç derecedir?',ext,W(ext,[180-ext,180-B,180-Cc,ext+10]),'Bir dış açı, kendisine komşu olmayan iki iç açının toplamına eşittir: '+B+'° + '+Cc+'° = '+ext+'°.','medium','ynT4');});
+
+/* ---------- EŞLİK VE BENZERLİK ---------- */
+G('mat-benzerlik',r=>{
+  const p=r.pick([[3,2],[5,4],[3,1],[6,5],[9,5]]),mult=r.int(2,8),S=p[1]*mult,H=p[0]*mult;
+  return C('Güneşli bir günde, boyu '+p[0]+' m olan bir direğin gölgesi '+p[1]+' m ölçülmüştür. Aynı anda yakındaki bir apartmanın gölgesi '+S+' m’dir.\n\nGüneş ışınları paralel olduğuna göre apartmanın yüksekliği kaç metredir?',H,W(H,[S+p[0]-p[1],S*2,Math.round(S/2),H+p[0]]),'Benzerlik: '+p[0]+'/'+p[1]+' = x/'+S+' → x = '+H+' m.','medium','ynS1');});
+G('mat-benzerlik',r=>{
+  const s=r.pick([500000,250000,200000,1000000,100000]),d=r.pick([2,3,4,5,6,8,10,12]),km=d*s/100000;
+  return C('Bir haritanın ölçeği 1/'+nf(s)+'’dir. Haritada iki şehir arasındaki uzaklık '+d+' cm ölçülmüştür.\n\nBu iki şehir arasındaki gerçek uzaklık kaç kilometredir?',nf(km),numW(nf(km),[km*10,km/10,d*s,d*s/1000,km*2]),'Gerçek uzaklık = '+d+' · '+nf(s)+' cm = '+nf(d*s)+' cm = '+nf(km)+' km (100 000 cm = 1 km).','hard','ynS2');});
+G('mat-benzerlik',r=>{
+  const p=r.pick([[2,3],[3,4],[1,2],[2,5],[3,5]]),A=p[0]*p[0]*r.int(2,6),big=A*p[1]*p[1]/(p[0]*p[0]);
+  return C('İki benzer üçgenin karşılıklı kenarlarının oranı '+p[0]+' : '+p[1]+'’dir. Küçük üçgensel bölgenin alanı '+A+' cm²’dir.\n\nBuna göre büyük üçgensel bölgenin alanı kaç cm²’dir?',big,W(big,[A*p[1]/p[0],A+p[1]-p[0],A*p[1],big+p[1]]),'Alanlar oranı, benzerlik oranının karesidir: '+p[0]*p[0]+' : '+p[1]*p[1]+'. '+A+' / '+(p[0]*p[0])+' · '+(p[1]*p[1])+' = '+big+' cm².','hard','ynS3');});
+G('mat-benzerlik',r=>{
+  const n=r.pick([20,25,40,50,100]),h=r.pick([12,16,20,24,30,40]),real=h*n/100;
+  return C('Bir mimar, 1/'+n+' ölçekli bir bina maketi hazırlamıştır. Makette binanın yüksekliği '+h+' cm’dir.\n\nGerçek binanın yüksekliği kaç metredir?',nf(real),numW(nf(real),[real*10,real/10,h*n,h/n,real*2]),'Gerçek yükseklik = '+h+' · '+n+' = '+nf(h*n)+' cm = '+nf(real)+' m.','medium','ynS4');});
+
+/* ---------- DÖNÜŞÜM GEOMETRİSİ ---------- */
+G('mat-donusum',r=>{
+  const x=r.int(-6,6),y=r.int(-6,6),a=r.int(1,6),b=r.int(1,6),X=x+a,Y=-(y+b),q=r.int(0,1);
+  const ok=pt(X,Y);
+  return C('Bir robot, koordinat düzleminde A('+x+', '+y+') noktasından hareket etmeye başlıyor. Önce sağa '+a+' birim ve yukarı '+b+' birim öteleniyor; ardından bulunduğu noktanın x eksenine göre yansıması alınıyor.\n\nRobotun son konumu aşağıdakilerden hangisidir?',ok,uniqStr([pt(X,y+b),pt(-X,Y),pt(x+a,-y+b),pt(-(x+a),-(y+b)),pt(Y,X)],ok).slice(0,3),'Öteleme: ('+x+' + '+a+', '+y+' + '+b+') = ('+(x+a)+', '+(y+b)+'). x eksenine göre yansıma: y işareti değişir → ('+X+', '+Y+').','hard','ynN1');});
+G('mat-donusum',r=>{
+  const x=r.int(-7,7),y=r.int(-7,7),k=r.pick([[ 'saat yönünün tersine 90°',(a,b)=>[-b,a]],['saat yönünde 90°',(a,b)=>[b,-a]],['180°',(a,b)=>[-a,-b]]]);
+  const R=k[1](x,y),ok=pt(R[0],R[1]);
+  if(x===0&&y===0)return null;
+  return C('Koordinat düzleminde bir uçurtmanın A('+x+', '+y+') köşesi, orijin etrafında '+k[0]+' döndürülmüştür.\n\nA noktasının dönmeden sonraki görüntüsü aşağıdakilerden hangisidir?',ok,uniqStr([pt(-x,y),pt(x,-y),pt(y,x),pt(-y,x),pt(y,-x),pt(-x,-y)],ok).slice(0,3),'Dönme sonrası konum: '+ok+'.','hard','ynN2');});
+G('mat-donusum',r=>{
+  const x=r.int(1,8),y=r.int(1,8),dx=r.int(2,6),X=-x+dx,ok=pt(X,y);
+  return C('Bir fotoğraf programında, A('+x+', '+y+') noktasına önce y eksenine göre yansıma uygulanmış, sonra sağa '+dx+' birim öteleme yapılmıştır.\n\nNoktanın son konumu aşağıdakilerden hangisidir?',ok,uniqStr([pt(x+dx,y),pt(-x-dx,y),pt(X,-y),pt(x-dx,-y),pt(-x,y+dx)],ok).slice(0,3),'y eksenine göre yansıma: ('+(-x)+', '+y+'). Sağa '+dx+' öteleme: ('+X+', '+y+').','medium','ynN3');});
+G('mat-donusum',r=>{
+  const b=r.int(3,9),h=r.int(2,8),A=b*h/2;if(!Number.isInteger(A))return null;
+  return C('Taban uzunluğu '+b+' cm, yüksekliği '+h+' cm olan üçgen biçimli bir kâğıt, koordinat düzleminde önce ötelenmiş, sonra bir eksene göre yansıtılmış ve en son orijin etrafında döndürülmüştür.\n\nSon durumdaki üçgenin alanı kaç cm² olur?',A,W(A,[b*h,A*2,A/2,b+h]),'Öteleme, yansıma ve dönme alanı değiştirmez. Alan = '+b+'·'+h+'/2 = '+A+' cm².','medium','ynN4');});
+
+/* ---------- GEOMETRİK CİSİMLER ---------- */
+G('mat-cisim',r=>{
+  const rr=r.pick([2,4,6]),h=r.pick([5,10,15]),V=3*rr*rr*h,pairs=[];
+  for(let a=2;a<=20;a++)for(let b=a;b<=20;b++)if(V%(a*b)===0&&V/(a*b)>=2&&V/(a*b)<=40)pairs.push([a,b,V/(a*b)]);
+  if(!pairs.length)return null;
+  const p=r.pick(pairs);
+  return C('Taban yarıçapı '+rr+' cm, yüksekliği '+h+' cm olan silindir biçimli bir kap tamamen suyla doludur. Bu suyun tamamı, taban ayrıtları '+p[0]+' cm ve '+p[1]+' cm olan dikdörtgen prizma biçimli boş bir kaba boşaltılıyor. (π = 3 alınız.)\n\nBuna göre prizma biçimli kaptaki suyun yüksekliği kaç cm olur?',p[2],W(p[2],[V,V/(p[0]*p[1])+1,rr*h,p[2]*2]),'Silindirin hacmi = 3 · '+rr+'² · '+h+' = '+V+' cm³. Prizma: '+p[0]+' · '+p[1]+' · x = '+V+' → x = '+p[2]+' cm.','hard','ynG1');});
+G('mat-cisim',r=>{
+  const rr=r.pick([2,3,4,5,6]),h=r.pick([3,6,9,12]),V=3*rr*rr*h;
+  return C('Bir dondurmacı, taban yarıçapı '+rr+' cm ve yüksekliği '+h+' cm olan silindir biçimli bir kaba '+V+' cm³ dondurma koymaktadır. Aynı tabana ve aynı yüksekliğe sahip koni biçimli bir külaha ise tam dolu dondurma konulacaktır. (π = 3 alınız.)\n\nKonideki dondurmanın hacmi kaç cm³’tür?',V/3,W(V/3,[V*3,V/2,V-V/3,V/6]),'Aynı taban ve yükseklikte koninin hacmi, silindirin hacminin 1/3’üdür: '+V+'/3 = '+(V/3)+' cm³.','medium','ynG2');});
+G('mat-cisim',r=>{
+  const g=r.pick([4,5,6,8,10]),a=g*r.int(2,6),b=g*r.int(2,6),c=g*r.int(2,6),gg=gcd(gcd(a,b),c),cnt=(a/gg)*(b/gg)*(c/gg);if(cnt>250||cnt<4)return null;
+  return C('Boyutları '+a+' cm × '+b+' cm × '+c+' cm olan dikdörtgen prizma biçimli bir kutu, ayrıt uzunluğu tam sayı (cm) olan eş küplerle boşluk kalmayacak biçimde doldurulacaktır. Küp sayısının en az olması isteniyor.\n\nBuna göre kutuya kaç küp yerleştirilir?',cnt,W(cnt,[a*b*c/(gg*gg*gg)+gg,(a+b+c)/gg,gg*gg*gg,cnt*2]),'Küp sayısının en az olması için ayrıt en büyük olmalı: EBOB('+a+', '+b+', '+c+') = '+gg+' cm. Küp sayısı ('+a+'/'+gg+')·('+b+'/'+gg+')·('+c+'/'+gg+') = '+cnt+'.','hard','ynG3');});
+G('mat-cisim',r=>{
+  const a=r.pick([10,20,30,40,50]),n=r.int(2,6),area=6*a*a*n;
+  return C('Ayrıtı '+a+' cm olan küp biçimli '+n+' hediye kutusu, üzerleri hiç boşluk ve üst üste binme olmadan renkli kâğıtla kaplanacaktır.\n\nBuna göre toplam kaç cm² kâğıt gerekir?',nf(area),numW(nf(area),[4*a*a*n,a*a*a*n,6*a*n,3*a*a*n,area*2]),'Bir küpün yüzey alanı 6a² = 6 · '+a+'² = '+6*a*a+' cm². '+n+' kutu için '+n+' · '+(6*a*a)+' = '+nf(area)+' cm².','medium','ynG4');});
+
+/* ================== TÜRKÇE ================== */
+/* ---- Cümlenin ögeleri: ek bankalar ---- */
+KBR['tr-oge']=[KBR['tr-oge'],
+ {cats:{'nesne vardır':['Ayşe mektubu yazdı.','Babam gazeteyi okudu.','Öğrenciler soruyu çözdü.','Annem yemek pişirdi.','Kardeşim resim yaptı.','Usta duvarı boyadı.','Çocuklar topu attı.','Öğretmen kitabı masaya koydu.','Selin hediyeyi paketledi.','Komşumuz bahçeyi suladı.'],
+  'nesne yoktur':['Çocuklar parkta oynadı.','Kuşlar sabah ötmeye başladı.','Ali okula yürüyerek gitti.','Misafirler akşam geldi.','Bebek huzurla uyudu.','Yağmur dün gece yağdı.','Öğrenciler sınıfta bekledi.','Kedi çatıya çıktı.','Yaşlı adam bankta oturdu.','Gemi limandan ayrıldı.']},
+  pos:['Aşağıdaki cümlelerin hangisinde {c}?'],noNeg:true,noCls:true,d:'medium'},
+ {cats:{'dolaylı tümleç vardır':['Ali arkadaşına mektup yazdı.','Öğretmen öğrencilere ödev verdi.','Annem komşuya yemek götürdü.','Çocuk okula koştu.','Babam bana hediye aldı.','Yolcular istasyona vardı.','Selin kardeşine masal anlattı.','Misafirler eve geldi.'],
+  'dolaylı tümleç yoktur':['Ayşe sessizce kitap okudu.','Annem yemek pişirdi.','Kuşlar ötüyor.','Gece yağmur yağdı.','Bebek uyudu.','Öğrenciler soruyu çözdü.','Ahmet hızlıca koştu.','Hava çok soğudu.']},
+  pos:['Aşağıdaki cümlelerin hangisinde {c}?'],noNeg:true,noCls:true,d:'medium'},
+ {cats:{'zarf tümleci vardır':['Çocuklar sessizce oynadı.','Dün akşam yağmur yağdı.','Ali hızlıca koştu.','Annem yemeği dikkatle pişirdi.','Sabah erkenden yola çıktık.','Kediler yavaşça yaklaştı.','Öğretmen sakince konuştu.','Ahmet çok çalıştı.'],
+  'zarf tümleci yoktur':['Çocuklar oynadı.','Yağmur yağdı.','Annem yemek pişirdi.','Ali kitabı okudu.','Kuşlar uçtu.','Bebek uyudu.','Öğretmen soruyu açıkladı.','Selin mektup yazdı.']},
+  pos:['Aşağıdaki cümlelerin hangisinde {c}?'],noNeg:true,noCls:true,d:'medium'}];
+/* ---- Numaralanmış cümlelerle uzun sorular ---- */
+function numCands(kb,r,tag){
+  const out=[],names=Object.keys(kb.cats),RM=['I','II','III','IV','V'];
+  const base=(kb.pos&&kb.pos[0])||'Aşağıdakilerden hangisi {c} örneğidir?';
+  (kb.only||names).forEach(cn=>{
+    const items=kb.cats[cn],others=[];names.forEach(o=>{if(o!==cn)kb.cats[o].forEach(x=>others.push(x));});
+    if(items.length<3||others.length<5)return;
+    const lcn=(kb.lc&&kb.lc[cn])||lc1(cn);
+    for(let rep=0;rep<9;rep++){
+      const k=r.pick([1,2,2,3]);
+      const pickC=r.some(items,k),pickO=r.some(others,5-k);
+      const mix=r.shuf(pickC.map(s=>[s,1]).concat(pickO.map(s=>[s,0])));
+      const body=mix.map((m,i)=>RM[i]+'. '+m[0]).join('\n');
+      const idx=mix.map((m,i)=>m[1]?i:-1).filter(i=>i>=0);
+      const q0=base.replace('{c}',lcn).replace(/^Aşağıdaki(ler)?(den)?/,m=>'Yukarıdaki'+(m.indexOf('den')>0?'lerden':m.indexOf('ler')>0?'ler':''));
+      const multi=q0.replace('hangisinde','hangilerinde').replace('hangisinin','hangilerinin').replace('hangisi','hangileri');
+      const stemHead='Aşağıdaki numaralanmış cümleleri dikkatle okuyunuz.\n\n'+body+'\n\n';
+      const lab=ix=>ix.length===1?'Yalnız '+RM[ix[0]]:ix.map(i=>RM[i]).slice(0,-1).join(', ')+' ve '+RM[ix[ix.length-1]];
+      const wrongs=[];let g=0;
+      while(wrongs.length<3&&g++<60){
+        const sz=r.pick([1,2,2,3]);const s=r.some([0,1,2,3,4],sz).sort((a,b)=>a-b);const l=lab(s);
+        if(l!==lab(idx)&&wrongs.indexOf(l)<0)wrongs.push(l);
+      }
+      const why=idx.map(i=>RM[i]).join(', ')+' numaralı cümle'+(idx.length>1?'ler':'')+' '+lcn+' ile ilgilidir; diğerleri farklı gruptandır.';
+      if(wrongs.length===3)out.push(C(stemHead+multi,lab(idx),wrongs,why,'hard','yn'+tag+'m'));
+      const nq=q0.replace('hangisinde','kaç tanesinde').replace('hangisinin','kaç tanesinin').replace('hangisi','kaç tanesi').replace('Yukarıdakilerden','Yukarıdaki cümlelerden');
+      const ws=[0,1,2,3,4,5].filter(v=>v!==k),cc=C(stemHead+nq,String(k),ws.slice(0,3).map(String),why,'medium','yn'+tag+'n');
+      out.push(cc);
+    }
+  });
+  return out;
+}
+['tr-sozcuk','tr-cumle','tr-fiilimsi','tr-oge','tr-cati','tr-cumleturu','tr-anlatim','tr-yazim','tr-noktalama','tr-tur'].forEach((lid,i)=>{
+  const parts=Array.isArray(KBR[lid])?KBR[lid]:[KBR[lid]];
+  CB[lid]=(function(prev){return function(r){
+    let o=prev?prev(r):[];
+    parts.forEach((p,pi)=>{
+      if(!p||!p.cats)return;
+      const nm=Object.keys(p.cats);
+      if(nm.indexOf('deyim')>=0||nm.indexOf('roman')>=0)return;
+      o=o.concat(numCands(p,r,String(pi)));
+    });
+    return o;
+  };})(CB[lid]);
+});
+
+/* ---- Uzun paragraf soruları ---- */
+const LPAR=[
+{t:'Gece yarısına kadar ders çalışmak, birçok öğrenciye başarının tek yolu gibi görünür. Oysa uyku, beynin gün içinde öğrendiklerini düzenlediği ve kalıcı hâle getirdiği bir süreçtir. Yeterince uyumayan bir öğrenci, yüzlerce sayfayı okusa bile bilgilerin önemli bölümünü ertesi gün hatırlayamayabilir. Üstelik uykusuzluk dikkati dağıtır, sınav sırasında yapılan hataları artırır. Bu nedenle sınava hazırlanırken çalışma programına uykuyu da bir ders gibi eklemek gerekir. Sekiz saat uyuyan bir öğrenci, daha az ders çalışsa bile çoğu zaman daha verimli bir gün geçirir.',main:'Verimli bir hazırlık için yeterli uyku, ders çalışmak kadar gereklidir.',nm:['Başarılı olmak isteyen öğrenciler geceleri ders çalışmalıdır.','Uyku, yalnızca sınav günlerinde önem kazanır.'],konu:'Uykunun öğrenmeye etkisi',tur:'Açıklayıcı',dev:'Neden-sonuç ilişkisi kurma',inf:['Uyku, öğrenilen bilgilerin kalıcı hâle gelmesine yardımcı olur.','Uykusuzluk dikkat dağınıklığına yol açabilir.','Çalışma programı yapılırken uyku süresi de planlanmalıdır.'],no:'Çok ders çalışan her öğrenci sınavda mutlaka başarılı olur.'},
+{t:'Okuma alışkanlığı, çoğu zaman sanıldığı gibi yalnızca bilgi edinmek için kazanılmaz. Bir roman okuyan kişi, başkalarının yaşadığı olayları kendi dünyasında yeniden kurar ve farklı bakış açılarını tanır. Bu durum, empati yeteneğinin gelişmesini sağlar. Araştırmalar, düzenli kitap okuyan çocukların kelime dağarcığının daha geniş olduğunu da göstermektedir. Ancak okuma isteği, zorla ya da ceza yoluyla değil, merak uyandırılarak oluşturulabilir. Çocuğuna her akşam birlikte kitap okumayı alışkanlık hâline getiren ailelerde okuma sevgisi çok daha kolay yerleşir.',main:'Okuma alışkanlığı, bilgi kazandırmanın yanında empati ve söz varlığını da geliştirir; bu alışkanlık merakla kazandırılmalıdır.',nm:['Çocuklar yalnızca ödev için kitap okumalıdır.','Okuma alışkanlığı cezalandırılarak kazandırılabilir.'],konu:'Okuma alışkanlığının yararları ve kazandırılması',tur:'Açıklayıcı',dev:'Araştırma sonuçlarından yararlanma',inf:['Roman okumak, farklı bakış açılarını tanımaya katkı sağlar.','Düzenli okuyan çocukların kelime hazinesi daha geniştir.','Aile içinde birlikte okumak, okuma sevgisini artırabilir.'],no:'Roman okumak, yalnızca eğlenmek için yapılan bir etkinliktir.'},
+{t:'Telefon ekranına saatlerce bakmak, günümüzde pek çok gencin günlük rutini hâline geldi. Birçok kişi bu durumu “nasıl olsa her şey ekranda” diyerek savunuyor. Oysa sürekli bildirim gelen bir cihazın başında ders çalışmak, dikkati her birkaç dakikada bir bölüyor. Dikkat her bölündüğünde beynin konuya yeniden odaklanması zaman alıyor; böylece iki saatlik çalışma, gerçekte yarım saatlik verime dönüşebiliyor. Bu yüzden ders çalışırken telefonu başka bir odaya koymak, küçük ama etkili bir önlemdir. Önemli olan, teknolojiyi tamamen bırakmak değil, onu ne zaman kullanacağımızı bilmektir.',main:'Teknolojiden vazgeçmek yerine, ders çalışırken dikkati dağıtan cihazları kontrol altında tutmak gerekir.',nm:['Telefon, öğrencilerin en büyük düşmanıdır ve tamamen yasaklanmalıdır.','Ekran başında geçirilen süre arttıkça verim de artar.'],konu:'Ders çalışırken telefonun etkisi',tur:'Tartışmacı',dev:'Karşıt görüşü çürütme',inf:['Bildirimler, dikkatin sık sık kesilmesine neden olur.','Uzun görünen bir çalışma süresi gerçek verimi yansıtmayabilir.','Telefonu başka odaya koymak, bir tedbir olarak önerilmektedir.'],no:'Yazar, öğrencilerin telefon kullanmasının kesinlikle yasaklanmasını istemektedir.'},
+{t:'Her yıl milyonlarca kuş, kilometrelerce uzaktaki sıcak bölgelere göç eder. Leylekler, Türkiye’nin üzerinden geçerek Afrika’ya ulaşırken yolculuklarının büyük kısmını kanatlarını çırpmadan, sıcak hava akımlarına süzülerek tamamlar. Bu yöntem, uzun yolculuk boyunca enerji harcamalarını önemli ölçüde azaltır. Kuşlar yönlerini güneşten, yıldızlardan ve hatta Dünya’nın manyetik alanından yararlanarak bulur. Genç kuşlar çoğu zaman yolu daha önce hiç görmemişken, yetişkinlerin ardından ya da içgüdüleriyle doğru yöne gider. Bilim insanları, kuşlara taktıkları küçük vericilerle bu göç yollarını yıllardır izlemektedir.',main:'Kuşlar, göç sırasında enerjilerini koruyarak ve doğal işaretlerden yararlanarak yollarını bulurlar.',nm:['Göç eden kuşların hepsi her yıl aynı yaşta yolculuğa çıkar.','Kuşların göçünü yalnızca bilim insanları yönlendirir.'],konu:'Kuşların göç yolculuğu',tur:'Açıklayıcı',dev:'Örneklendirme',inf:['Leylekler yolculuk sırasında sıcak hava akımlarından yararlanır.','Kuşlar yön bulmak için doğal işaretleri kullanır.','Bilim insanları göç yollarını vericilerle takip eder.'],no:'Göç eden kuşlar, gideceği yeri yalnızca öğretmenlerden öğrenir.'},
+{t:'Ali, matematik sınavından önceki akşam masasına oturduğunda ellerinin soğuduğunu hissetti. Defterini açtı, ama satırlar gözünün önünde dans ediyor gibiydi. Annesi, odaya çay getirirken yavaşça omzuna dokundu ve “Önce nefes al, sonra sadece bir soru çöz.” dedi. Ali gözlerini kapatıp derin bir nefes aldı. İlk soruyu çözdüğünde kalbinin hızının yavaşladığını fark etti. Bir soru, iki soruya, iki soru da yarım saatlik sakin bir çalışmaya dönüştü. Gece yatağına girerken yarını kazanıp kazanamayacağını bilmiyordu; ama en azından korkusunu yenmişti.',main:'Ali, annesinin desteğiyle sınav kaygısını yenmeyi başarmıştır.',nm:['Ali, matematik sınavına hiç çalışmadan girmiştir.','Ali, sınavdan çok yüksek not almıştır.'],konu:'Ali’nin sınav öncesi kaygısı ve sakinleşmesi',tur:'Öyküleyici',dev:'Olay akışıyla anlatma',inf:['Ali sınav öncesinde heyecanlanmıştır.','Annesi Ali’yi sakinleşmesi için yönlendirmiştir.','Ali, çalışmaya küçük adımlarla devam etmiştir.'],no:'Ali, sınav kaygısından dolayı çalışmayı tamamen bırakmıştır.'},
+{t:'Sabahın ilk ışıklarıyla birlikte göl, bembeyaz bir sisin altında uyanıyordu. Kıyıdaki söğütlerin dalları suya doğru eğilmiş, sanki serin suyu yudumlamak ister gibi duruyordu. Uzaklardaki dağların tepeleri, turuncu ışıkla yavaş yavaş aydınlanırken gölün yüzeyi pırıl pırıl bir ayna gibi parlıyordu. Havada nemli toprak ve çam kokusu vardı. Bir sazlığın içinden çıkan ördek ailesi, suyun üstünde ince çizgiler bırakarak yüzüyordu. Her yer o kadar sessizdi ki uzaktaki bir balığın sıçrayışı bile duyuluyordu.',main:'Sabaha uyanan bir gölün huzurlu doğa görünümü anlatılmaktadır.',nm:['Gölde balık avlamanın zorlukları anlatılmaktadır.','Dağlarda yaşayan canlıların beslenme biçimleri açıklanmaktadır.'],konu:'Sabah ışığında bir göl manzarası',tur:'Betimleyici',dev:'Duyulara seslenme (görme, koklama, işitme)',inf:['Göl, sabahın erken saatlerinde sisle kaplıdır.','Ortam sessizdir.','Gölün çevresinde söğüt ağaçları vardır.'],no:'Göl kıyısında kalabalık bir turist grubu piknik yapmaktadır.'},
+{t:'Hepimiz bir takımın parçası olmanın, tek başına çalışmaktan daha zor olduğunu düşünürüz. Haklıyız da; çünkü takımda farklı fikirler çatışır, herkes aynı hızda ilerlemez. Fakat bir okul tiyatrosunu düşünün: Sahne kuran, kostüm dikip metin yazan, ışığı yöneten ve oynayan öğrenciler ayrı ayrı yeteneklidir. Her biri tek başına çalışsa ortaya bir oyun çıkmaz. Yani takım çalışmasının zorluğu, sonunda ortaya çıkan eserin değerini azaltmaz; tersine, o eseri mümkün kılar. Bu yüzden takım içinde karşılaştığımız anlaşmazlıkları bir engel değil, birlikte öğrenmenin bir parçası olarak görmeliyiz.',main:'Takım çalışması zordur ama ortaya çıkan ortak eseri mümkün kıldığı için değerlidir.',nm:['Takım çalışmasında herkes aynı fikirde olmalıdır.','Yetenekli öğrenciler hiçbir zaman takımla çalışmamalıdır.'],konu:'Takım çalışmasının zorlukları ve değeri',tur:'Tartışmacı',dev:'Örnekle destekleme (okul tiyatrosu)',inf:['Takım çalışmasında farklı fikirler çatışabilir.','Tiyatro oyununda her öğrencinin farklı bir görevi vardır.','Anlaşmazlıklar, birlikte öğrenmenin bir parçası olarak görülebilir.'],no:'Yazara göre takım çalışması sadece yetenekli öğrenciler için uygundur.'},
+{t:'Dünya üzerindeki suyun yalnızca yüzde üçü tatlı sudur ve bunun büyük bölümü buzullarda hapsolmuştur. Yani insanların, hayvanların ve bitkilerin ihtiyaç duyduğu içilebilir su, düşündüğümüzden çok daha azdır. Üstelik bu kaynaklar sanayi atıkları, tarım ilaçları ve evsel kirlilik yüzünden her geçen gün azalmaktadır. Bir damla suyun bile değerini bilmek, yalnızca çevreci olmak değil, geleceğe karşı sorumluluk taşımaktır. Diş fırçalarken musluğu kapatmak, bahçeyi akşam sulamak ve yağmur suyunu biriktirmek gibi küçük adımlar, birleştiğinde büyük tasarruf sağlar.',main:'Tatlı su kaynakları sınırlıdır ve kirlenmektedir; bu yüzden herkes su tasarrufu yapmalıdır.',nm:['Dünya’daki suyun büyük bölümü içilebilir durumdadır.','Su tasarrufunu yalnızca sanayi kuruluşları yapmalıdır.'],konu:'Su kaynaklarının korunması',tur:'Açıklayıcı',dev:'Sayısal verilerden yararlanma',inf:['Dünya’daki suyun çok küçük bir bölümü tatlı sudur.','Tatlı suyun büyük bölümü buzullarda bulunur.','Küçük tasarruf adımları, birleşince önemli bir fark yaratır.'],no:'Yağmur suyunu biriktirmek, suyun kirlenmesine neden olur.'},
+{t:'Mimar Sinan’ın yaptığı yapıları ziyaret eden bir turist, önce kubbelerin genişliğine hayran kalır. Oysa bu yapıların asıl başarısı, o büyük kubbelerin birkaç ince sütun üzerinde taşınmasında gizlidir. Sinan, binalarını depreme dayanıklı kılmak için temellerde ve taşıyıcı sistemlerde dönemin teknolojisinin çok ötesinde çözümler geliştirmiştir. Ayrıca camilerin içinde sesin dağılımını da hesaplamış, avluların ve pencerelerin yerini ışığın en güzel biçimde düşeceği şekilde belirlemiştir. Bu yüzden Sinan yalnızca bir mimar değil, aynı zamanda bir mühendis ve düşünürdür.',main:'Mimar Sinan, yapılarında estetiğin yanında mühendislik bilgisini de kullanmıştır.',nm:['Mimar Sinan yalnızca küçük yapılar tasarlamıştır.','Sinan’ın yapıları depreme karşı hiç önlem içermez.'],konu:'Mimar Sinan’ın yapılarındaki ustalık',tur:'Açıklayıcı',dev:'Örneklendirme',inf:['Sinan’ın yapılarında büyük kubbeler birkaç sütunla taşınır.','Sinan, ışığın ve sesin yapıdaki etkisini de hesaba katmıştır.','Sinan hem mimar hem mühendis olarak değerlendirilebilir.'],no:'Sinan’ın tüm yapıları aynı şehirde yapılmıştır.'},
+{t:'Gönüllülük, çoğumuzun düşündüğü gibi çok zaman ve para gerektiren büyük işler değildir. Sokaktaki bir hayvana su koymak, yaşlı bir komşunun alışverişini taşımak ya da okuldaki kitapları yeni sınıfa düzenlemek de gönüllülüktür. Önemli olan, karşılık beklemeden yapılan bir iyiliktir. Gönüllü çalışan gençlerin özgüveninin arttığı, topluma aidiyet duygularının güçlendiği araştırmalarla gösterilmiştir. Üstelik gönüllülük bulaşıcıdır; bir kişinin iyiliğini gören pek çok kişi, bir sonraki gün aynı davranışı kendisi yapmaya başlar.',main:'Gönüllülük, küçük ve karşılıksız iyiliklerle başlar ve hem kişiye hem topluma yarar sağlar.',nm:['Gönüllü olmak için büyük bir bütçe gerekir.','Gönüllülük yalnızca yetişkinlerin yapabileceği bir davranıştır.'],konu:'Gönüllülüğün anlamı ve etkileri',tur:'Açıklayıcı',dev:'Örneklendirme ve araştırma sonuçlarından yararlanma',inf:['Küçük iyilikler de gönüllülük sayılır.','Gönüllü çalışmak gençlerin özgüvenini artırabilir.','Bir kişinin iyiliği başkalarına örnek olabilir.'],no:'Gönüllülük yapabilmek için karşılığında mutlaka ödül alınmalıdır.'},
+{t:'Duvarın yanındaki eski bisiklet, annemin ona ilk bindiği yaz mevsiminden kalma bir hatıraydı. Boyası solmuş, gidonundaki kırmızı bant gevşemişti; ama zili hâlâ aynı cıvıltılı sesle öterdi. Her yaz dedem onu yağlar, lastiklerini şişirir ve bana “Haydi, dünyanın öbür ucuna gidelim,” derdi. Ben de arkasından tozlu sokaklarda pedal çevirir, yokuşlarda nefes nefese kalırdım. O yaz bitip dedem bizden ayrıldığında, bisikleti duvarın dibine bıraktık. Şimdi her baktığımda, bir yerlerden o cıvıltılı zil sesini duyar gibi oluyorum.',main:'Yazar, dedesiyle paylaştığı bisiklet anılarını özlemle hatırlamaktadır.',nm:['Yazar, bisikletin satılması gerektiğini düşünmektedir.','Yazar, bisiklet sürmeyi hiçbir zaman sevmemiştir.'],konu:'Eski bir bisiklet ve dede anıları',tur:'Öyküleyici',dev:'Anı anlatma',inf:['Bisiklet, anneden kalmış bir hatıradır.','Dede her yaz bisikleti bakıma alırdı.','Yazar, bisikleti görünce dedesini hatırlamaktadır.'],no:'Bisikletin zili artık hiçbir ses çıkarmamaktadır.'},
+{t:'Orman yangınlarının çoğu, doğal nedenlerden çok insan hatalarından çıkar. Söndürülmeden bırakılan bir piknik ateşi ya da yola atılan yanık bir izmarit, kurak havada saatler içinde hektarlarca ormanı küle çevirebilir. Yanan her ağaç yalnızca bir bitkinin yok olması anlamına gelmez; kuşlar, böcekler ve küçük memeliler için yaşam alanlarının kaybıdır. Üstelik ormanın yeniden yetişmesi onlarca yıl alır. Bu nedenle ormana giden herkes, bıraktığı her izin sorumluluğunu taşıdığını hatırlamalıdır. Çocuklara orman sevgisi aşılamak da en kalıcı önlemlerden biridir.',main:'Orman yangınlarını önlemenin yolu, insanların bilinçli ve sorumlu davranmasıdır.',nm:['Orman yangınlarının tek nedeni kuraklıktır.','Yanan ormanlar kısa sürede eski hâline döner.'],konu:'Orman yangınları ve alınması gereken önlemler',tur:'Açıklayıcı',dev:'Neden-sonuç ilişkisi kurma',inf:['Orman yangınlarının birçoğu insan kaynaklıdır.','Yangınlar hayvanların yaşam alanlarını yok eder.','Çocuklara orman sevgisi aşılamak yararlı bir önlemdir.'],no:'Orman yangınlarından sonra ormanlar birkaç hafta içinde yeniden yetişir.'},
+{t:'Bazı insanlar matematiği, doğuştan yetenekli olanların alanı sanır. Oysa matematik, tıpkı bir müzik aleti çalmak gibi, tekrar ve sabırla gelişen bir beceridir. Bir problemde takılan öğrenci, çoğu zaman “Ben yapamıyorum.” diyerek vazgeçer; hâlbuki aynı problemi bir kez daha, bu sefer farklı bir yoldan denemek çözümü getirebilir. Başarılı matematikçilerin hayat hikâyeleri de çoğu zaman yüzlerce denemeyle doludur. Bu yüzden matematik korkusunu yenmenin ilk adımı, hata yapmanın öğrenmenin doğal bir parçası olduğuna inanmaktır.',main:'Matematik, doğuştan değil çalışarak ve hatalardan öğrenerek geliştirilebilen bir beceridir.',nm:['Matematik yalnızca yetenekli kişilerin başarabileceği bir alandır.','Hata yapan öğrenci matematikten uzak durmalıdır.'],konu:'Matematik korkusunu yenmek',tur:'Tartışmacı',dev:'Benzetme ve örneklendirme',inf:['Matematik, tekrarla gelişen bir beceri olarak görülmektedir.','Bir probleme farklı yoldan yaklaşmak çözümü kolaylaştırabilir.','Hata yapmak öğrenme sürecinin doğal bir parçasıdır.'],no:'Matematikte başarılı olmak için hiç hata yapmamak gerekir.'},
+{t:'Sokak hayvanlarına yaklaşım, bir toplumun merhamet düzeyini gösteren aynadır. Soğuk kış günlerinde bir kabın içine konulan su ve mama, küçük bir davranış gibi görünse de bir can için hayat anlamına gelir. Ancak merhamet, yalnızca besleyip geçmekle sınırlı değildir; hayvanların aşılanması, kısırlaştırılması ve barınaklara ulaştırılması gibi sürdürülebilir çözümler de gereklidir. Aksi hâlde sayıları kontrolsüz artan hayvanlar hem kendileri hem de çevreleri için sorun hâline gelebilir. Bu nedenle bireysel iyilik, kurumsal çabalarla desteklendiğinde kalıcı bir sonuç doğurur.',main:'Sokak hayvanları için bireysel merhamet yetmez; kalıcı çözümler için kurumsal çalışmalar da gereklidir.',nm:['Sokak hayvanlarına hiç yardım edilmemelidir.','Sokak hayvanları için yalnızca mama bırakmak yeterlidir.'],konu:'Sokak hayvanlarına yaklaşım',tur:'Tartışmacı',dev:'Örnekle destekleme',inf:['Küçük bir yardım, bir hayvan için hayat kurtarıcı olabilir.','Aşılama ve kısırlaştırma sürdürülebilir çözümler arasındadır.','Bireysel iyilik, kurumsal çabalarla birleşmelidir.'],no:'Yazar, sokak hayvanlarının barınaklarda tutulmasına karşı çıkmaktadır.'},
+{t:'Deniz kıyısında yürürken dalgaların kumsala bıraktığı plastik parçaları görmek artık sıradan bir manzara. Oysa her yıl milyonlarca ton plastik, denizlere karışıyor. Bu plastikler zamanla küçük parçalara ayrılıyor ve balıkların, deniz kuşlarının bedenine giriyor. Daha da kötüsü, bu parçacıklar besin zinciri yoluyla sofralarımıza kadar ulaşabiliyor. Çözüm, yalnızca sahilleri temizlemek değil; tek kullanımlık ürünleri azaltmak, geri dönüşümü yaygınlaştırmak ve bez çanta gibi alternatifleri alışkanlık haline getirmektir. Çünkü denize ulaşmadan önce önlenen her atık, binlerce canlıyı kurtarır.',main:'Deniz kirliliğini önlemek için plastik kullanımını azaltmak ve geri dönüşümü yaygınlaştırmak gerekir.',nm:['Denizlerdeki plastikler kendiliğinden yok olur.','Deniz kirliliği yalnızca balıkları ilgilendirir.'],konu:'Denizlerdeki plastik kirliliği',tur:'Açıklayıcı',dev:'Neden-sonuç ilişkisi kurma',inf:['Plastikler denizlerdeki canlılar için tehlike oluşturur.','Plastik parçacıklar besin zinciriyle insanlara ulaşabilir.','Tek kullanımlık ürünleri azaltmak çözüm olabilir.'],no:'Plastik atıklar denizde çok kısa sürede suya karışarak kaybolur.'},
+{t:'Müzik dinlemenin yalnızca eğlence olduğu düşünülür, oysa beyin müzik dinlerken çok karmaşık işler yapar. Ritmi izler, melodiyi hatırlar, duyguları yorumlar ve hatta geçmişteki anılara ulaşır. Bazı araştırmalar, düzenli olarak enstrüman çalan çocukların dikkat ve hafıza testlerinde daha başarılı olduğunu göstermektedir. Elbette her müzik her iş için uygun değildir; sözlü ve hızlı şarkılar ders çalışırken dikkati dağıtabilir. Ancak sakin ve sözsüz parçalar bazı kişilerde odaklanmayı kolaylaştırır. Bu nedenle müziği hem bir keyif hem de bir çalışma aracı olarak akıllıca kullanmak mümkündür.',main:'Müzik, doğru kullanıldığında beyin gelişimine ve çalışma verimine katkı sağlayabilir.',nm:['Müzik, çalışırken her zaman dikkati dağıtır.','Müzik dinlemek yalnızca eğlence amacı taşır.'],konu:'Müziğin beyin ve çalışma üzerindeki etkisi',tur:'Açıklayıcı',dev:'Araştırma sonuçlarından yararlanma',inf:['Müzik dinlerken beyin birçok işlemi aynı anda yapar.','Enstrüman çalan çocuklar bazı testlerde daha başarılı olabilir.','Sözsüz ve sakin parçalar odaklanmayı kolaylaştırabilir.'],no:'Hızlı ve sözlü şarkılar ders çalışırken odaklanmayı her zaman artırır.'}];
+const DEVS=['Örneklendirme','Neden-sonuç ilişkisi kurma','Karşıt görüşü çürütme','Araştırma sonuçlarından yararlanma','Sayısal verilerden yararlanma','Örnekle destekleme (okul tiyatrosu)','Benzetme ve örneklendirme','Olay akışıyla anlatma','Anı anlatma','Duyulara seslenme (görme, koklama, işitme)','Örneklendirme ve araştırma sonuçlarından yararlanma','Örnekle destekleme'];
+const PREV=CB['tr-parca'];
+CB['tr-parca']=function(r){
+  const out=PREV?PREV(r):[];
+  LPAR.forEach((p,i)=>{
+    const others=LPAR.filter((x,j)=>j!==i),o1=r.pick(others);
+    out.push(C('Aşağıdaki parçayı dikkatle okuyunuz.\n\n“'+p.t+'”\n\nBu parçanın ana düşüncesi aşağıdakilerden hangisidir?',p.main,[p.nm[0],p.nm[1],o1.main],'Parçanın tümünden çıkan temel yargı: '+p.main,'hard','ynP1','L'+i));
+    out.push(C('Aşağıdaki parçayı dikkatle okuyunuz.\n\n“'+p.t+'”\n\nBu parçadan aşağıdakilerden hangisi çıkarılamaz?',p.no,p.inf,'“'+p.no+'” yargısı parçada yer almamaktadır; diğer seçenekler parçadan çıkarılabilir.','hard','ynP2','L'+i));
+    out.push(C('Aşağıdaki parçayı dikkatle okuyunuz.\n\n“'+p.t+'”\n\nBu parçaya aşağıdaki başlıklardan hangisi verilebilir?',p.konu,r.some(others,3).map(x=>x.konu),'Parçada ele alınan konu: '+p.konu+'.','medium','ynP3','L'+i));
+    const ts=['Öyküleyici','Betimleyici','Açıklayıcı','Tartışmacı'];
+    out.push(C('Aşağıdaki parçayı dikkatle okuyunuz.\n\n“'+p.t+'”\n\nBu parçada ağır basan anlatım biçimi aşağıdakilerden hangisidir?',p.tur,ts.filter(x=>x!==p.tur),'Parçada ağır basan anlatım biçimi '+p.tur.toLowerCase()+' anlatımdır.','medium','ynP4','L'+i));
+  });
+  return out;
+};
+/* ---- Havuzda yeni nesil soruları öne çıkar ---- */
+
+/* ---- Görsel okuma: uzun tablo/yorum soruları ---- */
+(function(){
+const CX=[['Bir kütüphanede aylara göre ödünç verilen kitap sayısı',['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran'],'kitap'],['Bir okulda sınıflara göre toplanan atık pil sayısı',['5-A','5-B','6-A','6-B','7-A','7-B'],'pil'],['Bir spor kulübünde branşlara göre kayıtlı öğrenci sayısı',['Futbol','Voleybol','Basketbol','Yüzme','Tenis','Atletizm'],'öğrenci'],['Bir kafede günlere göre satılan tost sayısı',['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],'tost']];
+function vals(r){const v=[];while(v.length<6){const x=r.int(5,40)*2;if(v.indexOf(x)<0)v.push(x);}return v;}
+G('tr-gorsel',r=>{
+  const c=r.pick(CX),v=vals(r),L=c[1],u=c[2],tab=L.map((l,i)=>l+': '+v[i]).join('\n');
+  const i=r.int(0,5);let j=r.int(0,5);if(j===i)j=(i+1)%6;
+  const tot=v.reduce((a,b)=>a+b,0),mx=Math.max.apply(null,v),mn=Math.min.apply(null,v);
+  const T=[[L[i]+' için değer '+L[j]+' için değerden '+(v[i]>v[j]?'fazladır':'azdır')+'.',true],['Toplam değer '+tot+' '+u+'dir.'.replace('kitapdir','kitaptır').replace('pildir','pildir').replace('öğrencidir','öğrencidir').replace('tostdir','tosttur'),true],['En büyük değer ile en küçük değer arasındaki fark '+(mx-mn)+'’dir.',true]];
+  const F=r.pick([[L[i]+' için değer '+L[j]+' için değerden '+(v[i]>v[j]?'azdır':'fazladır')+'.',false],['Toplam değer '+(tot+10)+' '+u+'dir.'.replace('kitapdir','kitaptır').replace('tostdir','tosttur'),false],['En büyük değer ile en küçük değer arasındaki fark '+(mx-mn+4)+'’tür.',false]]);
+  const askFalse=r.pick([true,false]);
+  const body=c[0]+' aşağıdaki tabloda verilmiştir.\n\n'+tab+'\n\nBu tabloya göre aşağıdaki ifadelerden hangisi ';
+  if(askFalse){const opts=T.map(x=>x[0]);return C(body+'yanlıştır?',F[0],opts,'Tablo incelendiğinde “'+F[0]+'” ifadesinin yanlış olduğu görülür; diğer ifadeler doğrudur.','hard','ynG1');}
+  const opts=[F[0]].concat(T.slice(1).map(x=>x[0]).slice(0,2),[]);
+  const trues=T.filter(x=>x[0]!==F[0]);
+  const ft=[['Toplam değer '+(tot+10)+' '+u+'dir.'.replace('kitapdir','kitaptır').replace('tostdir','tosttur')],['En büyük değer ile en küçük değer arasındaki fark '+(mx-mn+4)+'’tür.'],[L[i]+' için değer '+L[j]+' için değerden '+(v[i]>v[j]?'azdır':'fazladır')+'.']];
+  return C(body+'doğrudur?',T[1][0],ft.map(x=>x[0]),'Toplam '+v.join(' + ')+' = '+tot+' olduğundan bu ifade doğrudur; diğerleri tablodaki verilerle çelişir.','hard','ynG2');});
+const NM=['Ada','Bora','Cem','Duru','Ege','Fulya'];
+G('tr-mantik',r=>{
+  const who=r.some(NM,5),truth=r.shuf(who),ctx=r.pick([['Bir koşu yarışında','önce bitirdi','en son bitirdi','birinci'],['Bir satranç turnuvasında','daha fazla puan topladı','en az puan topladı','birinci']]);
+  const clues=r.shuf([0,1,2,3]).map(i=>truth[i]+', '+truth[i+1]+'’'+(/[aıou][^aeıioöuü]*$/.test(truth[i+1])?'dan':'den')+' '+ctx[1]+'.');
+  const k=r.int(1,3),ans=truth[k];
+  return C(ctx[0]+' beş sporcu yarışmıştır. Yarışmayı izleyen bir görevli şu notları almıştır:\n'+clues.map((c,i)=>(i+1)+'. '+c).join('\n')+'\n\nBuna göre '+(k+1)+'. sırada yer alan sporcu kimdir? (Sıralama en iyiden en kötüye doğrudur.)',ans,who.filter(x=>x!==ans),'Notlar birleştirilince sıralama: '+truth.join(' > ')+'. '+(k+1)+'. sırada '+ans+' vardır.','hard','ynM1');});
+})();
+
+/* ===== 2. DALGA: ek yeni nesil şablonlar ===== */
+G('mat-carp',r=>{
+  const a=r.pick([4,6,8,10,12]),b=r.pick([5,9,10,15,18]),c=r.pick([6,12,14,15,20]);if(a===b||b===c||a===c)return null;
+  const l=lcm(lcm(a,b),c);if(l>360)return null;
+  return C('Bir gösteri merkezinde üç ayrı lamba sırasıyla her '+a+', '+b+' ve '+c+' saniyede bir yanıp sönmektedir. Gösteri başladığında üç lamba aynı anda yanmıştır.\n\nBuna göre üç lamba, başlangıçtan sonra ilk kez kaç saniye sonra yeniden aynı anda yanar?',l,W(l,[a+b+c,a*b*c/gcd(a,b),lcm(a,b),lcm(b,c),l*2]),'EKOK('+a+', '+b+', '+c+') = '+l+' saniye.','hard','ynC5');});
+G('mat-carp',r=>{
+  const X=r.int(1,9),Y=r.int(1,9),d=r.pick([3,9]),S=X+Y;let sum=0,list=[];for(let A=0;A<=9;A++)if((S+A)%d===0){sum+=A;list.push(A);}
+  if(list.length<2)return null;
+  return C('Bir öğrenci, üç basamaklı '+X+'A'+Y+' sayısının '+d+' ile tam bölünebildiğini fark ediyor. (A, rakamdır.)\n\nBuna göre A’nın alabileceği değerlerin toplamı kaçtır?',sum,W(sum,[list.length,list[0],sum+list[1],S]),'Rakamlar toplamı '+(S)+' + A, '+d+'’ün katı olmalı: A = '+list.join(', ')+'. Toplam '+sum+'.','hard','ynC6');});
+G('mat-uslu',r=>{
+  const a=r.pick([6,3,9,8]),b=r.pick([3,2,1]),m=r.int(2,6),n=m-r.int(1,2),ratio=(a/b)*Math.pow(10,m-n);if(!Number.isInteger(ratio)||ratio<2)return null;
+  return C('Bir gök bilimi kitabında Dünya’nın kütlesi '+a+'·10'+supe(m)+' kg, bir uydunun kütlesi ise '+b+'·10'+supe(n)+' kg olarak verilmiştir.\n\nBuna göre Dünya’nın kütlesi uydunun kütlesinin kaç katıdır?',ratio,W(ratio,[ratio*10,ratio/10,a*b,a-b]),'('+a+'·10'+supe(m)+')/('+b+'·10'+supe(n)+') = '+nf(a/b)+'·10'+supe(m-n)+' = '+ratio+'.','hard','ynU5');});
+G('mat-uslu',r=>{
+  const k=r.pick([2,3,4,5]),n=r.int(2,4),v=r.pick([100,200,500,1000]);
+  return C('Bir bankada '+v+' TL’lik bir tutar, her yıl sonunda '+k+' katına çıkacak biçimde bir fon hesabında değerlendirilecektir.\n\nBu tutar '+n+' yıl sonunda kaç TL olur?',nf(v*Math.pow(k,n)),numW(nf(v*Math.pow(k,n)),[v*k*n,v*n,v*Math.pow(k,n-1),v+k*n,v*Math.pow(k,n)*k]),v+' · '+k+supe(n)+' = '+nf(v*Math.pow(k,n))+' TL.','medium','ynU6');});
+G('mat-kok',r=>{
+  const a=r.int(2,5),b=r.int(2,5),m=r.pick([2,3,5]),ans=a*b*m;
+  return C('Dikdörtgen biçimli bir panonun kısa kenarı '+a+'√'+m+' dm, uzun kenarı '+b+'√'+m+' dm’dir.\n\nPanonun alanı kaç dm²’dir?',ans,W(ans,[a*b,a*b*m+m,(a+b)*m,a*b*Math.sqrt(m)].map(Math.round)),'Alan = ('+a+'√'+m+')·('+b+'√'+m+') = '+a*b+'·'+m+' = '+ans+' dm².','medium','ynK5');});
+G('mat-kok',r=>{
+  const m=r.pick([2,3,5]),a=r.int(2,6),b=r.int(1,4),c=r.int(1,3);
+  const A=a*a*m,B=b*b*m,Cc=c*c*m,tot=a+b+c,ok=radStr(tot,m);
+  return C('Bir ressam, boyları √'+A+' cm, √'+B+' cm ve √'+Cc+' cm olan üç çıtayı uç uca ekleyerek tek bir çıta elde edecektir.\n\nBu çıtanın toplam uzunluğu kaç cm’dir?',ok,uniqStr([radStr(a+b+c+1,m),radStr(1,A+B+Cc),radStr(tot,m*2),radStr(tot-1,m),radStr(a*b*c,m)],ok).slice(0,3),'√'+A+' = '+radStr(a,m)+', √'+B+' = '+radStr(b,m)+', √'+Cc+' = '+radStr(c,m)+'. Toplam '+ok+' cm.','hard','ynK6');});
+G('mat-veri',r=>{
+  const h=[];while(h.length<7)h.push(r.int(150,175));const s=h.slice().sort((a,b)=>a-b),med=s[3];
+  return C('Bir basketbol takımının 7 sporcusunun boyları (cm) şöyledir: '+h.join(', ')+'.\n\nBu boy verilerinin ortanca değeri (medyanı) kaç cm’dir?',med,W(med,[s[2],s[4],s[0],s[6],Math.round(h.reduce((a,b)=>a+b,0)/7)]),'Sıralı: '+s.join(', ')+'. 7 veri içinde ortadaki 4. değer '+med+'.','medium','ynV5');});
+G('mat-veri',r=>{
+  const nums=[36,37,38,39,40,41,42],freq=nums.map(()=>r.int(1,9)),mx=Math.max.apply(null,freq);if(freq.filter(x=>x===mx).length!==1)return null;const mode=nums[freq.indexOf(mx)];
+  return C('Bir ayakkabı mağazasında bir günde satılan ayakkabıların numaralara göre sayıları şöyledir: '+nums.map((n,i)=>n+' numara: '+freq[i]+' çift').join(', ')+'.\n\nMağaza sahibi, ertesi gün için en çok sipariş vermesi gereken numarayı belirlemek istiyor. Bu numara verilerin hangi değeridir?',mode,nums.filter(x=>x!==mode).slice(0,3).map(String),'Tepe değer (mod), en çok tekrar eden değerdir: '+mode+' numara ('+mx+' çift).','medium','ynV6');});
+G('mat-olasilik',r=>{
+  const p=r.pick([[1,3,1,4],[1,2,1,5],[1,4,1,3],[2,5,1,4]]),a=p[0]*p[3]*1,res=fr(20-p[0]*20/p[1]-p[2]*20/p[3],20);
+  const pr=20-p[0]*20/p[1]-p[2]*20/p[3];if(!Number.isInteger(pr)||pr<=0)return null;
+  return C('Bir kutudaki bilyeler kırmızı, mavi ve yeşil renktedir. Rastgele çekilen bir bilyenin kırmızı olma olasılığı '+p[0]+'/'+p[1]+', mavi olma olasılığı '+p[2]+'/'+p[3]+'’tür.\n\nBuna göre çekilen bilyenin yeşil olma olasılığı kaçtır?',res,fW(res,[[pr+1,20],[pr-1,20],[p[0]+p[2],p[1]+p[3]],[1,3],[1,2]]).slice(0,3),'Toplam olasılık 1’dir. Yeşil = 1 − '+p[0]+'/'+p[1]+' − '+p[2]+'/'+p[3]+' = '+pr+'/20 = '+res+'.','hard','ynO5');});
+G('mat-olasilik',r=>{
+  const T=r.pick([100,200,250,400,500]),k=r.pick([1,2,4,5,10]),pc=k/T*100;if(!Number.isFinite(pc))return null;
+  return C('Bir okul etkinliğinde '+T+' çekiliş bileti satılmıştır ve çekilişte '+k+' bilete ödül çıkacaktır. Her bilet eşit şansa sahiptir. Nehir, bu çekilişten yalnızca 1 bilet almıştır.\n\nBuna göre Nehir’in ödül kazanma olasılığı yüzde kaçtır?','%'+nf(pc),numW('%'+nf(pc),[pc*2,pc/2,pc*10,k,T/k]).map(x=>x.indexOf('%')===0?x:'%'+x),'Olasılık = '+k+'/'+T+' = '+nf(pc)+'/100 = %'+nf(pc)+'.','medium','ynO6');});
+G('mat-cebir',r=>{
+  const m=r.int(2,5),a=r.int(1,6),b=r.int(1,5),e=m*1,ex=lin(m,a-b);
+  return C('Ali’nin yaşına x diyelim. Ali’nin babasının yaşı, Ali’nin yaşının '+m+' katının '+a+' fazlasıdır. Annesinin yaşı ise babasının yaşından '+b+' eksiktir.\n\nBuna göre Ali’nin annesinin yaşını gösteren cebirsel ifade aşağıdakilerden hangisidir?',ex,uniqStr([lin(m,a+b),lin(m+1,a-b),lin(m,b-a),lin(m,a)],ex).slice(0,3),'Baba: '+lin(m,a)+'. Anne: ('+lin(m,a)+') − '+b+' = '+ex+'.','medium','ynB6');});
+G('mat-cebir',r=>{
+  const a=r.int(1,8),b=r.int(1,8),ans=lin(4,2*(a+b));
+  return C('Alanı x² + '+(a+b)+'x + '+(a*b)+' cm² olan dikdörtgen biçimli bir kartonun kenar uzunlukları, birer cebirsel ifade ile gösterilen (x + '+a+') cm ve (x + '+b+') cm’dir.\n\nBuna göre bu kartonun çevresini gösteren ifade aşağıdakilerden hangisidir?',ans+' cm',uniqStr([lin(2,a+b),lin(4,a+b),lin(4,a*b),lin(2,2*(a+b))],ans).slice(0,3).map(x=>x+' cm'),'Çevre = 2[(x + '+a+') + (x + '+b+')] = 2(2x + '+(a+b)+') = '+ans+'.','hard','ynB7');});
+G('mat-dogrusal',r=>{
+  const b=r.pick([4,6,8,10,12]),c=r.pick([2,3,4]),m=b/c;if(!Number.isInteger(m))return null;
+  const ok=eqL(-m,b);
+  return C('Bir mühendis, koordinat düzleminde y eksenini (0, '+b+') noktasında, x eksenini ise ('+c+', 0) noktasında kesen bir yol çizmektedir.\n\nBu yolu gösteren doğrunun denklemi aşağıdakilerden hangisidir?',ok,uniqStr([eqL(m,b),eqL(-m,c),eqL(-c,b),eqL(m,-b)],ok).slice(0,3),'Eğim = (0 − '+b+')/('+c+' − 0) = '+(-m)+'; y eksenini '+b+'’de kestiği için '+ok+'.','hard','ynD6');});
+G('mat-dogrusal',r=>{
+  const m=r.pick([2,3,-2,4,-3]),n=r.int(-5,5),p=r.int(1,4),q=r.int(-6,6),k=q-m*p,ok=eqL(m,k);
+  return C('Bir elektrik kablosu y = '+m+'x '+(n<0?'− '+(-n):'+ '+n)+' doğrusu boyunca döşenmiştir. Ikinci bir kablo, bu kabloya paralel olacak ve ('+p+', '+q+') noktasından geçecektir.\n\nİkinci kablonun doğrusunu gösteren denklem aşağıdakilerden hangisidir?',ok,uniqStr([eqL(m,n),eqL(-m,k),eqL(m,q),eqL(1/m===Math.floor(1/m)?1/m:m+1,k)],ok).slice(0,3),'Paralel doğruların eğimleri eşittir: m = '+m+'. y = '+m+'x + k, ('+p+', '+q+') için k = '+q+' − '+m*p+' = '+k+'.','hard','ynD7');});
+G('mat-esitsizlik',r=>{
+  const lo=r.int(-5,-1),hi=r.int(1,6),cnt=hi-lo+1;
+  return C('Bir bölgede gece hava sıcaklığının, geçen haftanın verilerine göre '+lo+' °C’ye eşit ya da bundan yüksek, ancak '+(hi+1)+' °C’den düşük olduğu belirlenmiştir. Sıcaklık, yalnızca tam sayı değerleri ölçen bir termometre ile okunuyor.\n\nBu termometrenin gösterebileceği kaç farklı değer vardır?',cnt,W(cnt,[hi-lo,cnt+1,hi+Math.abs(lo),cnt-1]),lo+' ≤ T < '+(hi+1)+' → T = '+lo+', …, '+hi+' → '+cnt+' değer.','medium','ynE5');});
+G('mat-esitsizlik',r=>{
+  const a=r.int(2,5),b=r.int(1,9),c=r.int(30,60),mx=Math.floor((c-b)/a),even=mx%2===0?mx:mx-1;
+  return C('Bir okulda sınıfa katılacak öğrenci sayısı n ile gösteriliyor. Okulun düzenlemesine göre '+a+'n + '+b+' ≤ '+c+' olmalıdır ve n bir çift doğal sayı seçilecektir.\n\nBuna göre n en çok kaç olabilir?',even,W(even,[mx,mx+1,even+2,(c-b)/a]),a+'n + '+b+' ≤ '+c+' → n ≤ '+nf((c-b)/a)+'. En büyük doğal sayı '+mx+', en büyük çift sayı '+even+'.','hard','ynE6');});
+G('mat-ucgen',r=>{
+  const a=r.int(6,14),mx=2*a-1;
+  return C('Bir mimar, iki kenarı '+a+' m olan ikizkenar üçgen biçimli bir çatı yapacaktır. Üçüncü kenarın uzunluğu tam sayı metre olarak ölçülecektir.\n\nBu çatının çevresi en çok kaç metre olabilir?',a+a+mx,W(a+a+mx,[3*a,4*a,2*a+a,a+a+2*a]),'Üçüncü kenar '+(2*a)+'’dan küçük olmalı: en çok '+mx+' m. Çevre = '+a+' + '+a+' + '+mx+' = '+(2*a+mx)+' m.','hard','ynT5');});
+G('mat-ucgen',r=>{
+  const t=r.pick(PTRI),k=r.pick([1,2,3]),a=t[0]*k,b=t[1]*k,c=t[2]*k;
+  return C('Bir yaya, bir parkta önce doğuya doğru '+a+' m, sonra kuzeye doğru '+b+' m yürümüştür. Başlangıç noktasına en kısa yoldan, düz bir çizgi boyunca dönmek istiyor.\n\nBu yaya başlangıç noktasına dönmek için kaç m yol yürür?',c,W(c,[a+b,b-a,c+k,a*b/k]),'Yürüyüş dik üçgen oluşturur: √('+a+'² + '+b+'²) = '+c+' m.','medium','ynT6');});
+G('mat-benzerlik',r=>{
+  const k=r.pick([125,150,200]),side=r.pick([8,10,12,20]),ns=side*k/100,pa=(k*k/10000-1)*100;
+  return C('Bir fotokopi makinesi, bir resmi yüzde '+k+' oranında büyüttüğünde resmin her kenarı bu oranda büyümektedir. Kenar uzunluğu '+side+' cm olan kare biçimli bir resim bu makineyle büyütülüyor.\n\nBüyütülmüş resmin alanı, orijinal alana göre yüzde kaç artmıştır?','%'+nf(pa),numW('%'+nf(pa),[k-100,pa/2,pa*2,k,k*k/100]).map(x=>x.indexOf('%')===0?x:'%'+x),'Kenarlar '+nf(k/100)+' kat olduğundan alan '+nf(k*k/10000)+' kat olur. Artış = %'+nf(pa)+'.','hard','ynS5');});
+G('mat-benzerlik',r=>{
+  const a=r.int(3,9),b=r.int(4,11),x=r.int(5,12),A=r.pick([2,3]);
+  return C('Birbirine eş iki üçgensel levhadan birinin kenar uzunlukları '+a+' cm, '+b+' cm ve '+x+' cm’dir. İkinci levhanın kenarlarından ikisi '+a+' cm ve '+b+' cm olarak ölçülmüştür.\n\nİki levha eş olduğuna göre ikinci levhanın üçüncü kenarı kaç cm’dir?',x,W(x,[a+b,Math.abs(a-b),x+1,a*b%20]),'Eş üçgenlerin karşılıklı kenarları eşittir; üçüncü kenar da '+x+' cm olur.','medium','ynS6');});
+G('mat-donusum',r=>{
+  const x=r.int(1,5),y=r.int(1,5),dx=r.int(-4,4),dy=r.int(-4,4),p=r.int(-6,6),q=r.int(-6,6);if(dx===0&&dy===0)return null;
+  const ok=pt(p+dx,q+dy);
+  return C('Koordinat düzleminde bir öteleme ile A('+x+', '+y+') noktası A′('+(x+dx)+', '+(y+dy)+') noktasına gitmiştir. Aynı öteleme B('+p+', '+q+') noktasına uygulanacaktır.\n\nB noktasının görüntüsü aşağıdakilerden hangisidir?',ok,uniqStr([pt(p-dx,q-dy),pt(p+dy,q+dx),pt(p+dx,q-dy),pt(-p,-q)],ok).slice(0,3),'Öteleme vektörü ('+dx+', '+dy+'). B′ = ('+p+' + '+(dx)+', '+q+' + '+dy+') = '+ok+'.','medium','ynN5');});
+G('mat-donusum',r=>{
+  const x=r.int(-3,3),y=r.int(-5,5),L=r.int(1,4),ok=pt(2*L-x,y);
+  return C('Bir mimar, x = '+L+' doğrusunu simetri ekseni kabul ederek bir planı yansıtmaktadır. Planın A('+x+', '+y+') noktası bu doğruya göre yansıtılıyor.\n\nA noktasının görüntüsü aşağıdakilerden hangisidir?',ok,uniqStr([pt(-x,y),pt(x,2*L-y),pt(L-x,y),pt(x+L,y)],ok).slice(0,3),'x = '+L+' doğrusuna göre yansımada x’in yeni değeri 2·'+L+' − '+x+' = '+(2*L-x)+'; y değişmez. Görüntü '+ok+'.','hard','ynN6');});
+G('mat-cisim',r=>{
+  const rr=r.pick([2,3,4,5,6]),h=r.pick([4,5,8,10]),A=6*rr*(rr+h);
+  return C('Taban yarıçapı '+rr+' cm ve yüksekliği '+h+' cm olan silindir biçimli kapalı bir teneke kutunun dış yüzeyi tamamen etiketle kaplanacaktır. (π = 3 alınız.)\n\nBuna göre kutunun toplam yüzey alanı kaç cm²’dir?',A,W(A,[6*rr*h,3*rr*rr*h,2*rr*(rr+h),6*rr*rr]),'Alan = 2πr² + 2πrh = 2·3·'+rr+'² + 2·3·'+rr+'·'+h+' = '+(6*rr*rr)+' + '+(6*rr*h)+' = '+A+' cm².','hard','ynG5');});
+G('mat-cisim',r=>{
+  const rr=r.pick([2,3,4,5]),V=4*rr*rr*rr;
+  return C('Çapı '+(2*rr)+' cm olan küre biçimli bir balon tamamen havayla doldurulmuştur. (π = 3 alınız.)\n\nBalonun içindeki havanın hacmi kaç cm³’tür?',V,W(V,[V*2,V/2,4*rr*rr,rr*rr*rr*3,V+rr]),'Yarıçap '+rr+' cm. V = 4/3 · π · r³ = 4/3 · 3 · '+rr+'³ = 4 · '+(rr*rr*rr)+' = '+V+' cm³.','hard','ynG6');});
 /* ================= DERS HARİTASI ================= */
 const ALL=[].concat.apply([],SUBJECTS.map(s=>s.lessons));
 const BY_ID={};ALL.forEach(l=>{BY_ID[l.id]=l;});
@@ -7028,7 +7843,7 @@ function viewLeague(){
 
 /* ================= KONU TESTLERİ — ARAYÜZ, OPTİK FORM, YAZDIRMA ================= */
 const printRoot=document.getElementById('printRoot');
-const TSUBJ_IDS=['tr','mat','fen','ink','din','ing'];
+const TSUBJ_IDS=['tr','mat','fen','ink','din','ing','kmy','bes','byt'];
 const DIFF_TR={easy:'Kolay',medium:'Orta',hard:'Zor'};
 const LET='ABCD';
 function lessonOfTest(id){return BY_ID[id.split(':')[1]];}
@@ -7046,7 +7861,7 @@ function testQAsQ(id){
     subjId:s.id,subject:s.name,icon:s.icon,color:s.color,topic:l.topic+' · Test '+p[2],lid:l.id,diff:tq.diff,emoji:s.icon};
 }
 function stemHTML(s){
-  return s.split('\n').map(ln=>ln===''?'<div class="ln gap"></div>':(ln.indexOf('█')>=0?'<div class="ln mono">'+esc(ln)+'</div>':'<div class="ln">'+fmtStem(ln)+'</div>')).join('');
+  return s.split('\n').map(ln=>ln===''?'<div class="ln gap"></div>':(ln.indexOf('█')>=0||/^\s|^(for |def |if |while |else|yaz\(|[a-z_0-9]+ = )/.test(ln)?'<div class="ln mono">'+esc(ln)+'</div>':'<div class="ln">'+fmtStem(ln)+'</div>')).join('');
 }
 function testMins(t){return Math.round(t.qs.length*1.5);}
 function netOf(d,y){return d-y/3;}
