@@ -3235,7 +3235,7 @@ function poolFor(lid){
       const g=groups[names[i]];
       while(g.length){
         const c=g.shift();
-        if(c.src&&(srcCount[c.src]||0)>=3)continue;
+        if(c.src&&(srcCount[c.src]||0)>=Math.max(3,spec.want||spec.n))continue;
         picked.push(c);if(c.src)srcCount[c.src]=(srcCount[c.src]||0)+1;moved=true;break;
       }
     }
@@ -6217,6 +6217,87 @@ G('mat-cisim',r=>{
 G('mat-cisim',r=>{
   const rr=r.pick([2,3,4,5]),V=4*rr*rr*rr;
   return C('Çapı '+(2*rr)+' cm olan küre biçimli bir balon tamamen havayla doldurulmuştur. (π = 3 alınız.)\n\nBalonun içindeki havanın hacmi kaç cm³’tür?',V,W(V,[V*2,V/2,4*rr*rr,rr*rr*rr*3,V+rr]),'Yarıçap '+rr+' cm. V = 4/3 · π · r³ = 4/3 · 3 · '+rr+'³ = 4 · '+(rr*rr*rr)+' = '+V+' cm³.','hard','ynG6');});
+/* ================= TEST SAYISI (ÜNİTEYE GÖRE) ve YENİ SORU KALIPLARI ================= */
+const TCOUNT={fen:[7,6,5,7,6,5,4],mat:[6,5,7,4,6,5],ink:[4,3,5,4,3,3,2],tr:[2,3,2,4],din:[3,2,3,2,3],ing:[2,3,2,4,3,2,3,2,4,3],kmy:[3,2,3,2],bes:[3,2,3],byt:[3,2,3,2]};
+(function(){
+  SUBJECTS.forEach(s=>{
+    const units=[];s.lessons.forEach(l=>{if(units.indexOf(l.unit)<0)units.push(l.unit);});
+    const tc=TCOUNT[s.id];if(!tc)return;
+    s.lessons.forEach(l=>{
+      const sp=TSPEC[l.id];if(!sp)return;
+      sp.want=tc[Math.min(units.indexOf(l.unit),tc.length-1)];sp.n=sp.want;
+      l.unitNo=units.indexOf(l.unit)+1;
+    });
+  });
+})();
+/* ---------- ek soru kalıpları (bilgi bankalarından) ---------- */
+function patCands(kb,r){
+  const out=[],T=kb.T||[],D=kb.D||[],RM=['I','II','III','IV'];
+  const lab2=s=>s.length===0?'Hiçbiri':s.length===1?'Yalnız '+RM[s[0]]:'I ve II';
+  const tp=kb.tp?kb.tp+' ':'';
+  if(T.length>=4){
+    /* sp1: iki ifade, sabit şıklar */
+    for(let k=0;k<24;k++){
+      const i=r.int(0,T.length-1);let j=r.int(0,T.length-1);if(i===j)continue;
+      const ask=r.pick([true,false]),a=T[i],b=T[j],sel=[];
+      if(!!a[1]===ask)sel.push(0);if(!!b[1]===ask)sel.push(1);
+      const e='I. '+(a[1]?'Doğru.':'Yanlış.'+(a[2]?' Doğrusu: '+a[2]:''))+' II. '+(b[1]?'Doğru.':'Yanlış.'+(b[2]?' Doğrusu: '+b[2]:''));
+      const cd=C((tp?uc1(tp)+'aşağıdaki':'Aşağıdaki')+' ifadeleri okuyunuz.\n\nI. '+a[0]+'\nII. '+b[0]+'\n\nBu ifadelerden hangileri '+(ask?'doğrudur?':'yanlıştır?'),lab2(sel),[],e,'medium','sp1','t:'+i);
+      cd.opts=['Yalnız I','Yalnız II','I ve II','Hiçbiri'];out.push(cd);
+    }
+    /* sp2: kaç tanesi */
+    for(let k=0;k<24;k++){
+      const pick=r.some(T,4),ask=r.pick([true,false]),cnt=pick.filter(x=>!!x[1]===ask).length;
+      const body=pick.map((x,i)=>RM[i]+'. '+x[0]).join('\n');
+      const base=cnt>=3?1:0,opts=[0,1,2,3,4].slice(base===1&&cnt===4?1:0,(base===1&&cnt===4?5:4)).map(String);
+      if(opts.indexOf(String(cnt))<0)continue;
+      const cd=C((tp?uc1(tp)+'aşağıdaki':'Aşağıdaki')+' ifadeleri okuyunuz.\n\n'+body+'\n\nBu ifadelerin kaç tanesi '+(ask?'doğrudur?':'yanlıştır?'),String(cnt),[],pick.map((x,i)=>RM[i]+'. '+(x[1]?'Doğru':'Yanlış')).join(' · ')+'.','hard','sp2','t:'+T.indexOf(pick[0]));
+      cd.opts=opts;out.push(cd);
+    }
+    /* sp3: yanlışın doğrusu */
+    const fa=T.filter(x=>!x[1]&&x[2]),pool=T.filter(x=>x[1]).map(x=>x[0]).concat(fa.map(x=>x[2]));
+    fa.forEach(f=>{
+      const w=r.some(pool.filter(x=>x!==f[2]),3);if(w.length<3)return;
+      out.push(C('Bir öğrenci defterine şu ifadeyi yazmıştır:\n\n“'+f[0]+'”\n\nÖğretmeni bu ifadenin yanlış olduğunu söylemiştir. Buna göre bu ifadenin doğru hâli aşağıdakilerden hangisidir?',f[2],w,'Yanlış ifade düzeltilince: '+f[2],'hard','sp3','t:'+T.indexOf(f)));
+    });
+  }
+  if(D.length>=4){
+    /* sp4: terim-tanım eşleştirme */
+    for(let k=0;k<26;k++){
+      const pick=r.some(D,3),swapMask=[r.int(0,1),r.int(0,1),r.int(0,1)];
+      const defs=pick.map((p,i)=>{if(!swapMask[i])return p[1];const o=r.pick(D.filter(x=>x[0]!==p[0]));return o[1];});
+      const okSel=[0,1,2].filter(i=>!swapMask[i]||defs[i]===pick[i][1]);
+      const stem=pick.map((p,i)=>RM[i]+'. '+p[0]+': '+defs[i]).join('\n');
+      const all=subsetsOf3(),correct=subLabel(okSel.length?okSel:[]);
+      if(!okSel.length)continue;
+      const wrongs=r.shuf(all.filter(s=>subLabel(s)!==correct)).slice(0,3);
+      const opts=all.filter(s=>subLabel(s)===correct||wrongs.indexOf(s)>=0).map(subLabel);
+      const cd=C('Aşağıda bazı kavramlar ve yanlarında tanımları verilmiştir.\n\n'+stem+'\n\nBu eşleştirmelerden hangileri doğrudur?',correct,[],pick.map((p,i)=>RM[i]+'. '+((okSel.indexOf(i)>=0)?'Doğru eşleşme.':'Yanlış; doğrusu: '+p[1]+'.')).join(' · '),'hard','sp4','m:'+pick[0][0]);
+      cd.opts=opts;out.push(cd);
+    }
+  }
+  return out;
+}
+Object.keys(TSPEC).forEach(lid=>{
+  const kb=KBR[lid];if(!kb)return;
+  const parts=Array.isArray(kb)?kb:[kb],prev=CB[lid];
+  CB[lid]=function(r){
+    let o=prev?prev(r):[];
+    parts.forEach(p=>{if(p&&(p.T||p.D))o=o.concat(patCands(p,r));});
+    return o;
+  };
+});
+/* ---------- gerçek test sayısı: havuz yeterliliğine göre ---------- */
+const TCUT=[];
+function finalizeSpecs(){
+  Object.keys(TSPEC).forEach(lid=>{
+    const sp=TSPEC[lid];if(sp.done)return;
+    const P=poolFor(lid),n=Math.max(1,Math.min(sp.want||sp.n,Math.floor(P.picked.length/sp.per)));
+    if(n<(sp.want||sp.n))TCUT.push(lid+' '+(sp.want)+'→'+n);
+    sp.n=n;P.picked=P.picked.slice(0,n*sp.per);P.need=n*sp.per;sp.done=true;
+  });
+}
+finalizeSpecs();
 /* ================= DERS HARİTASI ================= */
 const ALL=[].concat.apply([],SUBJECTS.map(s=>s.lessons));
 const BY_ID={};ALL.forEach(l=>{BY_ID[l.id]=l;});
@@ -7874,7 +7955,7 @@ function viewTests(){
   const w=el('section','page');
   const done=testsDoneAll(),tot=testsTotalAll();
   w.innerHTML='<div class="hero"><div style="font-size:44px">📄</div><h2 style="margin:6px 0 4px">Konu Testleri</h2>'+
-    '<div class="muted" style="font-size:14px;line-height:1.55">Türkçe, Matematik, Fen Bilimleri: her konudan 3 test × 20 soru.<br>İnkılap, Din Kültürü, İngilizce: her konudan 2 test × 10 soru.<br>Her test <b>yazdırılabilir</b> ve <b>optik formludur</b>.</div>'+
+    '<div class="muted" style="font-size:14px;line-height:1.55">Türkçe, Matematik ve Fen testleri 20, diğer derslerin testleri 10 sorudur.<br>Her ünitenin test sayısı farklıdır; bazı Fen ve Matematik ünitelerinde 6–7 test vardır.<br>Her test <b>yazdırılabilir</b> ve <b>optik formludur</b>.</div>'+
     '<div class="hero-stats"><div><b>'+done+'</b><span>Çözülen test</span></div><div><b>'+tot+'</b><span>Toplam test</span></div><div><b>'+Math.round(done/tot*100)+'%</b><span>İlerleme</span></div></div></div>';
   TSUBJ_IDS.forEach(sid=>{
     const s=SUBJ_BY_ID[sid],n=testCount(sid),d=testsDone(sid),per=TSPEC[testsOf(sid)[0].id];
